@@ -10,11 +10,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  String _currentPage = '';
 
-  void _incrementCounter() {
+  void _setPage(String newPage) {
     setState(() {
-      _counter++;
+      _currentPage = newPage;
     });
   }
 
@@ -30,19 +30,75 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'You have pushed the button this many times:',
+              'You are currently on page:',
             ),
             Text(
-              '$_counter',
+              '$_currentPage',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      drawer: Drawer(
+        child: Column(
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.lightBlue),
+              child: const Text(
+                'AI Hair Styler',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Editor'),
+              onTap: () => _setPage('Editor'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
+              onTap: () => _setPage('Gallery'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.directions_walk),
+              title: const Text('Walkthrough'),
+              // TODO this will actually trigger a walkthrough,
+              //  dynamically changing pages and showing caption text, maybe arrows...
+              //  the less text the easier to understand (for me at least)
+              onTap: () => _setPage('Walkthrough'),
+            ),
+            Spacer(), // filler
+
+            //Spacer(),
+            Divider(),
+            ListTile(
+              leading: const Icon(Icons.help),
+              title: const Text('Help'),
+              onTap: () => _setPage('Help'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('About'),
+              onTap: () => _setPage('About'),
+            ),
+            Divider(),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              onTap: () => _setPage('Settings'),
+            ),
+            /*
+            Expanded(
+                child: ListView(children: <Widget>[
+              Align(alignment: FractionalOffset.bottomCenter),
+              Divider(color: Colors.grey),
+              
+            ]))*/
+          ],
+        ),
       ),
     );
   }
