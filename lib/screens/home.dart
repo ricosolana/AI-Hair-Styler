@@ -28,6 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             const Text(
               'You are currently on page:',
@@ -36,6 +37,54 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_currentPage',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            Flexible(
+              //height: 200,
+              /*
+              child: Center(
+                child: ListView(children: <Widget>[
+                // TODO these elements will be dynamically
+                //  added, removed, and rearranged
+                ListTile(
+                  leading: const Icon(Icons.one_k),
+                )
+              ])),
+              */
+              /*
+              child: ListView(shrinkWrap: true, children: <Widget>[
+                // TODO these elements will be dynamically
+                //  added, removed, and rearranged
+                Center(
+                    child: ListTile(
+                  leading: const Icon(Icons.one_k),
+                ))
+              ]),*/
+              // try 2
+              child: ListView(shrinkWrap: true, children: <Widget>[
+                // TODO these elements will be dynamically
+                //  added, removed, and rearranged
+                Container(
+                    width: double.infinity,
+                    child: Center(
+                        child: ListTile(
+                      leading: const Icon(Icons.one_k),
+                    )))
+              ]),
+            ),
+            Spacer(),
+            ListTile(
+              leading: const Icon(Icons.camera),
+            )
+            /*
+            SizedBox(
+              height: 200,
+              child: ListView(children: <Widget>[
+                ListTile(
+                  leading: const Icon(Icons.camera),
+                )
+              ]),
+            )*/
+            //Expanded(child: )
+            //Spacer(), // Icons.photo_camera or
           ],
         ),
       ),
@@ -52,6 +101,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
+            // TODO open the editor
+            //  options to:
+            //    create a resource (take photo)
+            //    import a resource (focus on this later)
+            //    export / apply the current resource to file
             ListTile(
               leading: const Icon(Icons.edit),
               title: const Text('Editor'),
