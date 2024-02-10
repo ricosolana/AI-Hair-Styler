@@ -6,10 +6,11 @@
 name: Flutter
 
 on:
+  # todo change branch
   push:
-    branches: [ "main" ]
+    branches: [ "PeriodicSeizures-git-actions" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "PeriodicSeizures-git-actions" ]
 
 jobs:
   build:
