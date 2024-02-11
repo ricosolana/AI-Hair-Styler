@@ -8,9 +8,9 @@ name: Flutter
 on:
   # todo change branch
   push:
-    branches: [ "PeriodicSeizures-git-actions" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "PeriodicSeizures-git-actions" ]
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -18,20 +18,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      #- uses: subosito/flutter-action@v2
-      #  with:
-      #    flutter-version: '3.7.7'
-      #    channel: 'main'
-      #- run: flutter --version
 
       - uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
           java-version: '11'
+
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.16.9'
+
       - run: flutter pub get
-      - run: flutter test
+      - run: dart format --output=none --set-exit-if-changed .
+      - run: dart analyze --fatal # linter
+      - run: flutter test # run unit tests
       - run: flutter build apk
-      - run: flutter build appbundle
+      #- run: flutter build appbundle
