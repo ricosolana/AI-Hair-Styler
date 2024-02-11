@@ -14,6 +14,8 @@ include: package:lint/strict.yaml
 analyzer:
   exclude:
     #- '**.dont-scan-me.dart' 
+    - 'camera.dart'
+    - 'Pub/Cache/hosted/pub.dev/camera-0.10.5+9/lib/**'
 
 # any custom rules we want to be applied extra
 linter:

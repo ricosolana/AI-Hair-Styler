@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:senior_project_hair_ai/screens/editor.dart';
+import 'package:senior_project_hair_ai/screens/settings.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key});
 
-  final String title;
+  //final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _currentPage = '';
+  //String _currentPage = '';
   // will require more than string
   //  Basically what comprises a recents labeled picture thing?
   //    a name
@@ -21,10 +23,14 @@ class _MyHomePageState extends State<MyHomePage> {
   //  keep things simple, but all important?
   List<String> elements = ['apple', 'banana', 'pear', 'orange'];
 
-  void _setPage(String newPage) {
-    setState(() {
-      _currentPage = newPage;
-    });
+  //void _setPage(String newPage) {
+  //  setState(() {
+  //    _currentPage = newPage;
+  //  });
+  //}
+
+  void _setScreen(BuildContext context, Widget Function(BuildContext) newScreen) {
+    Navigator.of(context).push(MaterialPageRoute(builder: newScreen));
   }
 
   @override
@@ -32,31 +38,30 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: const Text('Flutter Demo Home Page'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You are currently on page:',
-            ),
-            Text(
-              '$_currentPage',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            //const Text(
+            //  'You are currently on page:',
+            //),
+            //Text(
+            //  '$_currentPage',
+            //  style: Theme.of(context).textTheme.headlineMedium,
+            //),
             Flexible(
                 child: ListView.separated(
-              separatorBuilder: (ctx, index) => Divider(
+              separatorBuilder: (ctx, index) => const Divider(
                 color: Colors.grey,
               ),
               itemCount: elements.length,
               itemBuilder: (ctx, index) => Padding(
-                padding: EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Center(child: Text('Index $index')),
               ),
-            )
+            ),
                 /*
               child: ListView.builder(itemBuilder: (BuildContext ctx, int index) => {
                 return Card()
@@ -79,14 +84,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),*/
                 ),
-            Spacer(),
+            const Spacer(),
             Center(
                 child: ListTile(
               leading: const Icon(Icons.camera), //, size: 2.0),
               onTap: () => {
-                // open capture menu
+                // https://docs.flutter.dev/cookbook/plugins/picture-using-camera
+
+                // Access the camera
+                // Open the editor with the photo passed as the body
+                
               },
-            )),
+            ),),
             // ...
           ],
         ),
@@ -96,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             const DrawerHeader(
               decoration: BoxDecoration(color: Colors.lightBlue),
-              child: const Text(
+              child: Text(
                 'AI Hair Styler',
                 style: TextStyle(
                   color: Colors.white,
@@ -112,40 +121,48 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               leading: const Icon(Icons.edit),
               title: const Text('Editor'),
-              onTap: () => _setPage('Editor'),
+              //onTap: () => _setPage('Editor'),
+              onTap: () => {
+                // open
+                //Navigator.of(context, )
+                _setScreen(context, (ctx) => const MyEditorPage(),),
+              },
             ),
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('Gallery'),
-              onTap: () => _setPage('Gallery'),
+            const ListTile(
+              leading: Icon(Icons.photo_library),
+              title: Text('Gallery'),
+              // TODO impl
+              //onTap: () => _setPage('Gallery'),
             ),
-            ListTile(
-              leading: const Icon(Icons.directions_walk),
-              title: const Text('Walkthrough'),
+            const ListTile(
+              leading: Icon(Icons.directions_walk),
+              title: Text('Walkthrough'),
               // TODO this will actually trigger a walkthrough,
               //  dynamically changing pages and showing caption text, maybe arrows...
               //  the less text the easier to understand (for me at least)
-              onTap: () => _setPage('Walkthrough'),
+              //onTap: () => _setPage('Walkthrough'),
             ),
-            Spacer(), // filler
+            const Spacer(), // filler
 
             //Spacer(),
-            Divider(),
-            ListTile(
-              leading: const Icon(Icons.help),
-              title: const Text('Help'),
-              onTap: () => _setPage('Help'),
+            const Divider(),
+            const ListTile(
+              leading: Icon(Icons.help),
+              title: Text('Help'),
+              // TODO impl
+              //onTap: () => _setPage('Help'),
             ),
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: const Text('About'),
-              onTap: () => _setPage('About'),
+            const ListTile(
+              leading: Icon(Icons.info),
+              title: Text('About'),
+              // TODO impl
+              //onTap: () => _setPage('About'),
             ),
-            Divider(),
+            const Divider(),
             ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Settings'),
-              onTap: () => _setPage('Settings'),
+              onTap: () => _setScreen(context, (ctx) => const MySettingsPage()),
             ),
             /*
             Expanded(

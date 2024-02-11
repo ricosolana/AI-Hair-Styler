@@ -30,7 +30,7 @@ jobs:
 
       - run: flutter pub get
       - run: dart format --output=none --set-exit-if-changed .
-      - run: dart analyze --fatal # linter
+      - run: dart analyze --fatal-infos # linter
       - run: flutter test # run unit tests
       - run: flutter build apk
       #- run: flutter build appbundle
