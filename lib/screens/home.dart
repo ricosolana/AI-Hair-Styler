@@ -29,7 +29,8 @@ class _MyHomePageState extends State<MyHomePage> {
   //  });
   //}
 
-  void _setScreen(BuildContext context, Widget Function(BuildContext) newScreen) {
+  void _setScreen(
+      BuildContext context, Widget Function(BuildContext) newScreen) {
     Navigator.of(context).push(MaterialPageRoute(builder: newScreen));
   }
 
@@ -52,22 +53,22 @@ class _MyHomePageState extends State<MyHomePage> {
             //  style: Theme.of(context).textTheme.headlineMedium,
             //),
             Flexible(
-                child: ListView.separated(
-              separatorBuilder: (ctx, index) => const Divider(
-                color: Colors.grey,
+              child: ListView.separated(
+                separatorBuilder: (ctx, index) => const Divider(
+                  color: Colors.grey,
+                ),
+                itemCount: elements.length,
+                itemBuilder: (ctx, index) => Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(child: Text('Index $index')),
+                ),
               ),
-              itemCount: elements.length,
-              itemBuilder: (ctx, index) => Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(child: Text('Index $index')),
-              ),
-            ),
-                /*
+              /*
               child: ListView.builder(itemBuilder: (BuildContext ctx, int index) => {
                 return Card()
               })
               */
-                /*
+              /*
               child: ListView(
                 shrinkWrap: true,
                 children: <Widget>[
@@ -83,19 +84,19 @@ class _MyHomePageState extends State<MyHomePage> {
                   // ...
                 ],
               ),*/
-                ),
+            ),
             const Spacer(),
             Center(
-                child: ListTile(
-              leading: const Icon(Icons.camera), //, size: 2.0),
-              onTap: () => {
-                // https://docs.flutter.dev/cookbook/plugins/picture-using-camera
+              child: ListTile(
+                leading: const Icon(Icons.camera), //, size: 2.0),
+                onTap: () => {
+                  // https://docs.flutter.dev/cookbook/plugins/picture-using-camera
 
-                // Access the camera
-                // Open the editor with the photo passed as the body
-                
-              },
-            ),),
+                  // Access the camera
+                  // Open the editor with the photo passed as the body
+                },
+              ),
+            ),
             // ...
           ],
         ),
@@ -125,7 +126,10 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () => {
                 // open
                 //Navigator.of(context, )
-                _setScreen(context, (ctx) => const MyEditorPage(),),
+                _setScreen(
+                  context,
+                  (ctx) => const MyEditorPage(),
+                ),
               },
             ),
             const ListTile(

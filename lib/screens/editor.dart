@@ -10,7 +10,6 @@ class MyEditorPage extends StatefulWidget {
 }
 
 class _MyEditorPageState extends State<MyEditorPage> {
-
   /*
     editor
       will contain options relating to ai generation? (more such as weights)
@@ -27,9 +26,9 @@ class _MyEditorPageState extends State<MyEditorPage> {
       // reduce complexity
       // no extra editing features except those few absolutely required
       // aka no cropping, no color changes (for now until main features are implemented)
-      
+
       // load an image
-      //body: 
+      //body:
       //Image.network()
       //Center(
       //  child: Column(
