@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="115.362 115.362 269.276 269.276" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+  <ellipse style="fill: rgb(255, 249, 212);" cx="250" cy="250" rx="134.638" ry="134.638"/>
+  <ellipse style="fill: rgb(255, 255, 255);" cx="187.604" cy="192.978" rx="22.242" ry="22.242"/>
+  <ellipse style="fill: rgb(255, 255, 255);" cx="312.396" cy="191.94" rx="22.242" ry="22.242"/>
+  <path style="fill: rgb(255, 255, 255); transform-origin: 265.182px 321.982px;" d="M 261.977 299.993 A 40.925 40.925 0 0 1 261.977 343.971 A 78.678 78.678 0 0 0 261.977 299.993 Z" transform="matrix(0, 2.295591115952, -1, 0, -15.181601584228, -57.830131174977)" bx:shape="crescent 227.461 321.982 40.925 65 0.96 1@7d52e792"/>
+</svg>

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 // TODO properly implement
 
@@ -28,18 +29,18 @@ class _MyEditorPageState extends State<MyEditorPage> {
       // aka no cropping, no color changes (for now until main features are implemented)
 
       // load an image
-      //body:
-      //Image.network()
-      //Center(
-      //  child: Column(
-      //    mainAxisAlignment: MainAxisAlignment.center,
-      //    children: <Widget>[
-      //      const Text(
-      //        'Hi',
-      //      ),
-      //    ],
-      //  ),
-      //),
+      // https://github.com/dnfield/flutter_svg/blob/master/packages/flutter_svg_test/test/flutter_svg_test_test.dart
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'Hi',
+            ),
+            SvgPicture.asset('assets/images/smiley.svg')
+          ],
+        ),
+      ),
     );
   }
 }
