@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:senior_project_hair_ai/screens/editor.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 
@@ -10,12 +9,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   // TODO generify for photo/file/resource type instead of these placeholders
   List<String> elements = ['apple', 'banana', 'pear', 'orange'];
 
   void _setScreen(
-      BuildContext context, Widget Function(BuildContext) newScreen) {
+    BuildContext context,
+    Widget Function(BuildContext) newScreen,
+  ) {
     Navigator.of(context).push(MaterialPageRoute(builder: newScreen));
   }
 
@@ -37,7 +37,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 itemCount: elements.length,
                 itemBuilder: (ctx, index) => GestureDetector(
-                  onTap: Feedback.wrapForTap(() => debugPrint('index $index clicked'), ctx),
+                  onTap: Feedback.wrapForTap(
+                      () => debugPrint('index $index clicked'), ctx),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Center(child: Text(elements[index])),

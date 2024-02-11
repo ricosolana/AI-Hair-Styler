@@ -37,7 +37,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
             const Text(
               'Hi',
             ),
-            SvgPicture.asset('assets/images/smiley.svg')
+            SvgPicture.asset('assets/images/smiley.svg'),
           ],
         ),
       ),
