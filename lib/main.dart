@@ -25,7 +25,8 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
       ),
-      home: const MyHomePage(),
+      home: const MyHomePage(title: "Ai_Hair_Styler"),
     );
   }
 }
+

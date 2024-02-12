@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:senior_project_hair_ai/screens/editor.dart';
+import 'package:senior_project_hair_ai/screens/settings.dart';
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -10,12 +13,28 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _currentPage = '';
+  String _currentPage = 'Home';
 
   void _setPage(String newPage) {
     setState(() {
       _currentPage = newPage;
     });
+  }
+
+  //Function to open the Settings Page
+  void _goToSettings(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MySettingsPage()),
+    );
+  }
+
+  //Function to open the Editor Page
+  void _goToEditor(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MyEditorPage()),
+    );
   }
 
   @override
@@ -27,7 +46,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             const Padding(
             padding: EdgeInsets.only(top: 20.0),
@@ -106,8 +124,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               leading: const Icon(Icons.edit),
               title: const Text('Editor'),
-              onTap: () => _setPage('Editor'),
-            ),
+              onTap: () {
+                _setPage('Editor');
+                _goToEditor(context);
+              },
+              ),
             ListTile(
               leading: const Icon(Icons.photo_library),
               title: const Text('Gallery'),
@@ -128,18 +149,37 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               leading: const Icon(Icons.help),
               title: const Text('Help'),
-              onTap: () => _setPage('Help'),
+              onTap: () {
+                //Go to the 'Help' route
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MyHelpPage(),
+                  ),
+                );
+              },
             ),
             ListTile(
               leading: const Icon(Icons.info),
               title: const Text('About'),
-              onTap: () => _setPage('About'),
+              onTap: () {
+                //Go to the 'About' route
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MyAboutPage(),
+                    ),
+                );
+                },
             ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Settings'),
-              onTap: () => _setPage('Settings'),
+              onTap: () {
+                _setPage('Settings');
+                _goToSettings(context);
+                },
             ),
             /*
             Expanded(
@@ -149,6 +189,75 @@ class _MyHomePageState extends State<MyHomePage> {
 
             ]))*/
           ],
+        ),
+      ),
+      onDrawerChanged: (isDrawerOpen) {
+        if (!isDrawerOpen) {
+          _setPage('Home');
+        }
+      },
+    );
+  }
+}
+
+class MyAboutPage extends StatelessWidget {
+
+  const MyAboutPage();
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('About'),
+      ),
+      body: const Center(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: 500.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                "About this App: Blah blah blah blah",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MyHelpPage extends StatelessWidget {
+
+  const MyHelpPage();
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Help'),
+      ),
+      body: const Center(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: 500.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                "Here's a Helpful Tip: Blah blah blah blah",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );
