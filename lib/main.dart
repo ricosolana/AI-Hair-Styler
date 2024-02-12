@@ -3,7 +3,7 @@ import './screens/home.dart';
 
 // BottomSheet
 // Drawer - horizontal sliding window
-// Snackbar - bottom alert
+// Snack bar - bottom alert
 // TabBar
 
 void main() {
