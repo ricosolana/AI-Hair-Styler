@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './screens/home.dart';
+import 'package:senior_project_hair_ai/screens/home.dart';
 
 // BottomSheet
 // Drawer - horizontal sliding window
@@ -20,8 +20,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        brightness: Brightness.light,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+      ),
+      home: const MyHomePage(),
     );
   }
 }
