@@ -14,6 +14,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _currentPage = 'Home';
+  List<String> recentCaptures = [
+    "Recent Capture 1",
+    "Recent Capture 2",
+    "Recent Capture 3",
+  ];
 
   void _setPage(String newPage) {
     setState(() {
@@ -57,6 +62,24 @@ class _MyHomePageState extends State<MyHomePage> {
               _currentPage,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            Center(
+            child: SizedBox(
+              height: 150.0,
+              child: ListView.builder(
+                itemCount: recentCaptures.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    title: Center(child:
+                      Text('(Recently Edited Photo ${index + 1})',
+                      style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 22.0),),),
+                    onTap: () {
+                      //TODO: Add logic to open recently edited photo
+                    },
+                  );
+                },
+              )
+            ),
+            ),
           ],
         ),
       ),
@@ -68,12 +91,12 @@ class _MyHomePageState extends State<MyHomePage> {
           height: 70.0,
           child: FloatingActionButton(
               onPressed: () {
-            // Gallery Button
-            // TODO: Add logic for the gallery button
+            // Upload Button
+            // TODO: Add logic for the upload button
           },
             shape: const CircleBorder(),
-            child: const Icon(Icons.photo_library,
-            size: 28.0,),
+            child: const Icon(Icons.file_upload_rounded,
+            size: 30.0,),
             ),
       ),
           const SizedBox(width: 50.0), // Adjust the spacing between buttons
@@ -96,13 +119,13 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 70.0,
               child: FloatingActionButton(
                   onPressed: () {
-                    // Undo Button
-                    // TODO: Add logic to undo edits (or whatever this button is for)
+                    // AI Edit Button
+                    // TODO: Add logic to open screen that enables AI edits (or whatever this button is for)
                   },
                   shape: const CircleBorder(),
                   child: const Icon(
-                    Icons.undo,
-                    size: 28.0,),
+                    Icons.auto_fix_high_rounded,
+                    size: 30.0,),
                   ),
             ),
         ],
