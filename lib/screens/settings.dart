@@ -22,7 +22,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
       body: SettingsList(
         sections: [
           SettingsSection(
-            title: const Text('Some Settings'),
+            title: const Text('Options:'),
             tiles: [
               SettingsTile(
                 title: const Text('Option 1'),

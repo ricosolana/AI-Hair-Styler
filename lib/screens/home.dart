@@ -2,21 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:senior_project_hair_ai/screens/editor.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 
+
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // TODO generify for photo/file/resource type instead of these placeholders
-  List<String> elements = ['apple', 'banana', 'pear', 'orange'];
+  String _currentPage = 'Home';
+  List<String> recentCaptures = [
+    "Recent Capture 1",
+    "Recent Capture 2",
+    "Recent Capture 3",
+  ];
 
-  void _setScreen(
-    BuildContext context,
-    Widget Function(BuildContext) newScreen,
-  ) {
-    Navigator.of(context).push(MaterialPageRoute(builder: newScreen));
+  void _setPage(String newPage) {
+    setState(() {
+      _currentPage = newPage;
+    });
+  }
+
+  //Function to open the Settings Page
+  void _goToSettings(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MySettingsPage()),
+    );
+  }
+
+  //Function to open the Editor Page
+  void _goToEditor(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MyEditorPage()),
+    );
   }
 
   @override
@@ -24,49 +47,96 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Flutter Demo Home Page'),
+        title: Text(widget.title),
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Flexible(
-              child: ListView.separated(
-                separatorBuilder: (ctx, index) => const Divider(
-                  color: Colors.grey,
-                ),
-                itemCount: elements.length,
-                itemBuilder: (ctx, index) => GestureDetector(
-                  onTap: Feedback.wrapForTap(
-                      () => debugPrint('index $index clicked'), ctx),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(child: Text(elements[index])),
-                  ),
-                ),
-              ),
+            const Padding(
+            padding: EdgeInsets.only(top: 20.0),
+            child: Text(
+              'You are currently on page:',
             ),
-            const Spacer(),
+            ),
+            Text(
+              _currentPage,
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
             Center(
-              child: ListTile(
-                leading: const Icon(Icons.camera),
-                onTap: () => {
-                  // https://docs.flutter.dev/cookbook/plugins/picture-using-camera
-
-                  // Access the camera, take a photo, then open editor
+            child: SizedBox(
+              height: 150.0,
+              child: ListView.builder(
+                itemCount: recentCaptures.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    title: Center(child:
+                      Text('(Recently Edited Photo ${index + 1})',
+                      style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 22.0),),),
+                    onTap: () {
+                      //TODO: Add logic to open recently edited photo
+                    },
+                  );
                 },
-              ),
+              )
             ),
-            // ...
+            ),
           ],
         ),
       ),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+          width: 70.0,
+          height: 70.0,
+          child: FloatingActionButton(
+              onPressed: () {
+            // Upload Button
+            // TODO: Add logic for the upload button
+          },
+            shape: const CircleBorder(),
+            child: const Icon(Icons.file_upload_rounded,
+            size: 30.0,),
+            ),
+      ),
+          const SizedBox(width: 50.0), // Adjust the spacing between buttons
+          SizedBox(
+            width: 100.0,
+            height: 100.0,
+          child: FloatingActionButton(
+            onPressed: () {
+              // Camera Button
+              // TODO: Add logic to capture photos
+            },
+            shape: const CircleBorder(),
+            child: const Icon(Icons.add_a_photo,
+              size: 48.0,),
+          ),
+              ),
+          const SizedBox(width: 50.0), // Adjust the spacing between buttons
+            SizedBox(
+              width: 70.0,
+              height: 70.0,
+              child: FloatingActionButton(
+                  onPressed: () {
+                    // AI Edit Button
+                    // TODO: Add logic to open screen that enables AI edits (or whatever this button is for)
+                  },
+                  shape: const CircleBorder(),
+                  child: const Icon(
+                    Icons.auto_fix_high_rounded,
+                    size: 30.0,),
+                  ),
+            ),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       drawer: Drawer(
         child: Column(
           children: <Widget>[
             const DrawerHeader(
               decoration: BoxDecoration(color: Colors.lightBlue),
-              child: Text(
+              child:  Text(
                 'AI Hair Styler',
                 style: TextStyle(
                   color: Colors.white,
@@ -74,50 +144,143 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            // TODO open the editor
-            //  options to:
-            //    create a resource (take photo)
-            //    import a resource (focus on this later)
-            //    export / apply the current resource to file
             ListTile(
               leading: const Icon(Icons.edit),
               title: const Text('Editor'),
-              onTap: () => {
-                _setScreen(
+              onTap: () {
+                _setPage('Editor');
+                _goToEditor(context);
+              },
+              ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
+              onTap: () => _setPage('Gallery'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.directions_walk),
+              title: const Text('Walkthrough'),
+              // TODO this will actually trigger a walkthrough,
+              //  dynamically changing pages and showing caption text, maybe arrows...
+              //  the less text the easier to understand (for me at least)
+              onTap: () => _setPage('Walkthrough'),
+            ),
+            const Spacer(), // filler
+
+            //Spacer(),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.help),
+              title: const Text('Help'),
+              onTap: () {
+                //Go to the 'Help' route
+                Navigator.push(
                   context,
-                  (ctx) => const MyEditorPage(),
-                ),
+                  MaterialPageRoute(
+                    builder: (context) => const MyHelpPage(),
+                  ),
+                );
               },
             ),
-            const ListTile(
-              leading: Icon(Icons.photo_library),
-              title: Text('Gallery'),
-              // TODO onTap
-            ),
-            const ListTile(
-              leading: Icon(Icons.directions_walk),
-              title: Text('Walkthrough'),
-              // TODO onTap
-            ),
-            const Spacer(),
-            const Divider(),
-            const ListTile(
-              leading: Icon(Icons.help),
-              title: Text('Help'),
-              // TODO onTap
-            ),
-            const ListTile(
-              leading: Icon(Icons.info),
-              title: Text('About'),
-              // TODO onTap
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('About'),
+              onTap: () {
+                //Go to the 'About' route
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MyAboutPage(),
+                    ),
+                );
+                },
             ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Settings'),
-              onTap: () => _setScreen(context, (ctx) => const MySettingsPage()),
+              onTap: () {
+                _setPage('Settings');
+                _goToSettings(context);
+                },
             ),
+            /*
+            Expanded(
+                child: ListView(children: <Widget>[
+              Align(alignment: FractionalOffset.bottomCenter),
+              Divider(color: Colors.grey),
+
+            ]))*/
           ],
+        ),
+      ),
+      onDrawerChanged: (isDrawerOpen) {
+        if (!isDrawerOpen) {
+          _setPage('Home');
+        }
+      },
+    );
+  }
+}
+
+class MyAboutPage extends StatelessWidget {
+
+  const MyAboutPage();
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('About'),
+      ),
+      body: const Center(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: 500.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                "About this App: Blah blah blah blah",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MyHelpPage extends StatelessWidget {
+
+  const MyHelpPage();
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Help'),
+      ),
+      body: const Center(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: 500.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                "Here's a Helpful Tip: Blah blah blah blah",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );

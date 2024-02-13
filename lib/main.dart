@@ -3,7 +3,7 @@ import 'package:senior_project_hair_ai/screens/home.dart';
 
 // BottomSheet
 // Drawer - horizontal sliding window
-// Snackbar - bottom alert
+// Snack bar - bottom alert
 // TabBar
 
 void main() {
@@ -25,7 +25,8 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
       ),
-      home: const MyHomePage(),
+      home: const MyHomePage(title: "Ai_Hair_Styler"),
     );
   }
 }
+
