@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:senior_project_hair_ai/screens/about.dart';
 import 'package:senior_project_hair_ai/screens/editor.dart';
 import 'package:senior_project_hair_ai/screens/help.dart';
@@ -69,17 +70,29 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: ListView.builder(
                     itemCount: recentCaptures.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return ListTile(
-                        title: Center(
-                          child: Text(
-                            '(Recently Edited Photo ${index + 1})',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 22.0,),
+                      return Row(
+                        children: [
+                          Expanded(
+                            // TODO make this load the image or fail, omit if missing? best to warn
+                            //child: Image.asset('assets/images/smiley.svg'),
+                            child: SvgPicture.asset('assets/images/smiley.svg'),
                           ),
-                        ),
-                        onTap: () {
-                          //TODO: Add logic to open recently edited photo
-                        },
+                          Expanded(
+                            flex: 5,
+                            child: ListTile(
+                              title: Center(
+                                child: Text(
+                                  '(Recently Edited Photo ${index + 1})',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500, fontSize: 22.0,),
+                                ),
+                              ),
+                              onTap: () {
+                                //TODO: Add logic to open recently edited photo
+                              },
+                            ),
+                          ),
+                        ]
                       );
                     },
                   ),),
