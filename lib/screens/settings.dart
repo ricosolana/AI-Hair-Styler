@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:senior_project_hair_ai/Navigation.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 // TODO properly implement
@@ -21,6 +23,22 @@ class _MySettingsPageState extends State<MySettingsPage> {
       ),
       body: SettingsList(
         sections: [
+          SettingsSection(
+            title: const Text('General:'),
+            tiles: [
+              SettingsTile.navigation(
+                title: const Text('My Abstract'),
+                leading: const Icon(CupertinoIcons.wrench),
+                description: const Text('Some text'),
+                onPressed: (context) {
+                  //Navigation.navigateTo(context: context, screen: screen, style: style)
+                },
+              ),
+              //SettingsTile.switchTile(
+              //  title: ,
+              //)
+            ],
+          ),
           SettingsSection(
             title: const Text('Options:'),
             tiles: [
