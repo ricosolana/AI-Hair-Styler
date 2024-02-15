@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:senior_project_hair_ai/Navigation.dart';
 import 'package:senior_project_hair_ai/screens/about.dart';
 import 'package:senior_project_hair_ai/screens/editor.dart';
+import 'package:senior_project_hair_ai/screens/gallery.dart';
 import 'package:senior_project_hair_ai/screens/help.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 
@@ -35,14 +37,6 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _currentPage = newPage;
     });
-  }
-
-  //Function to open the Settings Page
-  void _goToSettings(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const MySettingsPage()),
-    );
   }
 
   //Function to open the Editor Page
@@ -150,6 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 // Camera Button
                 // TODO: Add logic to capture photos
+                // 
               },
               shape: const CircleBorder(),
               child: const Icon(
@@ -193,15 +188,12 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               leading: const Icon(Icons.edit),
               title: const Text('Editor'),
-              onTap: () {
-                _setPage('Editor');
-                _goToEditor(context);
-              },
+              onTap: () => navigateTo(context: context, screen: const MyEditorPage(), style: NavigationRouteStyle.material),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
               title: const Text('Gallery'),
-              onTap: () => _setPage('Gallery'),
+              onTap: () => navigateTo(context: context, screen: const MyGalleryPage(), style: NavigationRouteStyle.material),
             ),
             ListTile(
               leading: const Icon(Icons.directions_walk),
@@ -209,44 +201,28 @@ class _MyHomePageState extends State<MyHomePage> {
               // TODO this will actually trigger a walkthrough,
               //  dynamically changing pages and showing caption text, maybe arrows...
               //  the less text the easier to understand (for me at least)
-              onTap: () => _setPage('Walkthrough'),
+              onTap: () {
+                // start walkthrough
+
+              }
             ),
             const Spacer(), // filler
             const Divider(),
             ListTile(
               leading: const Icon(Icons.help),
               title: const Text('Help'),
-              onTap: () {
-                //Go to the 'Help' route
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MyHelpPage(),
-                  ),
-                );
-              },
+              onTap: () => navigateTo(context: context, screen: const MyHelpPage(), style: NavigationRouteStyle.material),
             ),
             ListTile(
               leading: const Icon(Icons.info),
               title: const Text('About'),
-              onTap: () {
-                //Go to the 'About' route
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MyAboutPage(),
-                  ),
-                );
-              },
+              onTap: () => navigateTo(context: context, screen: const MyAboutPage(), style: NavigationRouteStyle.material),
             ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Settings'),
-              onTap: () {
-                _setPage('Settings');
-                _goToSettings(context);
-              },
+              onTap: () => navigateTo(context: context, screen: const MySettingsPage(), style: NavigationRouteStyle.material),
             ),
             /*
             Expanded(
