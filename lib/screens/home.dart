@@ -94,6 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
             width: 70.0,
             height: 70.0,
             child: FloatingActionButton(
+              heroTag: "upload-fab",
               onPressed: () {
                 // Upload Button
                 // TODO: Add logic for the upload button
@@ -110,6 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
             width: 100.0,
             height: 100.0,
             child: FloatingActionButton(
+              heroTag: "capture-fab",
               onPressed: () {
                 // Camera Button
                 // TODO: Add logic to capture photos
