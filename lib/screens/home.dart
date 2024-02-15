@@ -70,30 +70,33 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: ListView.builder(
                     itemCount: recentCaptures.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return Row(
-                        children: [
-                          Expanded(
-                            // TODO make this load the image or fail, omit if missing? best to warn
-                            //child: Image.asset('assets/images/smiley.svg'),
-                            child: SvgPicture.asset('assets/images/smiley.svg'),
-                          ),
-                          Expanded(
-                            flex: 5,
-                            child: ListTile(
-                              title: Center(
+                      return ListTile(
+                        title: Center(
+                          child: Row(
+                            children: [
+                              Spacer(flex: 3,),
+                              Expanded(
+                                // TODO make this load the image or fail, omit if missing? best to warn
+                                //child: Image.asset('assets/images/smiley.svg'),
+                                child: Center(
+                                  child: SvgPicture.asset('assets/images/smiley.svg', width: 50,),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 5,
                                 child: Text(
                                   '(Recently Edited Photo ${index + 1})',
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w500, fontSize: 22.0,),
                                 ),
                               ),
-                              onTap: () {
-                                //TODO: Add logic to open recently edited photo
-                              },
-                            ),
+                            ]
                           ),
-                        ]
-                      );
+                        ),
+                        onTap: () {
+                          //TODO: Add logic to open recently edited photo
+                        },
+                      );                      
                     },
                   ),),
             ),
