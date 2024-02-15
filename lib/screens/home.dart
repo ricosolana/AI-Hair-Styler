@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:senior_project_hair_ai/screens/about.dart';
 import 'package:senior_project_hair_ai/screens/editor.dart';
+import 'package:senior_project_hair_ai/screens/help.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
-
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -53,32 +54,35 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: <Widget>[
             const Padding(
-            padding: EdgeInsets.only(top: 20.0),
-            child: Text(
-              'You are currently on page:',
-            ),
+              padding: EdgeInsets.only(top: 20.0),
+              child: Text(
+                'You are currently on page:',
+              ),
             ),
             Text(
               _currentPage,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             Center(
-            child: SizedBox(
-              height: 150.0,
-              child: ListView.builder(
-                itemCount: recentCaptures.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    title: Center(child:
-                      Text('(Recently Edited Photo ${index + 1})',
-                      style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 22.0),),),
-                    onTap: () {
-                      //TODO: Add logic to open recently edited photo
+              child: SizedBox(
+                  height: 150.0,
+                  child: ListView.builder(
+                    itemCount: recentCaptures.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                        title: Center(
+                          child: Text(
+                            '(Recently Edited Photo ${index + 1})',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 22.0,),
+                          ),
+                        ),
+                        onTap: () {
+                          //TODO: Add logic to open recently edited photo
+                        },
+                      );
                     },
-                  );
-                },
-              )
-            ),
+                  ),),
             ),
           ],
         ),
@@ -87,47 +91,52 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-          width: 70.0,
-          height: 70.0,
-          child: FloatingActionButton(
+            width: 70.0,
+            height: 70.0,
+            child: FloatingActionButton(
               onPressed: () {
-            // Upload Button
-            // TODO: Add logic for the upload button
-          },
-            shape: const CircleBorder(),
-            child: const Icon(Icons.file_upload_rounded,
-            size: 30.0,),
+                // Upload Button
+                // TODO: Add logic for the upload button
+              },
+              shape: const CircleBorder(),
+              child: const Icon(
+                Icons.file_upload_rounded,
+                size: 30.0,
+              ),
             ),
-      ),
+          ),
           const SizedBox(width: 50.0), // Adjust the spacing between buttons
           SizedBox(
             width: 100.0,
             height: 100.0,
-          child: FloatingActionButton(
-            onPressed: () {
-              // Camera Button
-              // TODO: Add logic to capture photos
-            },
-            shape: const CircleBorder(),
-            child: const Icon(Icons.add_a_photo,
-              size: 48.0,),
-          ),
+            child: FloatingActionButton(
+              onPressed: () {
+                // Camera Button
+                // TODO: Add logic to capture photos
+              },
+              shape: const CircleBorder(),
+              child: const Icon(
+                Icons.add_a_photo,
+                size: 48.0,
               ),
-          const SizedBox(width: 50.0), // Adjust the spacing between buttons
-            SizedBox(
-              width: 70.0,
-              height: 70.0,
-              child: FloatingActionButton(
-                  onPressed: () {
-                    // AI Edit Button
-                    // TODO: Add logic to open screen that enables AI edits (or whatever this button is for)
-                  },
-                  shape: const CircleBorder(),
-                  child: const Icon(
-                    Icons.auto_fix_high_rounded,
-                    size: 30.0,),
-                  ),
             ),
+          ),
+          const SizedBox(width: 50.0), // Adjust the spacing between buttons
+          SizedBox(
+            width: 70.0,
+            height: 70.0,
+            child: FloatingActionButton(
+              onPressed: () {
+                // AI Edit Button
+                // TODO: Add logic to open screen that enables AI edits (or whatever this button is for)
+              },
+              shape: const CircleBorder(),
+              child: const Icon(
+                Icons.auto_fix_high_rounded,
+                size: 30.0,
+              ),
+            ),
+          ),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -136,7 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             const DrawerHeader(
               decoration: BoxDecoration(color: Colors.lightBlue),
-              child:  Text(
+              child: Text(
                 'AI Hair Styler',
                 style: TextStyle(
                   color: Colors.white,
@@ -151,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 _setPage('Editor');
                 _goToEditor(context);
               },
-              ),
+            ),
             ListTile(
               leading: const Icon(Icons.photo_library),
               title: const Text('Gallery'),
@@ -166,8 +175,6 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () => _setPage('Walkthrough'),
             ),
             const Spacer(), // filler
-
-            //Spacer(),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.help),
@@ -188,12 +195,12 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 //Go to the 'About' route
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MyAboutPage(),
-                    ),
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MyAboutPage(),
+                  ),
                 );
-                },
+              },
             ),
             const Divider(),
             ListTile(
@@ -202,7 +209,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 _setPage('Settings');
                 _goToSettings(context);
-                },
+              },
             ),
             /*
             Expanded(
@@ -219,70 +226,6 @@ class _MyHomePageState extends State<MyHomePage> {
           _setPage('Home');
         }
       },
-    );
-  }
-}
-
-class MyAboutPage extends StatelessWidget {
-
-  const MyAboutPage();
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('About'),
-      ),
-      body: const Center(
-        child: Padding(
-          padding: EdgeInsets.only(bottom: 500.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                "About this App: Blah blah blah blah",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class MyHelpPage extends StatelessWidget {
-
-  const MyHelpPage();
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Help'),
-      ),
-      body: const Center(
-        child: Padding(
-          padding: EdgeInsets.only(bottom: 500.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                "Here's a Helpful Tip: Blah blah blah blah",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

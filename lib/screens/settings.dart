@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:senior_project_hair_ai/Navigation.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 // TODO properly implement

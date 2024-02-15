@@ -1,4 +1,4 @@
-// Borrowed from 
+// Borrowed from
 // https://github.com/yako-dev/flutter-settings-ui/blob/master/example/lib/utils/navigation.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +16,8 @@ Future<T?> navigateTo<T>({
   Route<T> route;
   if (style == NavigationRouteStyle.cupertino) {
     route = CupertinoPageRoute<T>(builder: (_) => screen);
-  } else { //if (style == NavigationRouteStyle.material) {
+  } else {
+    //if (style == NavigationRouteStyle.material) {
     route = MaterialPageRoute<T>(builder: (_) => screen);
   }
 
