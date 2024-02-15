@@ -17,9 +17,18 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _currentPage = 'Home';
   List<String> recentCaptures = [
-    "Recent Capture 1",
-    "Recent Capture 2",
-    "Recent Capture 3",
+    "path/to/recents/a",
+    "path/to/recents/b",
+    "path/to/recents/c",
+    "path/to/recents/d",
+    "path/to/recents/e",
+    "path/to/recents/f",
+    "path/to/recents/g",
+    "path/to/recents/h",
+    "path/to/recents/i",
+    "path/to/recents/j",
+    "path/to/recents/k",
+    "path/to/recents/l",
   ];
 
   void _setPage(String newPage) {
@@ -47,60 +56,93 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.only(top: 20.0),
-              child: Text(
-                'You are currently on page:',
+      body: SingleChildScrollView(
+        //physics: const NeverScrollableScrollPhysics(), // scrolling doesnt work
+        child: Center(
+          child: Column(
+            children: <Widget>[
+              const Padding(
+                padding: EdgeInsets.only(top: 20.0),
+                child: Text(
+                  'You are currently on page:',
+                ),
               ),
-            ),
-            Text(
-              _currentPage,
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            Center(
-              child: SizedBox(
-                  height: 150.0,
-                  child: ListView.builder(
-                    itemCount: recentCaptures.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return ListTile(
-                        title: Center(
-                          child: Row(
-                            children: [
-                              Spacer(flex: 3,),
-                              Expanded(
-                                // TODO make this load the image or fail, omit if missing? best to warn
-                                //child: Image.asset('assets/images/smiley.svg'),
-                                child: Center(
-                                  child: SvgPicture.asset('assets/images/smiley.svg', width: 50,),
+              Text(
+                _currentPage,
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              //Center(
+              //  //child: Flex(
+              //  //  direction: Axis.vertical,
+              //  //  children: [],
+              //  //)
+//
+              //  //child: Expanded( //Container(
+              //  //  flex: 3,
+              //    
+              //    //height: 150,
+              //    child: 
+              //Column(
+                    //children: <Widget>[ //],)
+                      //Expanded(
+                        //child: 
+                        ListView.builder(
+                          //physics: const Phy(),
+                          padding: EdgeInsets.only(bottom: 120),
+                          shrinkWrap: true,
+                          itemCount: recentCaptures.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            //if (index == recentCaptures.length - 1) {
+                            //  return Padding(padding: ,)
+                            //}
+
+                            return ListTile(
+                              title: Center(
+                                child: Row(
+                                  children: [
+                                    const Spacer(
+                                      flex: 2,
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      // TODO make this load the image or fail, omit if missing? best to warn
+                                      //child: Image.asset('assets/images/smiley.svg'),
+                                      child: Center(
+                                        child: SvgPicture.asset('assets/images/smiley.svg', width: 50,),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        '(Recently Edited Photo ${index + 1})',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w500, fontSize: 22.0,),
+                                      ),
+                                    ),
+                                    const Spacer(
+                                      flex: 2,
+                                    ),
+                                  ],
                                 ),
                               ),
-                              Expanded(
-                                flex: 5,
-                                child: Text(
-                                  '(Recently Edited Photo ${index + 1})',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500, fontSize: 22.0,),
-                                ),
-                              ),
-                            ]
-                          ),
+                              onTap: () {
+                                //TODO: Add logic to open recently edited photo
+                              },
+                            );                      
+                          },
                         ),
-                        onTap: () {
-                          //TODO: Add logic to open recently edited photo
-                        },
-                      );                      
-                    },
-                  ),),
-            ),
-          ],
+                      //)
+                    ]
+                  )
+                //),
+              //),
+            //],
+          //),
         ),
       ),
       floatingActionButton: Row(
