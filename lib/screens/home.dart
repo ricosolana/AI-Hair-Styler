@@ -62,7 +62,6 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: SingleChildScrollView(
-        //physics: const NeverScrollableScrollPhysics(), // scrolling doesnt work
         child: Center(
           child: Column(
             children: <Widget>[
@@ -76,73 +75,51 @@ class _MyHomePageState extends State<MyHomePage> {
                 _currentPage,
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
-              //Center(
-              //  //child: Flex(
-              //  //  direction: Axis.vertical,
-              //  //  children: [],
-              //  //)
-//
-              //  //child: Expanded( //Container(
-              //  //  flex: 3,
-              //    
-              //    //height: 150,
-              //    child: 
-              //Column(
-                    //children: <Widget>[ //],)
-                      //Expanded(
-                        //child: 
-                        ListView.builder(
-                          //physics: const Phy(),
-                          padding: EdgeInsets.only(bottom: 120),
-                          shrinkWrap: true,
-                          itemCount: recentCaptures.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            //if (index == recentCaptures.length - 1) {
-                            //  return Padding(padding: ,)
-                            //}
-
-                            return ListTile(
-                              title: Center(
-                                child: Row(
-                                  children: [
-                                    const Spacer(
-                                      flex: 2,
-                                    ),
-                                    Expanded(
-                                      flex: 1,
-                                      // TODO make this load the image or fail, omit if missing? best to warn
-                                      //child: Image.asset('assets/images/smiley.svg'),
-                                      child: Center(
-                                        child: SvgPicture.asset('assets/images/smiley.svg', width: 50,),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text(
-                                        '(Recently Edited Photo ${index + 1})',
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w500, fontSize: 22.0,),
-                                      ),
-                                    ),
-                                    const Spacer(
-                                      flex: 2,
-                                    ),
-                                  ],
-                                ),
+              ListView.builder(
+                padding: const EdgeInsets.only(bottom: 120),
+                shrinkWrap: true,
+                itemCount: recentCaptures.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    title: Center(
+                      child: Row(
+                        children: [
+                          const Spacer(
+                            flex: 2,
+                          ),
+                          Expanded(
+                            // TODO make this load the image or fail, omit if missing? best to warn
+                            child: Center(
+                              child: SvgPicture.asset(
+                                'assets/images/smiley.svg',
+                                width: 50,
                               ),
-                              onTap: () {
-                                //TODO: Add logic to open recently edited photo
-                              },
-                            );                      
-                          },
-                        ),
-                      //)
-                    ]
-                  )
-                //),
-              //),
-            //],
-          //),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              '(Recently Edited Photo ${index + 1})',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 22.0,
+                              ),
+                            ),
+                          ),
+                          const Spacer(
+                            flex: 2,
+                          ),
+                        ],
+                      ),
+                    ),
+                    onTap: () {
+                      //TODO: Add logic to open recently edited photo
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: Row(
