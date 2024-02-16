@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
 
@@ -6,12 +7,25 @@ import 'package:senior_project_hair_ai/screens/home.dart';
 // Snack bar - bottom alert
 // TabBar
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  // init camera library
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Obtain a list of the available cameras on the device.
+  final cameras = await availableCameras();
+
+  // Get a specific camera from the list of available cameras.
+  final firstCamera = cameras.first;
+
+  runApp(
+    MyApp(camera: firstCamera),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.camera});
+
+  final CameraDescription camera;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +39,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
       ),
-      home: const MyHomePage(title: "Ai_Hair_Styler"),
+      home: MyHomePage(title: "Ai_Hair_Styler", camera: camera),
     );
   }
 }

@@ -1,22 +1,26 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:senior_project_hair_ai/Navigation.dart';
 import 'package:senior_project_hair_ai/screens/about.dart';
+import 'package:senior_project_hair_ai/screens/capture.dart';
 import 'package:senior_project_hair_ai/screens/editor.dart';
 import 'package:senior_project_hair_ai/screens/gallery.dart';
 import 'package:senior_project_hair_ai/screens/help.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  MyHomePage({super.key, required this.title, required CameraDescription this.camera});
 
   final String title;
+  CameraDescription camera;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  
   String _currentPage = 'Home';
   List<String> recentCaptures = [
     "path/to/recents/a",
@@ -145,6 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 // Camera Button
                 // TODO: Add logic to capture photos
                 // 
+                navigateTo(context: context, screen: TakePictureScreen(camera: widget.camera), style: NavigationRouteStyle.material);
               },
               shape: const CircleBorder(),
               child: const Icon(
