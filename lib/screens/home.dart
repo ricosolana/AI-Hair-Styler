@@ -10,7 +10,7 @@ import 'package:senior_project_hair_ai/screens/help.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({super.key, required this.title, required CameraDescription this.camera});
+  MyHomePage({super.key, required this.title, required this.camera});
 
   final String title;
   CameraDescription camera;
@@ -20,7 +20,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  
   String _currentPage = 'Home';
   List<String> recentCaptures = [
     "path/to/recents/a",
@@ -148,8 +147,11 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 // Camera Button
                 // TODO: Add logic to capture photos
-                // 
-                navigateTo(context: context, screen: TakePictureScreen(camera: widget.camera), style: NavigationRouteStyle.material);
+                //
+                navigateTo(
+                    context: context,
+                    screen: TakePictureScreen(camera: widget.camera),
+                    style: NavigationRouteStyle.material);
               },
               shape: const CircleBorder(),
               child: const Icon(
@@ -193,12 +195,18 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               leading: const Icon(Icons.edit),
               title: const Text('Editor'),
-              onTap: () => navigateTo(context: context, screen: const MyEditorPage(), style: NavigationRouteStyle.material),
+              onTap: () => navigateTo(
+                  context: context,
+                  screen: const MyEditorPage(),
+                  style: NavigationRouteStyle.material),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
               title: const Text('Gallery'),
-              onTap: () => navigateTo(context: context, screen: const MyGalleryPage(), style: NavigationRouteStyle.material),
+              onTap: () => navigateTo(
+                  context: context,
+                  screen: const MyGalleryPage(),
+                  style: NavigationRouteStyle.material),
             ),
             ListTile(
               leading: const Icon(Icons.directions_walk),
@@ -208,26 +216,34 @@ class _MyHomePageState extends State<MyHomePage> {
               //  the less text the easier to understand (for me at least)
               onTap: () {
                 // start walkthrough
-
-              }
+              },
             ),
             const Spacer(), // filler
             const Divider(),
             ListTile(
               leading: const Icon(Icons.help),
               title: const Text('Help'),
-              onTap: () => navigateTo(context: context, screen: const MyHelpPage(), style: NavigationRouteStyle.material),
+              onTap: () => navigateTo(
+                  context: context,
+                  screen: const MyHelpPage(),
+                  style: NavigationRouteStyle.material),
             ),
             ListTile(
               leading: const Icon(Icons.info),
               title: const Text('About'),
-              onTap: () => navigateTo(context: context, screen: const MyAboutPage(), style: NavigationRouteStyle.material),
+              onTap: () => navigateTo(
+                  context: context,
+                  screen: const MyAboutPage(),
+                  style: NavigationRouteStyle.material),
             ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Settings'),
-              onTap: () => navigateTo(context: context, screen: const MySettingsPage(), style: NavigationRouteStyle.material),
+              onTap: () => navigateTo(
+                  context: context,
+                  screen: const MySettingsPage(),
+                  style: NavigationRouteStyle.material),
             ),
             /*
             Expanded(

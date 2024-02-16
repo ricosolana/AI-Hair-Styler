@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:senior_project_hair_ai/Navigation.dart';
 
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
