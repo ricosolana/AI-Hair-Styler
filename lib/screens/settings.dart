@@ -12,8 +12,11 @@ class MySettingsPage extends StatefulWidget {
   State<MySettingsPage> createState() => _MySettingsPageState();
 }
 
+
 class _MySettingsPageState extends State<MySettingsPage> {
   @override
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -45,10 +48,33 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 title: const Text('Option 1'),
                 leading: const Icon(Icons.screen_lock_landscape),
               ),
+              SettingsTile(
+                title: const Text('Option 2'),
+                leading: const Icon(Icons.screen_lock_landscape),
+              ),
               //SettingsTile.switchTile(
               //  title: ,
               //)
             ],
+          ),
+          SettingsSection(
+            title: const Text('Customization:'),
+          tiles: [
+          SettingsTile(
+          title: const Text('Change Theme (Color 1)'),
+          leading: const Icon(Icons.palette_rounded),
+          onPressed: (context) {
+            //Navigation.navigateTo(context: context, screen: screen, style: style)
+          },
+          ),
+          SettingsTile(
+          title: const Text('Change Theme (Color 2)'),
+          leading: const Icon(Icons.palette_rounded),
+          onPressed: (context) {
+              //Navigation.navigateTo(context: context, screen: screen, style: style)
+          },
+          ),
+          ],  //tiles
           ),
         ],
       ),

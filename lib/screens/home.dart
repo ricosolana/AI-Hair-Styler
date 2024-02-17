@@ -42,14 +42,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  //Function to open the Editor Page
-  void _goToEditor(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const MyEditorPage()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,8 +50,8 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: SingleChildScrollView(
-        child: Center(
+      body:
+        Center(
           child: Column(
             children: <Widget>[
               const Padding(
@@ -72,53 +64,57 @@ class _MyHomePageState extends State<MyHomePage> {
                 _currentPage,
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
-              ListView.builder(
-                padding: const EdgeInsets.only(bottom: 120),
-                shrinkWrap: true,
-                itemCount: recentCaptures.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    title: Center(
-                      child: Row(
-                        children: [
-                          const Spacer(
-                            flex: 2,
-                          ),
-                          Expanded(
-                            // TODO make this load the image or fail, omit if missing? best to warn
-                            child: Center(
-                              child: SvgPicture.asset(
-                                'assets/images/smiley.svg',
-                                width: 50,
+              SizedBox(
+                height: 500,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: ListView(
+                      padding: const EdgeInsets.only(bottom: 300),
+                      shrinkWrap: true,
+                      children: recentCaptures.map((path) {
+                        return ListTile(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Spacer(
+                                flex: 2,
                               ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Text(
-                              '(Recently Edited Photo ${index + 1})',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 22.0,
+                              Expanded(
+                                // TODO make this load the image or fail, omit if missing? best to warn
+                                child: Center(
+                                  child: SvgPicture.asset(
+                                    'assets/images/smiley.svg',
+                                    width: 50,
+                                  ),
+                                ),
                               ),
-                            ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  '(Recently Edited Photo ${recentCaptures.indexOf(path) + 1})',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 22.0,
+                                  ),
+                                ),
+                              ),
+                              const Spacer(
+                                flex: 2,
+                              ),
+                            ],
                           ),
-                          const Spacer(
-                            flex: 2,
-                          ),
-                        ],
-                      ),
+                          onTap: () {
+                            //TODO: Add logic to open recently edited photo
+                          },
+                        );
+                      }).toList(),
                     ),
-                    onTap: () {
-                      //TODO: Add logic to open recently edited photo
-                    },
-                  );
-                },
-              ),
+                  ),
+              )
+
             ],
           ),
         ),
-      ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -196,17 +192,17 @@ class _MyHomePageState extends State<MyHomePage> {
               leading: const Icon(Icons.edit),
               title: const Text('Editor'),
               onTap: () => navigateTo(
-                  context: context,
-                  screen: const MyEditorPage(),
-                  style: NavigationRouteStyle.material),
+                context: context,
+                screen: const MyEditorPage(),
+                style: NavigationRouteStyle.material,),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
               title: const Text('Gallery'),
               onTap: () => navigateTo(
-                  context: context,
-                  screen: const MyGalleryPage(),
-                  style: NavigationRouteStyle.material),
+                context: context,
+                screen: const MyGalleryPage(),
+                style: NavigationRouteStyle.material,),
             ),
             ListTile(
               leading: const Icon(Icons.directions_walk),
