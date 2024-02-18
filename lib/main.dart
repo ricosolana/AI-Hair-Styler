@@ -1,5 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
 
 // BottomSheet
@@ -18,7 +20,10 @@ Future<void> main() async {
   final firstCamera = cameras.first;
 
   runApp(
-    MyApp(camera: firstCamera),
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: MyApp(camera: firstCamera),
+    ),
   );
 }
 

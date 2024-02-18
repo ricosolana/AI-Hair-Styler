@@ -10,6 +10,7 @@ import 'package:senior_project_hair_ai/screens/help.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 
 class MyHomePage extends StatefulWidget {
+
   MyHomePage({super.key, required this.title, required this.camera});
 
   final String title;

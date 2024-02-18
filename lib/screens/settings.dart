@@ -1,5 +1,8 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:senior_project_hair_ai/Navigation.dart';
+import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 // TODO properly implement
@@ -14,6 +17,9 @@ class MySettingsPage extends StatefulWidget {
 
 
 class _MySettingsPageState extends State<MySettingsPage> {
+  late CameraDescription camera;
+
+
   @override
 
 
@@ -61,18 +67,14 @@ class _MySettingsPageState extends State<MySettingsPage> {
             title: const Text('Customization:'),
           tiles: [
           SettingsTile(
-          title: const Text('Change Theme (Color 1)'),
+          title: const Text('Change Theme and Colors'),
           leading: const Icon(Icons.palette_rounded),
           onPressed: (context) {
-            //Navigation.navigateTo(context: context, screen: screen, style: style)
-          },
-          ),
-          SettingsTile(
-          title: const Text('Change Theme (Color 2)'),
-          leading: const Icon(Icons.palette_rounded),
-          onPressed: (context) {
-              //Navigation.navigateTo(context: context, screen: screen, style: style)
-          },
+            navigateTo(
+            context: context,
+            screen: ColorsPage(), style:
+            NavigationRouteStyle.material,);
+            },
           ),
           ],  //tiles
           ),
