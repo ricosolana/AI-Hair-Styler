@@ -154,7 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Spacer(
-                                flex: 2,
+                                flex: 1,
                               ),
                               Expanded(
                                 // TODO make this load the image or fail, omit if missing? best to warn
@@ -162,11 +162,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: SvgPicture.asset(
                                     'assets/images/smiley.svg',
                                     width: 50,
-                                  ),
+                                ),
                                 ),
                               ),
                               Expanded(
-                                flex: 2,
+                                flex: 10,
                                 child: Text(
                                   '(Recently Edited Photo ${recentCaptures.indexOf(path) + 1})',
                                   style: const TextStyle(
@@ -176,7 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ),
                               const Spacer(
-                                flex: 2,
+                                flex: 1,
                               ),
                             ],
                           ),
