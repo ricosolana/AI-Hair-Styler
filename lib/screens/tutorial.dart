@@ -38,7 +38,11 @@ class TutorialItemContent extends StatelessWidget {
               Row(
                 children: [
                   TextButton(
-                    onPressed: () => Tutorial.skipAll(context),
+                    // TODO determine whether this calls completer handler
+                    onPressed: () {
+                      Tutorial.skipAll(context);
+                      //_MyHomePageState.markTutorialCompleted();
+                    },
                     child: const Text(
                       'Skip onboarding',
                       style: TextStyle(color: Colors.white),
@@ -53,7 +57,7 @@ class TutorialItemContent extends StatelessWidget {
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),

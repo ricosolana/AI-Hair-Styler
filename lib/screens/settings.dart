@@ -15,14 +15,10 @@ class MySettingsPage extends StatefulWidget {
   State<MySettingsPage> createState() => _MySettingsPageState();
 }
 
-
 class _MySettingsPageState extends State<MySettingsPage> {
   late CameraDescription camera;
 
-
   @override
-
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -65,18 +61,19 @@ class _MySettingsPageState extends State<MySettingsPage> {
           ),
           SettingsSection(
             title: const Text('Customization:'),
-          tiles: [
-          SettingsTile(
-          title: const Text('Change Theme and Colors'),
-          leading: const Icon(Icons.palette_rounded),
-          onPressed: (context) {
-            navigateTo(
-            context: context,
-            screen: ColorsPage(), style:
-            NavigationRouteStyle.material,);
-            },
-          ),
-          ],  //tiles
+            tiles: [
+              SettingsTile(
+                title: const Text('Change Theme and Colors'),
+                leading: const Icon(Icons.palette_rounded),
+                onPressed: (context) {
+                  navigateTo(
+                    context: context,
+                    screen: ColorsPage(),
+                    style: NavigationRouteStyle.material,
+                  );
+                },
+              ),
+            ], //tiles
           ),
         ],
       ),

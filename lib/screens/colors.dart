@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
 
-
 class MyColorsPage extends StatefulWidget {
   const MyColorsPage({super.key, required this.camera});
 
@@ -28,7 +27,10 @@ class _MyColorsPageState extends State<MyColorsPage> {
         primarySwatch: Colors.blue,
         primaryColor: Colors.blue,
       ),
-      home: MyHomePage(title: '', camera: widget.camera,),
+      home: MyHomePage(
+        title: '',
+        camera: widget.camera,
+      ),
     );
   }
 }
@@ -88,12 +90,10 @@ class ThemeProvider with ChangeNotifier {
 class ThemeSwitcher extends StatefulWidget {
   @override
   _ThemeSwitcherState createState() => _ThemeSwitcherState();
-
-
 }
 
 class _ThemeSwitcherState extends State<ThemeSwitcher> {
-  void changeTheme(ThemeMode themeMode){
+  void changeTheme(ThemeMode themeMode) {
     Provider.of<ThemeProvider>(context, listen: false).themeMode = themeMode;
   }
 
@@ -106,7 +106,8 @@ class _ThemeSwitcherState extends State<ThemeSwitcher> {
         crossAxisSpacing: 10,
         crossAxisCount: 3,
         children: [
-          buildThemeButton(context, ThemeMode.light, 'Light', Icons.wb_sunny_outlined),
+          buildThemeButton(
+              context, ThemeMode.light, 'Light', Icons.wb_sunny_outlined,),
           buildThemeButton(context, ThemeMode.dark, 'Dark', Icons.brightness_3),
           buildThemeButton(context, ThemeMode.system, 'Auto', Icons.sync),
         ],
@@ -114,7 +115,8 @@ class _ThemeSwitcherState extends State<ThemeSwitcher> {
     );
   }
 
-  Widget buildThemeButton(BuildContext context, ThemeMode themeMode, String title, IconData icon) {
+  Widget buildThemeButton(
+      BuildContext context, ThemeMode themeMode, String title, IconData icon,) {
     return GestureDetector(
       onTap: () {
         changeTheme(themeMode);
@@ -151,7 +153,6 @@ class _ThemeSwitcherState extends State<ThemeSwitcher> {
     );
   }
 }
-
 
 class AppTheme {
   ThemeMode mode;
@@ -194,11 +195,11 @@ class PrimaryColorSwitcher extends StatelessWidget {
         crossAxisSpacing: 10,
         children: List.generate(
           5,
-              (i) {
+          (i) {
             return GestureDetector(
-              onTap: (){
-                Provider.of<ThemeProvider>(context, listen: false).primaryColor =
-                const [
+              onTap: () {
+                Provider.of<ThemeProvider>(context, listen: false)
+                    .primaryColor = const [
                   Color(0xffd23156),
                   Color(0xff16b9fd),
                   Color(0xff13d0c1),
@@ -207,18 +208,18 @@ class PrimaryColorSwitcher extends StatelessWidget {
                 ][i];
               },
               child: Container(
-              height: 50,
-              decoration: BoxDecoration(
-                color: const [
-                  Color(0xffd23156),
-                  Color(0xff16b9fd),
-                  Color(0xff13d0c1),
-                  Color(0xffe5672f),
-                  Color(0xffb73d99),
-                ][i],
-                borderRadius: BorderRadius.circular(10),
+                height: 50,
+                decoration: BoxDecoration(
+                  color: const [
+                    Color(0xffd23156),
+                    Color(0xff16b9fd),
+                    Color(0xff13d0c1),
+                    Color(0xffe5672f),
+                    Color(0xffb73d99),
+                  ][i],
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-            ),
             );
           },
         ),

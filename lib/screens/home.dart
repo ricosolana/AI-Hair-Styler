@@ -10,6 +10,7 @@ import 'package:senior_project_hair_ai/screens/gallery.dart';
 import 'package:senior_project_hair_ai/screens/help.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/tutorial.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({super.key, required this.title, required this.camera});
@@ -60,12 +61,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<TutorialItem> tutorialItems = [];
 
-  void _setPage(String newPage) {
-    setState(() {
-      _currentPage = newPage;
-    });
-  }
-
   //@override
   //void initState() {
   //  super.initState();
@@ -73,28 +68,61 @@ class _MyHomePageState extends State<MyHomePage> {
   //  //((_scaffoldKey.currentState!.widget.appBar!) as AppBar).leading.key = ValueKey('hamburgerButton');
   //}
 
+  static const String tutorialCompletedId = 'tutorial-completed';
+
+  void _setPage(String newPage) {
+    setState(() {
+      _currentPage = newPage;
+    });
+  }
+
+  Future<void> _tryStartTutorial() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!(prefs.getBool(tutorialCompletedId) ?? false)) {
+      _startTutorial();
+    }
+  }
+
+  Future<void> _startTutorial() async {
+    Future.delayed(const Duration(microseconds: 200)).then((value) {
+      Tutorial.showTutorial(
+        context,
+        tutorialItems,
+        onTutorialComplete: _markTutorialCompleted,
+      );
+    });
+  }
+
+  // TODO I do not know any other way to make this visible
+  //  to tutorial.dart without passing this.object through several
+  //  constructors / ... too much
+  Future<void> _markTutorialCompleted() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool(tutorialCompletedId, true);
+  }
+
   void initTutorialItems() {
     tutorialItems.addAll({
       TutorialItem(
-        globalKey: uploadFloatingKey, 
+        globalKey: uploadFloatingKey,
         child: const TutorialItemContent(
           title: 'Upload button',
           content: 'This is to upload images',
-        )
+        ),
       ),
       TutorialItem(
-        globalKey: captureFloatingKey, 
+        globalKey: captureFloatingKey,
         child: const TutorialItemContent(
           title: 'Capture button',
           content: 'This is to take pictures',
-        )
+        ),
       ),
       TutorialItem(
-        globalKey: editorFloatingKey, 
+        globalKey: editorFloatingKey,
         child: const TutorialItemContent(
           title: 'Editor button',
           content: 'Press this to open the editor for image editing',
-        )
+        ),
       ),
     });
   }
@@ -104,12 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     initTutorialItems();
-    Future.delayed(const Duration(microseconds: 200)).then((value) {
-      Tutorial.showTutorial(context, tutorialItems, onTutorialComplete: () {
-        // Code to be executed after the tutorial ends
-        print('Tutorial is complete!');
-      });
-    });
+    _tryStartTutorial();
   }
 
   @override
@@ -127,71 +150,64 @@ class _MyHomePageState extends State<MyHomePage> {
         //  },
         //),
       ),
-      body:
-        Center(
-          child: Column(
-            children: <Widget>[
-              const Padding(
-                padding: EdgeInsets.only(top: 20.0),
-                child: Text(
-                  'You are currently on page:',
+      body: Center(
+        child: Column(
+          children: <Widget>[
+            const Padding(
+              padding: EdgeInsets.only(top: 20.0),
+              child: Text(
+                'You are currently on page:',
+              ),
+            ),
+            Text(
+              _currentPage,
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            SizedBox(
+              height: 500,
+              child: SingleChildScrollView(
+                child: ListView(
+                  padding: const EdgeInsets.only(bottom: 300),
+                  shrinkWrap: true,
+                  children: recentCaptures.map((path) {
+                    return ListTile(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Spacer(),
+                          Expanded(
+                            // TODO make this load the image or fail, omit if missing? best to warn
+                            child: Center(
+                              child: SvgPicture.asset(
+                                'assets/images/smiley.svg',
+                                width: 50,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 10,
+                            child: Text(
+                              '(Recently Edited Photo ${recentCaptures.indexOf(path) + 1})',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 22.0,
+                              ),
+                            ),
+                          ),
+                          const Spacer(),
+                        ],
+                      ),
+                      onTap: () {
+                        //TODO: Add logic to open recently edited photo
+                      },
+                    );
+                  }).toList(),
                 ),
               ),
-              Text(
-                _currentPage,
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              SizedBox(
-                height: 500,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: ListView(
-                      padding: const EdgeInsets.only(bottom: 300),
-                      shrinkWrap: true,
-                      children: recentCaptures.map((path) {
-                        return ListTile(
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Spacer(
-                                flex: 1,
-                              ),
-                              Expanded(
-                                // TODO make this load the image or fail, omit if missing? best to warn
-                                child: Center(
-                                  child: SvgPicture.asset(
-                                    'assets/images/smiley.svg',
-                                    width: 50,
-                                ),
-                                ),
-                              ),
-                              Expanded(
-                                flex: 10,
-                                child: Text(
-                                  '(Recently Edited Photo ${recentCaptures.indexOf(path) + 1})',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 22.0,
-                                  ),
-                                ),
-                              ),
-                              const Spacer(
-                                flex: 1,
-                              ),
-                            ],
-                          ),
-                          onTap: () {
-                            //TODO: Add logic to open recently edited photo
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ),
-              )
-
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -224,9 +240,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 // TODO: Add logic to capture photos
                 //
                 navigateTo(
-                    context: context,
-                    screen: TakePictureScreen(camera: widget.camera),
-                    style: NavigationRouteStyle.material);
+                  context: context,
+                  screen: TakePictureScreen(camera: widget.camera),
+                  style: NavigationRouteStyle.material,
+                );
               },
               shape: const CircleBorder(),
               child: const Icon(
@@ -274,7 +291,8 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () => navigateTo(
                 context: context,
                 screen: const MyEditorPage(),
-                style: NavigationRouteStyle.material,),
+                style: NavigationRouteStyle.material,
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
@@ -282,7 +300,8 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () => navigateTo(
                 context: context,
                 screen: const MyGalleryPage(),
-                style: NavigationRouteStyle.material,),
+                style: NavigationRouteStyle.material,
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.directions_walk),
@@ -292,7 +311,12 @@ class _MyHomePageState extends State<MyHomePage> {
               //  the less text the easier to understand (for me at least)
               onTap: () {
                 // start walkthrough
-
+                // close drawer
+                //navigateTo(context: context, screen: MyHomePage(title: title, camera: camera), style: style)
+                // hide drawer
+                Navigator.pop(context);
+                //Scaffold.of(context).closeEndDrawer();
+                _startTutorial();
               },
             ),
             const Spacer(), // filler
@@ -301,26 +325,29 @@ class _MyHomePageState extends State<MyHomePage> {
               leading: const Icon(Icons.help),
               title: const Text('Help'),
               onTap: () => navigateTo(
-                  context: context,
-                  screen: const MyHelpPage(),
-                  style: NavigationRouteStyle.material),
+                context: context,
+                screen: const MyHelpPage(),
+                style: NavigationRouteStyle.material,
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.info),
               title: const Text('About'),
               onTap: () => navigateTo(
-                  context: context,
-                  screen: const MyAboutPage(),
-                  style: NavigationRouteStyle.material),
+                context: context,
+                screen: const MyAboutPage(),
+                style: NavigationRouteStyle.material,
+              ),
             ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Settings'),
               onTap: () => navigateTo(
-                  context: context,
-                  screen: const MySettingsPage(),
-                  style: NavigationRouteStyle.material),
+                context: context,
+                screen: const MySettingsPage(),
+                style: NavigationRouteStyle.material,
+              ),
             ),
             /*
             Expanded(
