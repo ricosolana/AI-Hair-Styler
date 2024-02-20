@@ -168,41 +168,63 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context)
                         .padding
-                        .bottom), // Add padding to the bottom
-                child: ListView(
-                  padding: const EdgeInsets.only(bottom: 150),
-                  children: recentCaptures.map((path) {
-                    return ListTile(
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Spacer(),
-                          Expanded(
-                            child: Center(
-                              child: SvgPicture.asset(
-                                'assets/images/smiley.svg',
-                                width: 50,
+                        .bottom,), // Add padding to the bottom
+                child: Stack(
+                  children: [
+                    ListView(
+                      padding: const EdgeInsets.only(bottom: 150),
+                      children: recentCaptures.map((path) {
+                        return ListTile(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Spacer(),
+                              Expanded(
+                                child: Center(
+                                  child: SvgPicture.asset(
+                                    'assets/images/smiley.svg',
+                                    width: 50,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 10,
-                            child: Text(
-                              '(Recently Edited Photo ${recentCaptures.indexOf(path) + 1})',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 22.0,
+                              Expanded(
+                                flex: 10,
+                                child: Text(
+                                  '(Recently Edited Photo ${recentCaptures.indexOf(path) + 1})',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 22.0,
+                                  ),
+                                ),
                               ),
-                            ),
+                              const Spacer(),
+                            ],
                           ),
-                          const Spacer(),
-                        ],
+                          onTap: () {
+                            //TODO: Add logic to open recently edited photo
+                          },
+                        );
+                      }).toList(),
+                    ),
+                    Positioned(
+                      top: 500,
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.black.withOpacity(0.85),
+                              Colors.transparent,
+                            ],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                          ),
+                        ),
                       ),
-                      onTap: () {
-                        //TODO: Add logic to open recently edited photo
-                      },
-                    );
-                  }).toList(),
+                    ),
+                  ],
                 ),
               ),
             ),
