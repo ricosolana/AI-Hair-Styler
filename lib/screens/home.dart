@@ -1,3 +1,4 @@
+import 'package:app_tutorial/app_tutorial.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,9 +9,9 @@ import 'package:senior_project_hair_ai/screens/editor.dart';
 import 'package:senior_project_hair_ai/screens/gallery.dart';
 import 'package:senior_project_hair_ai/screens/help.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
+import 'package:senior_project_hair_ai/screens/tutorial.dart';
 
 class MyHomePage extends StatefulWidget {
-
   MyHomePage({super.key, required this.title, required this.camera});
 
   final String title;
@@ -37,9 +38,77 @@ class _MyHomePageState extends State<MyHomePage> {
     "path/to/recents/l",
   ];
 
+  //final _scaffoldKey = GlobalKey<ScaffoldState>();
+  //final hamburgerKey = ValueKey();
+
+  //final drawerKey = ValueKey('drawer_button');
+  //final uploadFloatingKey = GlobalKey('uploadFloatingButton');
+  //final captureFloatingKey = ValueKey('captureFloatingButton');
+  //final editorFloatingKey = ValueKey('editorFloatingButton');
+  //final editorKey = ValueKey('editorDrawerButton');
+  //final galleryKey = ValueKey('galleryDrawerButton');
+  //final walkthroughKey = ValueKey('walkthroughDrawerButton');
+  //final settingsKey = ValueKey('settingsDrawerButton');
+
+  final uploadFloatingKey = GlobalKey();
+  final captureFloatingKey = GlobalKey();
+  final editorFloatingKey = GlobalKey();
+  final editorKey = GlobalKey();
+  final galleryKey = GlobalKey();
+  final walkthroughKey = GlobalKey();
+  final settingsKey = GlobalKey();
+
+  List<TutorialItem> tutorialItems = [];
+
   void _setPage(String newPage) {
     setState(() {
       _currentPage = newPage;
+    });
+  }
+
+  //@override
+  //void initState() {
+  //  super.initState();
+  //  // Assign the GlobalKey to the button
+  //  //((_scaffoldKey.currentState!.widget.appBar!) as AppBar).leading.key = ValueKey('hamburgerButton');
+  //}
+
+  void initTutorialItems() {
+    tutorialItems.addAll({
+      TutorialItem(
+        globalKey: uploadFloatingKey, 
+        child: const TutorialItemContent(
+          title: 'Upload button',
+          content: 'This is to upload images',
+        )
+      ),
+      TutorialItem(
+        globalKey: captureFloatingKey, 
+        child: const TutorialItemContent(
+          title: 'Capture button',
+          content: 'This is to take pictures',
+        )
+      ),
+      TutorialItem(
+        globalKey: editorFloatingKey, 
+        child: const TutorialItemContent(
+          title: 'Editor button',
+          content: 'Press this to open the editor for image editing',
+        )
+      ),
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    initTutorialItems();
+    Future.delayed(const Duration(microseconds: 200)).then((value) {
+      Tutorial.showTutorial(context, tutorialItems, onTutorialComplete: () {
+        // Code to be executed after the tutorial ends
+        print('Tutorial is complete!');
+      });
     });
   }
 
@@ -50,6 +119,13 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        //leading: IconButton(
+        //  key: ValueKey('hamburgerButton'), // This is the hamburger button
+        //  icon: Icon(Icons.menu),
+        //  onPressed: () {
+        //    _scaffoldKey.currentState.openDrawer();
+        //  },
+        //),
       ),
       body:
         Center(
@@ -124,6 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
             height: 70.0,
             child: FloatingActionButton(
               heroTag: "upload-fab",
+              key: uploadFloatingKey,
               onPressed: () {
                 // Upload Button
                 // TODO: Add logic for the upload button
@@ -141,6 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
             height: 100.0,
             child: FloatingActionButton(
               heroTag: "capture-fab",
+              key: captureFloatingKey,
               onPressed: () {
                 // Camera Button
                 // TODO: Add logic to capture photos
@@ -162,6 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
             width: 70.0,
             height: 70.0,
             child: FloatingActionButton(
+              key: editorFloatingKey,
               onPressed: () {
                 // AI Edit Button
                 // TODO: Add logic to open screen that enables AI edits (or whatever this button is for)
@@ -213,6 +292,7 @@ class _MyHomePageState extends State<MyHomePage> {
               //  the less text the easier to understand (for me at least)
               onTap: () {
                 // start walkthrough
+
               },
             ),
             const Spacer(), // filler
