@@ -163,12 +163,14 @@ class _MyHomePageState extends State<MyHomePage> {
               _currentPage,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            SizedBox(
-              height: 500,
-              child: SingleChildScrollView(
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context)
+                        .padding
+                        .bottom), // Add padding to the bottom
                 child: ListView(
-                  padding: const EdgeInsets.only(bottom: 300),
-                  shrinkWrap: true,
+                  padding: const EdgeInsets.only(bottom: 150),
                   children: recentCaptures.map((path) {
                     return ListTile(
                       title: Row(
@@ -176,7 +178,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           const Spacer(),
                           Expanded(
-                            // TODO make this load the image or fail, omit if missing? best to warn
                             child: Center(
                               child: SvgPicture.asset(
                                 'assets/images/smiley.svg',

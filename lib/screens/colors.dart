@@ -107,7 +107,11 @@ class _ThemeSwitcherState extends State<ThemeSwitcher> {
         crossAxisCount: 3,
         children: [
           buildThemeButton(
-              context, ThemeMode.light, 'Light', Icons.wb_sunny_outlined,),
+            context,
+            ThemeMode.light,
+            'Light',
+            Icons.wb_sunny_outlined,
+          ),
           buildThemeButton(context, ThemeMode.dark, 'Dark', Icons.brightness_3),
           buildThemeButton(context, ThemeMode.system, 'Auto', Icons.sync),
         ],
@@ -116,7 +120,11 @@ class _ThemeSwitcherState extends State<ThemeSwitcher> {
   }
 
   Widget buildThemeButton(
-      BuildContext context, ThemeMode themeMode, String title, IconData icon,) {
+    BuildContext context,
+    ThemeMode themeMode,
+    String title,
+    IconData icon,
+  ) {
     return GestureDetector(
       onTap: () {
         changeTheme(themeMode);
