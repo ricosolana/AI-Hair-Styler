@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //}
 
   static const String tutorialCompletedPrefKey = 'tutorial-completed';
-  
+
   void _setPage(String newPage) {
     setState(() {
       _currentPage = newPage;
@@ -166,9 +166,8 @@ class _MyHomePageState extends State<MyHomePage> {
             Expanded(
               child: Padding(
                 padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context)
-                        .padding
-                        .bottom,), // Add padding to the bottom
+                  bottom: MediaQuery.of(context).padding.bottom,
+                ), // Add padding to the bottom
                 child: Stack(
                   children: [
                     ListView(

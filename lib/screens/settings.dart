@@ -1,9 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:senior_project_hair_ai/Navigation.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -114,7 +112,8 @@ class _MySettingsPageState extends State<MySettingsPage> {
               SettingsTile.switchTile(
                 title: const Text('Use Dark Theme'),
                 leading: const Icon(Icons.dark_mode),
-                initialValue: _isDarkTheme, // TODO ensure this reflects saved setting
+                initialValue:
+                    _isDarkTheme, // TODO ensure this reflects saved setting
                 onToggle: _saveTheme,
               ),
             ], //tiles

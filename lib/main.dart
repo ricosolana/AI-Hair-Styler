@@ -22,10 +22,11 @@ Future<void> main() async {
 
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final bool isDarkTheme = prefs.getBool(darkThemePrefKey) ?? false;
-  
+
   runApp(
     ChangeNotifierProvider(
-      create: (context) => ThemeNotifier(isDarkTheme ? ThemeMode.dark : ThemeMode.light),
+      create: (context) =>
+          ThemeNotifier(isDarkTheme ? ThemeMode.dark : ThemeMode.light),
       child: MyApp(
         camera: firstCamera,
       ),
@@ -49,7 +50,7 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   //MyApp({super.key, required this.camera, required this.themeNotifier});
 
-  MyApp({super.key, required this.camera});
+  const MyApp({super.key, required this.camera});
 
   final CameraDescription camera;
   //final ThemeNotifier themeNotifier;
@@ -59,7 +60,7 @@ class MyApp extends StatelessWidget {
 
   //@override
   //void initState() {
-  //  
+  //
   //}
 
   @override
