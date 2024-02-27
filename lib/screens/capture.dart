@@ -4,14 +4,10 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class TakePictureScreen extends StatefulWidget {
-  const TakePictureScreen({
-    super.key,
-    required this.camera,
-  });
-
-  final CameraDescription camera;
+  const TakePictureScreen({super.key});
 
   @override
   TakePictureScreenState createState() => TakePictureScreenState();
@@ -26,8 +22,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     super.initState();
     // To display the current output from the Camera,
     // create a CameraController.
+
+    final camera = Provider.of<CameraDescription>(context, listen: false);
+
     _controller = CameraController(
-      widget.camera,
+      camera,
       ResolutionPreset.medium,
     );
 

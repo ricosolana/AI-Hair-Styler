@@ -21,13 +21,8 @@ class _MySettingsPageState extends State<MySettingsPage> {
 
   bool _isDarkTheme = false;
 
-  Future<bool> _loadThemePref() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(darkThemePrefKey) ?? false;
-  }
-
   Future<void> _loadTheme() async {
-    _loadThemePref().then((isDarkTheme) {
+    loadThemePref().then((isDarkTheme) {
       setState(() {
         _isDarkTheme = isDarkTheme;
       });

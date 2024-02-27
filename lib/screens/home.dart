@@ -1,5 +1,4 @@
 import 'package:app_tutorial/app_tutorial.dart';
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:senior_project_hair_ai/Navigation.dart';
@@ -13,10 +12,9 @@ import 'package:senior_project_hair_ai/screens/tutorial.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({super.key, required this.title, required this.camera});
+  const MyHomePage({super.key, required this.title});
 
   final String title;
-  CameraDescription camera;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -263,7 +261,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 //
                 navigateTo(
                   context: context,
-                  screen: TakePictureScreen(camera: widget.camera),
+                  screen: const TakePictureScreen(),
                   style: NavigationRouteStyle.material,
                 );
               },
