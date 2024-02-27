@@ -3,6 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
 
+class ThemeNotifier extends ChangeNotifier {
+  ThemeMode _themeMode = ThemeMode.light;
+
+  ThemeNotifier(this._themeMode);
+
+  ThemeMode get themeMode => _themeMode;
+
+  set themeMode(ThemeMode themeMode) {
+    _themeMode = themeMode;
+    notifyListeners();
+  }
+
+  //ThemeNotifier(super.value);
+}
+
+const String darkThemePrefKey = 'dark-theme';
+
+// old ...
+
 class MyColorsPage extends StatefulWidget {
   const MyColorsPage({super.key, required this.camera});
 

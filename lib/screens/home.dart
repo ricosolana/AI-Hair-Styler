@@ -68,8 +68,8 @@ class _MyHomePageState extends State<MyHomePage> {
   //  //((_scaffoldKey.currentState!.widget.appBar!) as AppBar).leading.key = ValueKey('hamburgerButton');
   //}
 
-  static const String tutorialCompletedId = 'tutorial-completed';
-
+  static const String tutorialCompletedPrefKey = 'tutorial-completed';
+  
   void _setPage(String newPage) {
     setState(() {
       _currentPage = newPage;
@@ -78,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _tryStartTutorial() async {
     final prefs = await SharedPreferences.getInstance();
-    if (!(prefs.getBool(tutorialCompletedId) ?? false)) {
+    if (!(prefs.getBool(tutorialCompletedPrefKey) ?? false)) {
       _startTutorial();
     }
   }
@@ -98,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //  constructors / ... too much
   Future<void> _markTutorialCompleted() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setBool(tutorialCompletedId, true);
+    prefs.setBool(tutorialCompletedPrefKey, true);
   }
 
   void initTutorialItems() {
