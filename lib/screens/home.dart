@@ -9,7 +9,6 @@ import 'package:senior_project_hair_ai/screens/gallery.dart';
 import 'package:senior_project_hair_ai/screens/help.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/tutorial.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -75,8 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _tryStartTutorial() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!(prefs.getBool(tutorialCompletedPrefKey) ?? false)) {
+    if (!(await getPref(tutorialCompletedPrefKey, false))) {
       _startTutorial();
     }
   }
@@ -86,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
       Tutorial.showTutorial(
         context,
         tutorialItems,
-        onTutorialComplete: _markTutorialCompleted,
+        onTutorialComplete: () => setTutorialCompletedPref(true),
       );
     });
   }
@@ -94,9 +92,8 @@ class _MyHomePageState extends State<MyHomePage> {
   // TODO I do not know any other way to make this visible
   //  to tutorial.dart without passing this.object through several
   //  constructors / ... too much
-  Future<void> _markTutorialCompleted() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool(tutorialCompletedPrefKey, true);
+  Future<void> setTutorialCompletedPref(bool isCompleted) async {
+    setPref(tutorialCompletedPrefKey, isCompleted);
   }
 
   void initTutorialItems() {

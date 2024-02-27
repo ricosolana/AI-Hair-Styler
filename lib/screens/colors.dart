@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 const String darkThemePrefKey = 'dark-theme';
-
-Future<bool> loadThemePref() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool(darkThemePrefKey) ?? false;
-}
 
 class ThemeNotifier extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.light;

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
+import 'package:senior_project_hair_ai/screens/settings.dart';
 
 Future<void> main() async {
   // init camera library
@@ -14,7 +15,7 @@ Future<void> main() async {
   // Get a specific camera from the list of available cameras.
   final firstCamera = cameras.first;
 
-  final isDarkTheme = await loadThemePref();
+  final isDarkTheme = await getThemePref();
 
   runApp(
     MultiProvider(
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Hair Styler',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
         useMaterial3: true,
         brightness: Brightness.light,
       ),

@@ -9,6 +9,36 @@ import 'package:shared_preferences/shared_preferences.dart';
 // TODO properly implement
 // https://docs.flutter.dev/cookbook/persistence/key-value
 
+Future<T> getPref<T>(String prefKey, T def) async {
+  final pref = await SharedPreferences.getInstance();
+  return pref.get(prefKey) as T ?? def;
+}
+
+Future<bool> setPref<T>(String prefKey, T value) async {
+  final pref = await SharedPreferences.getInstance();
+  if (T == int) {
+    return pref.setInt(prefKey, value as int);
+  } else if (T == double) {
+    return pref.setDouble(prefKey, value as double);
+  } else if (T == bool) {
+    return pref.setBool(prefKey, value as bool);
+  } else if (T == String) {
+    return pref.setString(prefKey, value as String);
+  } else if (T == List<String>) {
+    return pref.setStringList(prefKey, value as List<String>);
+  } else {
+    throw UnsupportedError('Unsupported type $T');
+  }
+}
+
+Future<bool> getThemePref() async {
+  return getPref(darkThemePrefKey, false);
+}
+
+Future<void> setThemePref(bool isDarkTheme) async {
+  setPref(darkThemePrefKey, isDarkTheme);
+}
+
 class MySettingsPage extends StatefulWidget {
   const MySettingsPage({super.key});
 
@@ -22,20 +52,15 @@ class _MySettingsPageState extends State<MySettingsPage> {
   bool _isDarkTheme = false;
 
   Future<void> _loadTheme() async {
-    loadThemePref().then((isDarkTheme) {
+    getThemePref().then((isDarkTheme) {
       setState(() {
         _isDarkTheme = isDarkTheme;
       });
     });
   }
 
-  Future<void> _saveThemePref(bool isDarkTheme) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool(darkThemePrefKey, isDarkTheme);
-  }
-
   Future<void> _saveTheme(bool isDarkTheme) async {
-    _saveThemePref(isDarkTheme);
+    setThemePref(isDarkTheme);
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
     themeNotifier.themeMode = isDarkTheme ? ThemeMode.dark : ThemeMode.light;
     setState(() {
