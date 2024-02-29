@@ -1,7 +1,14 @@
 import 'package:app_tutorial/app_tutorial.dart';
 import 'package:flutter/material.dart';
+import 'package:senior_project_hair_ai/screens/settings.dart';
 
 // Code borrowed from https://pub.dev/packages/app_tutorial/example
+
+const String tutorialCompletedPrefKey = 'tutorial-completed';
+
+Future<void> setTutorialCompletedPref(bool isCompleted) async {
+  setPref(tutorialCompletedPrefKey, isCompleted);
+}
 
 class TutorialItemContent extends StatelessWidget {
   const TutorialItemContent({
@@ -41,10 +48,10 @@ class TutorialItemContent extends StatelessWidget {
                     // TODO determine whether this calls completer handler
                     onPressed: () {
                       Tutorial.skipAll(context);
-                      //_MyHomePageState.markTutorialCompleted();
+                      setTutorialCompletedPref(true);
                     },
                     child: const Text(
-                      'Skip onboarding',
+                      'Skip All',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),

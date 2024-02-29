@@ -17,12 +17,14 @@ Future<void> main() async {
 
   final isDarkTheme = await getThemePref();
 
+  final themeNotifier =
+      ThemeNotifier(isDarkTheme ? ThemeMode.dark : ThemeMode.light);
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (context) =>
-              ThemeNotifier(isDarkTheme ? ThemeMode.dark : ThemeMode.light),
+        ChangeNotifierProvider.value(
+          value: themeNotifier,
         ),
         Provider<CameraDescription>.value(
           value: firstCamera,
@@ -51,7 +53,7 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
       ),
       themeMode: themeNotifier.themeMode, // use saved pref, not built-in
-      home: const MyHomePage(title: "Ai_Hair_Styler"),
+      home: const MyHomePage(title: "Ai Hair Styler"),
     );
   }
 }

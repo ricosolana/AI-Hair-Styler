@@ -65,8 +65,6 @@ class _MyHomePageState extends State<MyHomePage> {
   //  //((_scaffoldKey.currentState!.widget.appBar!) as AppBar).leading.key = ValueKey('hamburgerButton');
   //}
 
-  static const String tutorialCompletedPrefKey = 'tutorial-completed';
-
   void _setPage(String newPage) {
     setState(() {
       _currentPage = newPage;
@@ -87,13 +85,6 @@ class _MyHomePageState extends State<MyHomePage> {
         onTutorialComplete: () => setTutorialCompletedPref(true),
       );
     });
-  }
-
-  // TODO I do not know any other way to make this visible
-  //  to tutorial.dart without passing this.object through several
-  //  constructors / ... too much
-  Future<void> setTutorialCompletedPref(bool isCompleted) async {
-    setPref(tutorialCompletedPrefKey, isCompleted);
   }
 
   void initTutorialItems() {
