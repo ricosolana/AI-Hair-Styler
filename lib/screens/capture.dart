@@ -1,4 +1,3 @@
-// A screen that allows users to take a picture using a given camera.
 import 'dart:developer';
 import 'dart:io';
 
@@ -20,97 +19,151 @@ class TakePictureScreen extends StatefulWidget {
 class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
+  List<String> imagePaths = [];
 
   @override
   void initState() {
     super.initState();
-    // To display the current output from the Camera,
-    // create a CameraController.
     _controller = CameraController(
       widget.camera,
       ResolutionPreset.medium,
     );
-
-    // Next, initialize the controller. This returns a Future.
     _initializeControllerFuture = _controller.initialize();
   }
 
   @override
   void dispose() {
-    // Dispose of the controller when the widget is disposed.
     _controller.dispose();
     super.dispose();
   }
 
+  void _onPictureTaken(String path) {
+    setState(() {
+      imagePaths.add(path);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Take a picture')),
-      // You must wait until the controller is initialized before displaying the
-      // camera preview. Use a FutureBuilder to display a loading spinner until the
-      // controller has finished initializing.
-      body: FutureBuilder<void>(
-        future: _initializeControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            // If the Future is complete, display the preview.
-            return CameraPreview(_controller);
-          } else {
-            // Otherwise, display a loading indicator.
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
+      appBar: AppBar(title: const Text("Take a Picture of:")),
+      body: Column(
+        children: <Widget>[
+          const SizedBox(height: 20), // Add some spacing
+          Text(
+            imagePaths.isEmpty
+                ? "Your face from the front (1/4)"
+                : imagePaths.length == 1
+                ? "The LEFT side of your head (2/4)"
+                : imagePaths.length == 2
+                ? "The RIGHT side of your head (3/4)"
+                : "The BACK of your head (4/4)",
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20), // Add some spacing
+          FutureBuilder<void>(
+            future: _initializeControllerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return Expanded(child: CameraPreview(_controller));
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        // Provide an onPressed callback.
-        onPressed: () async {
-          // Take the Picture in a try / catch block. If anything goes wrong,
-          // catch the error.
-          try {
-            // Ensure that the camera is initialized.
-            await _initializeControllerFuture;
+      floatingActionButton: SizedBox(
+        height: 100.0,
+        width: 100.0,
+        child: FittedBox(
+          child: FloatingActionButton(
+            onPressed: () async {
+              try {
+                await _initializeControllerFuture;
+                final image = await _controller.takePicture();
+                if (!context.mounted) return;
+                _onPictureTaken(image.path);
+                if (imagePaths.length >= 4) {
+                  // Navigate to the DisplayPictureScreen after taking all four pictures
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          DisplayPictureScreen(imagePaths: imagePaths),
+                    ),
+                  );
 
-            // Attempt to take a picture and get the file `image`
-            // where it was saved.
-            final image = await _controller.takePicture();
-
-            if (!context.mounted) return;
-
-            // If the picture was taken, display it on a new screen.
-            //await navigateTo(context: context, screen: DisplayPictureScreen(imagePath: image.path), style: NavigationRouteStyle.material);
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(
-                  // Pass the automatically generated path to
-                  // the DisplayPictureScreen widget.
-                  imagePath: image.path,
-                ),
-              ),
-            );
-          } catch (e) {
-            // If an error occurs, log the error to the console.
-            log(e.toString());
-          }
-        },
-        child: const Icon(Icons.camera_alt),
+                  // Clear the imagePaths list after navigating back
+                  setState(() {
+                    imagePaths.clear();
+                  });
+                }
+              } catch (e) {
+                log(e.toString());
+              }
+            },
+            shape: const CircleBorder(),
+            child: const Icon(Icons.camera_alt, size: 28.0),
+          ), // Align button to the middle
+        ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
 
-// A widget that displays the picture taken by the user.
 class DisplayPictureScreen extends StatelessWidget {
-  final String imagePath;
+  final List<String> imagePaths;
+  final List<String> captions = ['Front', 'Left', 'Right', 'Back'];
 
-  const DisplayPictureScreen({super.key, required this.imagePath});
+  DisplayPictureScreen({super.key, required this.imagePaths});
 
   @override
   Widget build(BuildContext context) {
+    final controller = PageController(
+      initialPage: 1000, // Start at a large number to enable infinite scrolling
+    );
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Display the Picture')),
-      // The image is stored as a file on the device. Use the `Image.file`
-      // constructor with the given path to display the image.
-      body: Image.file(File(imagePath)),
+      appBar: AppBar(title: const Text('Your Captures:')),
+      body: PageView.builder(
+        controller: controller,
+        itemBuilder: (context, index) {
+          final captionIndex = index % captions.length;
+          final imagePathIndex = index % imagePaths.length;
+
+          return Column(
+            children: [
+              const SizedBox(height: 20), // Add padding above the caption
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  captions[captionIndex],
+                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Expanded(
+                child: Image.file(
+                  File(imagePaths[imagePathIndex]),
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 20), // Add spacing between image and button
+            ],
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton.large(
+        onPressed: () {
+          // Add functionality for the "Edit" button here
+        },
+        shape: const CircleBorder(),
+        child: const Icon(
+          Icons.auto_fix_high_rounded,
+          size: 50.0,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
