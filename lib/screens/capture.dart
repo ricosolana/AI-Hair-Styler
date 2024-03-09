@@ -55,10 +55,10 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             imagePaths.isEmpty
                 ? "Your face from the front (1/4)"
                 : imagePaths.length == 1
-                ? "The LEFT side of your head (2/4)"
-                : imagePaths.length == 2
-                ? "The RIGHT side of your head (3/4)"
-                : "The BACK of your head (4/4)",
+                    ? "The LEFT side of your head (2/4)"
+                    : imagePaths.length == 2
+                        ? "The RIGHT side of your head (3/4)"
+                        : "The BACK of your head (4/4)",
             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20), // Add some spacing
@@ -140,7 +140,8 @@ class DisplayPictureScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   captions[captionIndex],
-                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 32, fontWeight: FontWeight.bold),
                 ),
               ),
               Expanded(
@@ -149,7 +150,8 @@ class DisplayPictureScreen extends StatelessWidget {
                   fit: BoxFit.contain,
                 ),
               ),
-              const SizedBox(height: 20), // Add spacing between image and button
+              const SizedBox(
+                  height: 20), // Add spacing between image and button
             ],
           );
         },
