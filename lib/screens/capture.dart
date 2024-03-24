@@ -1,9 +1,13 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:convert_native_img_stream/convert_native_img_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as imglib;
 
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({super.key});
@@ -16,6 +20,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   List<String> imagePaths = [];
+  final nativeConvert = ConvertNativeImgStream();
 
   @override
   void initState() {
@@ -27,9 +32,39 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
     _controller = CameraController(
       camera,
-      ResolutionPreset.medium,
+      ResolutionPreset.low,
     );
-    _initializeControllerFuture = _controller.initialize();
+
+    // TODO ffi?
+    // https://medium.com/@hugand/capture-photos-from-camera-using-image-stream-with-flutter-e9af94bc2bee
+    _initializeControllerFuture = _controller.initialize().then((_) async {
+      _controller.startImageStream((image) async { 
+        final jpegByte = await nativeConvert.convertImgToBytes(image.planes.first.bytes, image.width, image.height, quality: 90);
+
+        // Android: image.format.group: yuv420
+        final client = http.Client();
+        try {
+          // https://medium.com/kbtg-life/real-time-machine-learning-with-flutter-camera-bbcf1b5c3193#d4a0
+
+          //final jpgImage = imglib.decodeImage(image.planes[0].bytes);
+
+          //final response = await client.post(
+          //    Uri.http('10.0.2.2', 'api/svoji'),
+          //    body: {'image': imglib.encodeJpg(jpgImage!)});
+
+          final response = await client.post(
+              Uri.http('10.0.2.2', 'api/svoji'),
+              body: {'image': jpegByte});
+
+          final decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
+          //final uri = Uri.parse(decodedResponse['uri'] as String);
+          //log(client.get(uri).toString());
+          log(decodedResponse.toString());
+        } finally {
+          client.close();
+        }
+      });
+    });
   }
 
   @override
