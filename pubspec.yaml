@@ -41,6 +41,8 @@ dependencies:
   provider: ^5.0.0
   app_tutorial: ^1.0.6
   shared_preferences: ^2.2.2
+  flutter_launcher_icons: ^0.13.1
+  http: ^1.2.1
 
 dev_dependencies:
   flutter_test:
