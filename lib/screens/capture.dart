@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:convert_native_img_stream/convert_native_img_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart' as http_parser;
 import 'package:image/image.dart' as imglib;
 
 class TakePictureScreen extends StatefulWidget {
@@ -39,32 +41,106 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     // https://medium.com/@hugand/capture-photos-from-camera-using-image-stream-with-flutter-e9af94bc2bee
     _initializeControllerFuture = _controller.initialize().then((_) async {
       _controller.startImageStream((image) async { 
-        final jpegByte = await nativeConvert.convertImgToBytes(image.planes.first.bytes, image.width, image.height, quality: 90);
+        //final jpegByte = await nativeConvert.convertImgToBytes(image.planes.first.bytes, image.width, image.height, quality: 90);
+
+        final rgbImage = _convertYUV420toImageColor(image);
 
         // Android: image.format.group: yuv420
+
+        // TODO do not create a new HTTP client here, create outside that attempts reconnects
+        //  use socketio library for persistent streams?
+        //  multiple http requests do not need to exist at one time, completely inefficient
+        //  server will only respond when ready; 
+        //  send a new frame when previous was acknowledged, regarding these discrete frames?
+        //  this will ofc change later when socketio may be used.
         final client = http.Client();
         try {
           // https://medium.com/kbtg-life/real-time-machine-learning-with-flutter-camera-bbcf1b5c3193#d4a0
 
-          //final jpgImage = imglib.decodeImage(image.planes[0].bytes);
+          final jpegBytes = imglib.encodeJpg(rgbImage);
 
+          // The 10.0.2.2 EP is a proxy set up in Android emulator (points to localhost)
           //final response = await client.post(
           //    Uri.http('10.0.2.2', 'api/svoji'),
           //    body: {'image': imglib.encodeJpg(jpgImage!)});
 
-          final response = await client.post(
-              Uri.http('10.0.2.2', 'api/svoji'),
-              body: {'image': jpegByte});
+          // TODO
+          // use multipart encoder for files
+          // https://stackoverflow.com/a/76921312/9044814
+          final request = http.MultipartRequest(
+              'POST',
+              Uri.parse('http://10.0.2.2:80/api/svoji'),
+          );
 
-          final decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
-          //final uri = Uri.parse(decodedResponse['uri'] as String);
-          //log(client.get(uri).toString());
-          log(decodedResponse.toString());
-        } finally {
+          //request.files.add(
+          //  http.MultipartFile.fromBytes(
+          //    'image', 
+          //    jpegBytes,
+          //    contentType: http_parser.MediaType.parse('image/jpeg')));
+
+          request.files.add(
+            http.MultipartFile.fromBytes(
+              'image', 
+              jpegBytes,
+              filename: 'image.jpeg'));
+
+          final responseStream = await request.send();
+          final response = await http.Response.fromStream(responseStream);
+
+          // TODO parse response image and display?
+          if(response.statusCode == 200) {
+            log("success");
+          } else {
+            log('failed');
+          }
+        } catch(e) {
+          log(e.toString());
+        }
+        finally {
           client.close();
         }
       });
     });
+  }
+
+  // TODO play around with performance measures
+  //  use native code (c++ / java?)
+  //  downscale input image
+  imglib.Image _convertYUV420toImageColor(CameraImage image) {
+    const shift = 0xFF << 24;
+
+    final int width = image.width;
+    final int height = image.height;
+    final int uvRowStride = image.planes[1].bytesPerRow;
+    final int uvPixelStride = image.planes[1].bytesPerPixel!;
+
+    final img = imglib.Image(height: height, width: width); // Create Image buffer
+
+    // Fill image buffer with plane[0] from YUV420_888
+    for (int x = 0; x < width; x++) {
+      for (int y = 0; y < height; y++) {
+        final int uvIndex =
+            uvPixelStride * (x / 2).floor() + uvRowStride * (y / 2).floor();
+        final int index = y * width + x;
+
+        final yp = image.planes[0].bytes[index];
+        final up = image.planes[1].bytes[uvIndex];
+        final vp = image.planes[2].bytes[uvIndex];
+        // Calculate pixel color
+        final r = (yp + vp * 1436 / 1024 - 179).round().clamp(0, 255);
+        final g = (yp - up * 46549 / 131072 + 44 - vp * 93604 / 131072 + 91)
+            .round()
+            .clamp(0, 255);
+        final b = (yp + up * 1814 / 1024 - 227).round().clamp(0, 255);
+        // color: 0x FF  FF  FF  FF
+        //           A   B   G   R
+        if (img.isBoundsSafe(height - y, x)) {
+          img.setPixelRgba(height - y, x, r, g, b, shift);
+        }
+      }
+    }
+
+    return img;
   }
 
   @override
