@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:senior_project_hair_ai/recents_provider.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
@@ -17,8 +18,7 @@ Future<void> main() async {
 
   final isDarkTheme = await getThemePref();
 
-  final themeNotifier =
-      ThemeNotifier(isDarkTheme ? ThemeMode.dark : ThemeMode.light);
+  final themeNotifier = ThemeNotifier(isDarkTheme ? ThemeMode.dark : ThemeMode.light);
 
   runApp(
     MultiProvider(
@@ -29,6 +29,7 @@ Future<void> main() async {
         Provider<CameraDescription>.value(
           value: firstCamera,
         ),
+        ChangeNotifierProvider(create: (_) => RecentsProvider()),
       ],
       child: const MyApp(),
     ),

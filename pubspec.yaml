@@ -46,6 +46,8 @@ dependencies:
   ffi: ^2.1.2
   image: ^4.1.7
   convert_native_img_stream: ^0.0.1
+  crypto: ^3.0.3
+  fluttertoast: ^8.2.4
 
 dev_dependencies:
   flutter_test:

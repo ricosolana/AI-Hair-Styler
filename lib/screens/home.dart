@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:app_tutorial/app_tutorial.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/Navigation.dart';
+import 'package:senior_project_hair_ai/recents_provider.dart';
 import 'package:senior_project_hair_ai/screens/about.dart';
 import 'package:senior_project_hair_ai/screens/capture.dart';
 import 'package:senior_project_hair_ai/screens/editor.dart';
@@ -21,20 +25,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _currentPage = 'Home';
-  List<String> recentCaptures = [
-    "path/to/recents/a",
-    "path/to/recents/b",
-    "path/to/recents/c",
-    "path/to/recents/d",
-    "path/to/recents/e",
-    "path/to/recents/f",
-    "path/to/recents/g",
-    "path/to/recents/h",
-    "path/to/recents/i",
-    "path/to/recents/j",
-    "path/to/recents/k",
-    "path/to/recents/l",
-  ];
 
   //final _scaffoldKey = GlobalKey<ScaffoldState>();
   //final hamburgerKey = ValueKey();
@@ -156,9 +146,48 @@ class _MyHomePageState extends State<MyHomePage> {
                 ), // Add padding to the bottom
                 child: Stack(
                   children: [
+                    Consumer<RecentsProvider>(
+                      builder: (context, recentsProvider, child) {
+                        return ListView(
+                          padding: const EdgeInsets.only(bottom: 150),
+                          children: recentsProvider.savedFiles.reversed.map((path) {
+                            return ListTile(
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Spacer(),
+                                  Expanded(
+                                    child: Center(
+                                      child: Image.file(File(path), width: 50,)
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 10,
+                                    child: Text(
+                                      path,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 22.0,
+                                      ),
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                ],
+                              ),
+                              onTap: () {
+                                //TODO: Add logic to open recently edited photo
+                              },
+                            );
+                          }).toList(),
+                        );
+
+                      }
+                    ),
+
+                    /*
                     ListView(
                       padding: const EdgeInsets.only(bottom: 150),
-                      children: recentCaptures.map((path) {
+                      children: Provider.of<RecentsProvider>(context, listen: false).savedFiles.reversed.map((path) {
                         return ListTile(
                           title: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -166,16 +195,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               const Spacer(),
                               Expanded(
                                 child: Center(
-                                  child: SvgPicture.asset(
-                                    'assets/images/smiley.svg',
-                                    width: 50,
-                                  ),
+                                  child: Image.file(File(path), width: 50,)
                                 ),
                               ),
                               Expanded(
                                 flex: 10,
                                 child: Text(
-                                  '(Recently Edited Photo ${recentCaptures.indexOf(path) + 1})',
+                                  path,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 22.0,
@@ -191,6 +217,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         );
                       }).toList(),
                     ),
+                    */
+
+                    
                     Positioned(
                       top: 500,
                       bottom: 0,
