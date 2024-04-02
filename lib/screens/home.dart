@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:app_tutorial/app_tutorial.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/Navigation.dart';
 import 'package:senior_project_hair_ai/recents_provider.dart';
@@ -147,42 +146,43 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Stack(
                   children: [
                     Consumer<RecentsProvider>(
-                      builder: (context, recentsProvider, child) {
-                        return ListView(
-                          padding: const EdgeInsets.only(bottom: 150),
-                          children: recentsProvider.savedFiles.reversed.map((path) {
-                            return ListTile(
-                              title: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Spacer(),
-                                  Expanded(
-                                    child: Center(
-                                      child: Image.file(File(path), width: 50,)
+                        builder: (context, recentsProvider, child) {
+                      return ListView(
+                        padding: const EdgeInsets.only(bottom: 150),
+                        children:
+                            recentsProvider.savedFiles.reversed.map((path) {
+                          return ListTile(
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Spacer(),
+                                Expanded(
+                                  child: Center(
+                                      child: Image.file(
+                                    File(path),
+                                    width: 50,
+                                  ),),
+                                ),
+                                Expanded(
+                                  flex: 10,
+                                  child: Text(
+                                    path,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 22.0,
                                     ),
                                   ),
-                                  Expanded(
-                                    flex: 10,
-                                    child: Text(
-                                      path,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 22.0,
-                                      ),
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                ],
-                              ),
-                              onTap: () {
-                                //TODO: Add logic to open recently edited photo
-                              },
-                            );
-                          }).toList(),
-                        );
-
-                      }
-                    ),
+                                ),
+                                const Spacer(),
+                              ],
+                            ),
+                            onTap: () {
+                              //TODO: Add logic to open recently edited photo
+                            },
+                          );
+                        }).toList(),
+                      );
+                    },),
 
                     /*
                     ListView(
@@ -219,7 +219,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     */
 
-                    
                     Positioned(
                       top: 500,
                       bottom: 0,

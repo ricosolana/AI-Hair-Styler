@@ -18,7 +18,8 @@ Future<void> main() async {
 
   final isDarkTheme = await getThemePref();
 
-  final themeNotifier = ThemeNotifier(isDarkTheme ? ThemeMode.dark : ThemeMode.light);
+  final themeNotifier =
+      ThemeNotifier(isDarkTheme ? ThemeMode.dark : ThemeMode.light);
 
   runApp(
     MultiProvider(

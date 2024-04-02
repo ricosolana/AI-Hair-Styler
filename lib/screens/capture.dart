@@ -81,12 +81,12 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
 }
 
 class DisplayPictureScreen extends StatelessWidget {
- final XFile imageCachedFile;
+  final XFile imageCachedFile;
 
- const DisplayPictureScreen({super.key, required this.imageCachedFile});
+  const DisplayPictureScreen({super.key, required this.imageCachedFile});
 
- @override
- Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Preview')),
       body: Column(
@@ -104,17 +104,20 @@ class DisplayPictureScreen extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center, // Center the overlay text
               children: [
-                Center( // Center the image
-                 child: Image.file(
+                Center(
+                  // Center the image
+                  child: Image.file(
                     File(imageCachedFile.path),
                     fit: BoxFit.contain, // Maintain aspect ratio
-                 ),
+                  ),
                 ),
-                Positioned( // Position the overlay text
-                 top: 20, // Adjust as needed
-                 child: Container(
+                Positioned(
+                  // Position the overlay text
+                  top: 20, // Adjust as needed
+                  child: Container(
                     padding: const EdgeInsets.all(8.0),
-                    color: Colors.black.withOpacity(0.4), // Semi-transparent background
+                    color: Colors.black
+                        .withOpacity(0.4), // Semi-transparent background
                     child: const Text(
                       'Save or Retake',
                       style: TextStyle(
@@ -122,7 +125,7 @@ class DisplayPictureScreen extends StatelessWidget {
                         color: Colors.white,
                       ),
                     ),
-                 ),
+                  ),
                 ),
               ],
             ),
@@ -132,20 +135,21 @@ class DisplayPictureScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final directory = await getApplicationDocumentsDirectory();
-          final path = '${directory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+          final path =
+              '${directory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
           final File file = File(path);
           await file.writeAsBytes(await imageCachedFile.readAsBytes());
 
           if (!context.mounted) return;
-          
+
           Navigator.of(context).popUntil((route) => route.isFirst);
 
           Fluttertoast.showToast(msg: 'Image saved as $path');
-          Provider.of<RecentsProvider>(context, listen: false).addFile  (path);
+          Provider.of<RecentsProvider>(context, listen: false).addFile(path);
         },
         child: const Icon(Icons.save_alt, size: 28.0),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
- }
+  }
 }
