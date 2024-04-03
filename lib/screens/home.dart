@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:app_tutorial/app_tutorial.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/Navigation.dart';
 import 'package:senior_project_hair_ai/recents_provider.dart';
@@ -60,6 +61,18 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  File ? imageUploaded;
+
+  Future uploadImage() async{
+    final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (returnedImage == null) {
+      return;
+    }
+    setState(() {
+      imageUploaded = File(returnedImage.path);
+      Provider.of<RecentsProvider>(context, listen: false).addFile(returnedImage.path);
+    });
+    }
   Future<void> _tryStartTutorial() async {
     if (!(await getPref(tutorialCompletedPrefKey, false))) {
       _startTutorial();
@@ -177,7 +190,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               ],
                             ),
                             onTap: () {
-                              //TODO: Add logic to open recently edited photo
+                              //TODO: ***Open Uploaded/Captured Photo, Navigate to Editing Screen (Colors, Hairstyles, Generate Button)
                             },
                           );
                         }).toList(),
@@ -256,6 +269,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 // Upload Button
                 // TODO: Add logic for the upload button
+                uploadImage();
               },
               shape: const CircleBorder(),
               child: const Icon(
@@ -273,8 +287,6 @@ class _MyHomePageState extends State<MyHomePage> {
               key: captureFloatingKey,
               onPressed: () {
                 // Camera Button
-                // TODO: Add logic to capture photos
-                //
                 navigateTo(
                   context: context,
                   screen: const TakePictureScreen(),
@@ -401,5 +413,6 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       },
     );
+
   }
 }
