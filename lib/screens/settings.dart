@@ -66,8 +66,9 @@ class _MySettingsPageState extends State<MySettingsPage> {
   late CameraDescription camera;
 
   bool _isDarkTheme = false;
-  String _apiServer = "";
+  String _apiServer = '';
   late TextEditingController _textEditingController; // = TextEditingController(text:);
+  String _apiServerErrorText = '';
 
   Future<void> _loadTheme() async {
     getThemePref().then((isDarkTheme) {
@@ -98,6 +99,12 @@ class _MySettingsPageState extends State<MySettingsPage> {
     setApiServerPref(apiServer);
     setState(() {
       _apiServer = apiServer;
+    });
+  }
+
+  void _setApiServerErrorText(String text) {
+    setState(() {
+      _apiServerErrorText = text;
     });
   }
 
@@ -135,7 +142,23 @@ class _MySettingsPageState extends State<MySettingsPage> {
                         title: const Text('API Server'),
                         content: TextField(
                           controller: _textEditingController,
-                          decoration: const InputDecoration(hintText: "https://10.10.10.1/"),
+                          decoration: InputDecoration(
+                            hintText: "https://10.10.10.1/", 
+                            errorText: _apiServerErrorText
+                          ),
+                          //validator: (value) {
+                          //  if (value == null || value.isEmpty) {
+                          //    return 'Please enter a URL';
+                          //  }
+                          //  if (!(Uri.tryParse(value)?.hasAbsolutePath ?? false)) {
+                          //    return 'Please enter a valid URL';
+                          //  }
+                          //  return null;
+                          //},
+                          //onSaved: (newValue) {
+                          //  _saveApiServer(_textEditingController.text);
+                          //  Navigator.of(context).pop();
+                          //},
                         ),
                         actions: <Widget>[
                           TextButton(
@@ -148,8 +171,18 @@ class _MySettingsPageState extends State<MySettingsPage> {
                             child: const Text('Save'),
                             onPressed: () {
                               // Handle the submit action
-                              _saveApiServer(_textEditingController.text);
-                              Navigator.of(context).pop();
+                              final text = _textEditingController.text;
+                              if (text.isEmpty) {
+                                _setApiServerErrorText('Must input a URL');
+                              }
+                              else if (!(Uri.tryParse(text)?.isAbsolute ?? false)) {
+                                // error
+                                _setApiServerErrorText('Must be in a URL format');
+                              } else {
+                                _saveApiServer(text);
+                                Navigator.of(context).pop();
+                                _setApiServerErrorText('');
+                              }
                             },
                           ),
                         ],
@@ -203,6 +236,57 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 onToggle: _saveTheme,
               ),
             ], //tiles
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+
+class MyApiServersSettingsPage extends StatefulWidget {
+  const MyApiServersSettingsPage({super.key});
+
+  @override
+  State<MyApiServersSettingsPage> createState() => _MyApiServersSettingsPageState();
+}
+
+class _MyApiServersSettingsPageState extends State<MyApiServersSettingsPage> {
+  late CameraDescription camera;
+
+  bool _isDarkTheme = false;
+
+  @override
+  void initState() {
+    super.initState();
+    //_loadApiServers(); // load from prefs?
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text('Settings'),
+      ),
+      body: SettingsList(
+        sections: [
+          SettingsSection(
+            title: const Text('General'),
+            tiles: [
+              SettingsTile.navigation(
+                title: const Text('API Servers'),
+                leading: const Icon(CupertinoIcons.wrench),
+                description: const Text('Backend servers to process image'),
+                onPressed: (context) {
+                  // 
+                },
+              ),
+              //SettingsTile.switchTile(
+              //  title: ,
+              //)
+            ],
           ),
         ],
       ),
