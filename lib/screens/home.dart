@@ -61,18 +61,21 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  File ? imageUploaded;
+  File? imageUploaded;
 
-  Future uploadImage() async{
-    final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+  Future uploadImage() async {
+    final returnedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (returnedImage == null) {
       return;
     }
     setState(() {
       imageUploaded = File(returnedImage.path);
-      Provider.of<RecentsProvider>(context, listen: false).addFile(returnedImage.path);
+      Provider.of<RecentsProvider>(context, listen: false)
+          .addFile(returnedImage.path);
     });
-    }
+  }
+
   Future<void> _tryStartTutorial() async {
     if (!(await getPref(tutorialCompletedPrefKey, false))) {
       _startTutorial();
@@ -159,43 +162,45 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Stack(
                   children: [
                     Consumer<RecentsProvider>(
-                        builder: (context, recentsProvider, child) {
-                      return ListView(
-                        padding: const EdgeInsets.only(bottom: 150),
-                        children:
-                            recentsProvider.savedFiles.reversed.map((path) {
-                          return ListTile(
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Spacer(),
-                                Expanded(
-                                  child: Center(
+                      builder: (context, recentsProvider, child) {
+                        return ListView(
+                          padding: const EdgeInsets.only(bottom: 150),
+                          children:
+                              recentsProvider.savedFiles.reversed.map((path) {
+                            return ListTile(
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Spacer(),
+                                  Expanded(
+                                    child: Center(
                                       child: Image.file(
-                                    File(path),
-                                    width: 50,
-                                  ),),
-                                ),
-                                Expanded(
-                                  flex: 10,
-                                  child: Text(
-                                    path,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 22.0,
+                                        File(path),
+                                        width: 50,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const Spacer(),
-                              ],
-                            ),
-                            onTap: () {
-                              //TODO: ***Open Uploaded/Captured Photo, Navigate to Editing Screen (Colors, Hairstyles, Generate Button)
-                            },
-                          );
-                        }).toList(),
-                      );
-                    },),
+                                  Expanded(
+                                    flex: 10,
+                                    child: Text(
+                                      path,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 22.0,
+                                      ),
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                ],
+                              ),
+                              onTap: () {
+                                //TODO: ***Open Uploaded/Captured Photo, Navigate to Editing Screen (Colors, Hairstyles, Generate Button)
+                              },
+                            );
+                          }).toList(),
+                        );
+                      },
+                    ),
 
                     /*
                     ListView(
@@ -413,6 +418,5 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       },
     );
-
   }
 }
