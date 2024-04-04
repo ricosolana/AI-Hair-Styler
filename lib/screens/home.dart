@@ -61,6 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  // TODO what is this stored as a field for?
   File? imageUploaded;
 
   Future uploadImage() async {

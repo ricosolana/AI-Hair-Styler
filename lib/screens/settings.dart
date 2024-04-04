@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:senior_project_hair_ai/navigation.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,9 +10,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 // TODO properly implement
 // https://docs.flutter.dev/cookbook/persistence/key-value
 
+const String apiServerPrefKey = 'api-server';
+
 Future<T> getPref<T>(String prefKey, T def) async {
   final pref = await SharedPreferences.getInstance();
-  return pref.get(prefKey) as T ?? def;
+  final Object? value = pref.get(prefKey);
+  if (value is T) {
+    return value;
+  }
+  return def;
+  //return pref.get(prefKey) as T ?? def;
 }
 
 Future<bool> setPref<T>(String prefKey, T value) async {
@@ -39,6 +47,14 @@ Future<void> setThemePref(bool isDarkTheme) async {
   setPref(darkThemePrefKey, isDarkTheme);
 }
 
+Future<String> getApiServerPref() async {
+  return getPref(apiServerPrefKey, '');
+}
+
+Future<void> setApiServerPref(String apiServer) async {
+  setPref(apiServerPrefKey, apiServer);
+}
+
 class MySettingsPage extends StatefulWidget {
   const MySettingsPage({super.key});
 
@@ -50,6 +66,8 @@ class _MySettingsPageState extends State<MySettingsPage> {
   late CameraDescription camera;
 
   bool _isDarkTheme = false;
+  String _apiServer = "";
+  late TextEditingController _textEditingController; // = TextEditingController(text:);
 
   Future<void> _loadTheme() async {
     getThemePref().then((isDarkTheme) {
@@ -68,10 +86,27 @@ class _MySettingsPageState extends State<MySettingsPage> {
     });
   }
 
+  Future<void> _loadApiServer() async {
+    getApiServerPref().then((apiServer) {
+      setState(() {
+        _apiServer = apiServer;
+      });
+    });
+  }
+
+  Future<void> _saveApiServer(String apiServer) async {
+    setApiServerPref(apiServer);
+    setState(() {
+      _apiServer = apiServer;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     _loadTheme();
+    _loadApiServer();
+    _textEditingController = TextEditingController(text: _apiServer);
   }
 
   @override
@@ -84,14 +119,45 @@ class _MySettingsPageState extends State<MySettingsPage> {
       body: SettingsList(
         sections: [
           SettingsSection(
-            title: const Text('General:'),
+            title: const Text('General'),
             tiles: [
               SettingsTile.navigation(
-                title: const Text('My Abstract'),
+                title: const Text('API Server'),
                 leading: const Icon(CupertinoIcons.wrench),
-                description: const Text('Some text'),
+                description: Text(_apiServer), //const Text('Backend servers to process image'),
                 onPressed: (context) {
-                  //Navigation.navigateTo(context: context, screen: screen, style: style)
+
+
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('API Server'),
+                        content: TextField(
+                          controller: _textEditingController,
+                          decoration: const InputDecoration(hintText: "https://10.10.10.1/"),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('Cancel'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          TextButton(
+                            child: const Text('Save'),
+                            onPressed: () {
+                              // Handle the submit action
+                              _saveApiServer(_textEditingController.text);
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
+
                 },
               ),
               //SettingsTile.switchTile(
@@ -100,7 +166,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
             ],
           ),
           SettingsSection(
-            title: const Text('Options:'),
+            title: const Text('Options'),
             tiles: [
               SettingsTile(
                 title: const Text('Option 1'),
@@ -116,7 +182,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
             ],
           ),
           SettingsSection(
-            title: const Text('Customization:'),
+            title: const Text('Customization'),
             tiles: [
               //SettingsTile(
               //  title: const Text('Change Theme and Colors'),
