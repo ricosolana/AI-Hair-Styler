@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/recents_provider.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
@@ -22,12 +23,15 @@ Future<void> main() async {
   final themeNotifier =
       ThemeNotifier(isDarkTheme ? ThemeMode.dark : ThemeMode.light);
 
-  final prefs = await SharedPreferences.getInstance();
+  final prefs = PreferencesProvider(prefs: await SharedPreferences.getInstance());
 
   runApp(
     MultiProvider(
       providers: [
-        Provider.value(value: prefs),
+        //Provider.value(value: prefs),
+        ChangeNotifierProvider.value(
+          value: prefs
+        ),
         ChangeNotifierProvider.value(
           value: themeNotifier,
         ),

@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/Navigation.dart';
 import 'package:senior_project_hair_ai/api_access.dart';
+import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/recents_provider.dart';
 import 'package:senior_project_hair_ai/screens/about.dart';
 import 'package:senior_project_hair_ai/screens/capture.dart';
@@ -80,8 +81,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _tryStartTutorial() {
-    if (!(Provider.of<SharedPreferences>(context)
-            .getBool(tutorialCompletedPrefKey) ??
+    if (!(Provider.of<PreferencesProvider>(context, listen: false)
+            .get<bool>(tutorialCompletedPrefKey) ??
         false)) {
       _startTutorial();
     }
@@ -201,10 +202,10 @@ class _MyHomePageState extends State<MyHomePage> {
                               onTap: () {
                                 //TODO: ***Open Uploaded/Captured Photo, Navigate to Editing Screen (Colors, Hairstyles, Generate Button)
                                 final prefs =
-                                    Provider.of<SharedPreferences>(context);
+                                    Provider.of<PreferencesProvider>(context);
                                 api_barber_post(
-                                    prefs.getString(apiHostPrefKey)!,
-                                    prefs.getString(apiTokenPrefKey)!,
+                                    prefs.get<String>(apiHostPrefKey)!,
+                                    prefs.get<String>(apiTokenPrefKey)!,
                                     //'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxMjQ1NDk3OSwianRpIjoiOWUyMjkyZGMtMzM0OC00MDVhLThkZTQtNWFhNDg4YmVmOGYyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFub255bW91cyIsIm5iZiI6MTcxMjQ1NDk3OSwiY3NyZiI6IjNjNTgwZmYyLTJiZmEtNDRlZS1iNWJhLTFlNzUxMTg3MzkwZiIsImV4cCI6MTcxMjQ1NTg3OX0.XmkuVZmbKvoautbTq1ez8Ti_PrEuozMBp5HEiFElAG8',
                                     path,
                                     'bob',

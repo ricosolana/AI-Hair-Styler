@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,11 +48,11 @@ Future<void> setThemePref(bool isDarkTheme) async {
 }
 
 Future<String> getApiServerPref() async {
-  return getPref(apiServerPrefKey, '');
+  return getPref(apiHostPrefKey, '');
 }
 
 Future<void> setApiServerPref(String apiServer) async {
-  setPref(apiServerPrefKey, apiServer);
+  setPref(apiHostPrefKey, apiServer);
 }
 
 class MySettingsPage extends StatefulWidget {
@@ -202,6 +202,55 @@ class _MySettingsPageState extends State<MySettingsPage> {
                   );
                 },
               ),
+
+              //SettingsTile.navigation(
+              //  title: const Text('API Token2'),
+              //  leading: const Icon(CupertinoIcons.wrench),
+              //  description: Text(_apiToken),
+              //  onPressed: (context) {
+              //    navigateTo(
+              //        context: context,
+              //        screen: const MyTextDialog(
+              //          title: 'API Token2',
+              //          prefKey: 'api-token-2-example',
+              //        ),
+              //        style: NavigationRouteStyle.material);
+              //  },
+              //),
+
+              /*
+              SettingsTile.navigation(
+                title: const Text('API Token2'),
+                leading: const Icon(CupertinoIcons.wrench),
+                description: Text(_apiToken),
+                onPressed: (context) {
+                  navigateTo(
+                    context: context, 
+                    screen: const MyTextDialog(
+                      title: 'API Token2', 
+                      prefKey: 'api-token-2-example',
+                    ), 
+                    style: NavigationRouteStyle.material
+                  );
+                },
+              ),*/
+
+              createTextSettingsTile(
+                title: const Text('API Token2'), 
+                prefKey: 'api-token-2-example',
+                context: context,
+                valueAsDescription: true
+              ),
+
+              createTextSettingsTile(
+                title: const Text('api url2'), 
+                prefKey: 'api-url2-example',
+                context: context,
+                valueAsDescription: true,
+                validator: (str) {
+                  return (Uri.tryParse(str ?? '')?.hasAbsolutePath ?? false) ? null : 'Must enter a URL';
+                }
+              )
             ],
           ),
           SettingsSection(
@@ -251,41 +300,45 @@ class _MySettingsPageState extends State<MySettingsPage> {
 
 
 
-class MyTextInputSettingsTile extends StatefulWidget {
 
-  final String title;
+
+class MyTextDialog extends StatefulWidget {
+  //final String title;
+  final Text title;
   final String prefKey;
   final String defaultText;
+  final String? Function(String?)?
+      validator; // Add a validator function parameter
 
-  MyTextInputSettingsTile({required this.title, required this.prefKey, this.defaultText=''});
+  const MyTextDialog({
+    required this.title,
+    required this.prefKey,
+    this.defaultText = '',
+    this.validator, // Initialize the validator function
+  });
 
   @override
-  _MyTextInputSettingsTileState createState() =>
-      _MyTextInputSettingsTileState();
+  _MyTextDialogState createState() => _MyTextDialogState();
 }
 
-class _MyTextInputSettingsTileState extends State<MyTextInputSettingsTile> {
-  
-  //final _controller = TextEditingController();
-
-  //final String title;
-  //final String prefKey;
-  String rawText;
+class _MyTextDialogState extends State<MyTextDialog> {
+  late String textString;
   late TextEditingController _textEditingController;
-  //_MyTextInputSettingsTileState({required this.title, required this.prefKey, this.rawText=''});
 
-  _MyTextInputSettingsTileState({this.rawText=widget.defaultText});
+  final _formKey = GlobalKey<FormState>();
 
   void _loadText() {
     setState(() {
-      rawText = Provider.of<SharedPreferences>(context).getString(widget.prefKey) ?? rawText;
+      textString = Provider.of<PreferencesProvider>(context, listen: false)
+              .getOr<String>(widget.prefKey, widget.defaultText);
     });
   }
 
   void _saveText(String text) {
     setState(() {
-      rawText = text;
-      Provider.of<SharedPreferences>(context).setString(widget.prefKey, rawText);
+      textString = text;
+      Provider.of<PreferencesProvider>(context, listen: false)
+          .set(widget.prefKey, textString);
     });
   }
 
@@ -293,7 +346,7 @@ class _MyTextInputSettingsTileState extends State<MyTextInputSettingsTile> {
   void initState() {
     super.initState();
     _loadText();
-    _textEditingController = TextEditingController(text: rawText);
+    _textEditingController = TextEditingController(text: textString);
   }
 
   @override
@@ -304,6 +357,37 @@ class _MyTextInputSettingsTileState extends State<MyTextInputSettingsTile> {
 
   @override
   Widget build(BuildContext context) {
+    return AlertDialog(
+      title: widget.title, //Text(widget.title),
+      // TODO test if form doesnt look tacky
+      content: Form(
+        key: _formKey,
+        child: TextFormField(
+          controller: _textEditingController,
+          validator: widget.validator, // Apply the validator function
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        TextButton(
+          child: const Text('Save'),
+          onPressed: () {
+            //if (_textEditingController.text.isNotEmpty) {
+            if (_formKey.currentState!.validate()) {
+              _saveText(_textEditingController.text);
+              Navigator.of(context).pop();
+            }
+          },
+        ),
+      ],
+    );
+
+    /*
     return SettingsTile.navigation(
       title: Text(widget.title),
       leading: const Icon(CupertinoIcons.wrench),
@@ -314,8 +398,12 @@ class _MyTextInputSettingsTileState extends State<MyTextInputSettingsTile> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text(widget.title),
-              content: TextField(
-                controller: _textEditingController,
+              // TODO test if form doesnt look tacky
+              content: Form(
+                child: TextFormField(
+                  controller: _textEditingController,
+                  validator: widget.validator, // Apply the validator function
+                ),
               ),
               actions: <Widget>[
                 TextButton(
@@ -327,9 +415,10 @@ class _MyTextInputSettingsTileState extends State<MyTextInputSettingsTile> {
                 TextButton(
                   child: const Text('Save'),
                   onPressed: () {
-                    // Handle the submit action
-                    rawText = _textEditingController.text;
-                    Navigator.of(context).pop();
+                    if (_textEditingController.text.isNotEmpty) {
+                      _saveText(_textEditingController.text);
+                      Navigator.of(context).pop();
+                    }
                   },
                 ),
               ],
@@ -337,6 +426,204 @@ class _MyTextInputSettingsTileState extends State<MyTextInputSettingsTile> {
           },
         );
       },
-    );
+    );*/
   }
 }
+
+SettingsTile createTextSettingsTile(
+    {
+    required BuildContext context,
+    // SettingsTile.navigation ctor:
+    Widget? leading,
+    Widget? trailing,
+    Widget? value,
+    required Text title,
+    Widget? description,
+    bool enabled = true,
+    Key? key,
+    // dialog ctor:
+    required String prefKey,
+    String defaultText = '',
+    bool valueAsDescription = false,
+    String? Function(String?)? validator}) {
+  
+      return SettingsTile.navigation(
+        leading: leading,
+        trailing: trailing,
+        value: value,
+        title: title,
+        //description: description,
+        description: valueAsDescription ? 
+          Consumer<PreferencesProvider>(
+            builder: (context, preferencesProvider, child) {
+              return Text(preferencesProvider.getOr(prefKey, defaultText));
+            }
+          ) : description,
+        enabled: enabled,
+        key: key,
+        onPressed: (context) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return MyTextDialog(
+                title: title,
+                prefKey: prefKey,
+                defaultText: defaultText,
+                validator: validator,
+              );
+            },
+          );
+        },
+      );
+}
+
+/*
+class MyTextTile extends SettingsTile {
+ final String title;
+ final String prefKey;
+ final String defaultText;
+ final String? Function(String?)? validator;
+
+ MyTextTile({
+    required this.title,
+    required this.prefKey,
+    this.defaultText = '',
+    this.validator,
+ });
+
+ @override
+ Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(title),
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return MyTextDialog(
+              title: title,
+              prefKey: prefKey,
+              defaultText: defaultText,
+              validator: validator,
+              onDialogDismissed: (String newText) {
+                // Handle the new text here, e.g., update the tile's state
+              },
+            );
+          },
+        );
+      },
+    );
+ }
+}*/
+
+//const MyTextDialog({
+//  required this.title,
+//  required this.prefKey,
+//  this.defaultText = '',
+//  this.validator, // Initialize the validator function
+//});
+//auto
+/*
+SettingsTile createTextSettingsTile({ 
+  // SettingsTile.navigation ctor:
+ Widget? leading,
+ Widget? trailing,
+ Widget? value,
+ required Text title,
+ Widget? description,
+ bool enabled = true,
+ Key? key,
+  // dialog ctor:
+  required String prefKey,
+  String defaultText = '',
+  String? Function(String?)? validator
+}) {
+  String rawText;
+
+  void loadText() {
+    // FIX THIS
+    setState(() {
+      rawText =
+          Provider.of<SharedPreferences>(context, listen: false).getString(widget.prefKey) ??
+              widget.defaultText;
+    });
+  }
+
+  void saveText(String text) {
+    // FIX THIS
+    setState(() {
+      rawText = text;
+      Provider.of<SharedPreferences>(context)
+          .setString(widget.prefKey, rawText);
+    });
+  }
+
+  loadText();
+
+  final controller =  TextEditingController(text: rawText);
+
+ return SettingsTile.navigation(
+    leading: leading,
+    trailing: trailing,
+    value: value,
+    title: title,
+    description: description,
+    enabled: enabled,
+    key: key,
+    onPressed: (context) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: title,
+            // TODO test if form doesnt look tacky
+            content: Form(
+              child: TextFormField(
+                // FIX where _textEditingController should be stored
+                controller: controller,
+                validator: validator, // Apply the validator function
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: const Text('Save'),
+                onPressed: () {
+                  if (controller.text.isNotEmpty) {
+                    saveText(controller.text);
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+            ],
+          );
+        },
+      );
+    },
+ );
+}
+*/
+
+/*
+// my partially-broken one
+SettingsTile createTextSettingsTile(
+  // SettingsTile.navigation ctor:
+  String title, {
+    Widget? leading,
+    Widget? trailing,
+    Widget? value,
+    Widget? description,
+    bool enabled = true,
+    Key? key,
+  }) {
+    return SettingsTile.navigation(
+      title: title,
+      // ...
+
+    );
+  }
+*/
