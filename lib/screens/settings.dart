@@ -2,7 +2,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:senior_project_hair_ai/navigation.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,8 +65,10 @@ class _MySettingsPageState extends State<MySettingsPage> {
   late CameraDescription camera;
 
   bool _isDarkTheme = false;
-  String _apiServer = "";
-  late TextEditingController _textEditingController; // = TextEditingController(text:);
+  String _apiServer = '';
+  String _accessToken = '';
+  late TextEditingController
+      _textEditingController; // = TextEditingController(text:);
 
   Future<void> _loadTheme() async {
     getThemePref().then((isDarkTheme) {
@@ -124,10 +125,9 @@ class _MySettingsPageState extends State<MySettingsPage> {
               SettingsTile.navigation(
                 title: const Text('API Server'),
                 leading: const Icon(CupertinoIcons.wrench),
-                description: Text(_apiServer), //const Text('Backend servers to process image'),
+                description: Text(
+                    _apiServer,), //const Text('Backend servers to process image'),
                 onPressed: (context) {
-
-
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -135,7 +135,9 @@ class _MySettingsPageState extends State<MySettingsPage> {
                         title: const Text('API Server'),
                         content: TextField(
                           controller: _textEditingController,
-                          decoration: const InputDecoration(hintText: "https://10.10.10.1/"),
+                          decoration: const InputDecoration(
+                              hintText:
+                                  "https://10.0.2.2/",), // 10.0.2.2 refers to host when virtualized
                         ),
                         actions: <Widget>[
                           TextButton(
@@ -156,10 +158,48 @@ class _MySettingsPageState extends State<MySettingsPage> {
                       );
                     },
                   );
-
-
                 },
               ),
+
+              SettingsTile.navigation(
+                title: const Text('API Token'),
+                leading: const Icon(CupertinoIcons.wrench),
+                description: Text(
+                    _apiServer,), //const Text('Backend servers to process image'),
+                onPressed: (context) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('API Token'),
+                        content: TextField(
+                          controller: _textEditingController,
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('Cancel'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          TextButton(
+                            child: const Text('Save'),
+                            onPressed: () {
+                              // Handle the submit action
+                              //_saveApiToken(_textEditingController.text);
+                              // TODO save token 
+                              _accessToken = _textEditingController.text;
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+
+
               //SettingsTile.switchTile(
               //  title: ,
               //)
