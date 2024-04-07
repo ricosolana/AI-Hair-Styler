@@ -5,6 +5,7 @@ import 'package:senior_project_hair_ai/recents_provider.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   // init camera library
@@ -21,16 +22,20 @@ Future<void> main() async {
   final themeNotifier =
       ThemeNotifier(isDarkTheme ? ThemeMode.dark : ThemeMode.light);
 
+  final prefs = await SharedPreferences.getInstance();
+
   runApp(
     MultiProvider(
       providers: [
+        Provider.value(value: prefs),
         ChangeNotifierProvider.value(
           value: themeNotifier,
         ),
-        Provider<CameraDescription>.value(
+        Provider.value(
           value: firstCamera,
         ),
-        ChangeNotifierProvider(create: (_) => RecentsProvider()),
+        // TODO persist the Recents list to disk
+        ChangeNotifierProvider.value(value: RecentsProvider()),
       ],
       child: const MyApp(),
     ),

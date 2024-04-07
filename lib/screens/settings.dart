@@ -1,6 +1,6 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -9,7 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 // TODO properly implement
 // https://docs.flutter.dev/cookbook/persistence/key-value
 
-const String apiServerPrefKey = 'api-server';
+const String apiHostPrefKey = 'api-host';
+const String apiTokenPrefKey = 'api-token';
 
 Future<T> getPref<T>(String prefKey, T def) async {
   final pref = await SharedPreferences.getInstance();
@@ -62,13 +63,12 @@ class MySettingsPage extends StatefulWidget {
 }
 
 class _MySettingsPageState extends State<MySettingsPage> {
-  late CameraDescription camera;
-
   bool _isDarkTheme = false;
-  String _apiServer = '';
-  String _accessToken = '';
-  late TextEditingController
-      _textEditingController; // = TextEditingController(text:);
+  String _apiHost = '';
+  String _apiToken = '';
+  late TextEditingController _apiHostTextEditingController;
+  late TextEditingController _apiTokenTextEditingController;
+  //late TextEditingController _textEditingController;
 
   Future<void> _loadTheme() async {
     getThemePref().then((isDarkTheme) {
@@ -88,17 +88,17 @@ class _MySettingsPageState extends State<MySettingsPage> {
   }
 
   Future<void> _loadApiServer() async {
-    getApiServerPref().then((apiServer) {
+    getApiServerPref().then((apiHost) {
       setState(() {
-        _apiServer = apiServer;
+        _apiHost = apiHost;
       });
     });
   }
 
-  Future<void> _saveApiServer(String apiServer) async {
-    setApiServerPref(apiServer);
+  Future<void> _saveApiServer(String apiHost) async {
+    setApiServerPref(apiHost);
     setState(() {
-      _apiServer = apiServer;
+      _apiHost = apiHost;
     });
   }
 
@@ -107,7 +107,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
     super.initState();
     _loadTheme();
     _loadApiServer();
-    _textEditingController = TextEditingController(text: _apiServer);
+    _apiHostTextEditingController = TextEditingController(text: _apiHost);
   }
 
   @override
@@ -123,21 +123,22 @@ class _MySettingsPageState extends State<MySettingsPage> {
             title: const Text('General'),
             tiles: [
               SettingsTile.navigation(
-                title: const Text('API Server'),
+                title: const Text('API Host'),
                 leading: const Icon(CupertinoIcons.wrench),
                 description: Text(
-                    _apiServer,), //const Text('Backend servers to process image'),
+                  _apiHost,
+                ), //const Text('Backend servers to process image'),
                 onPressed: (context) {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: const Text('API Server'),
+                        title: const Text('API Host'),
                         content: TextField(
-                          controller: _textEditingController,
+                          controller: _apiHostTextEditingController,
                           decoration: const InputDecoration(
-                              hintText:
-                                  "https://10.0.2.2/",), // 10.0.2.2 refers to host when virtualized
+                            hintText: "http://10.0.2.2/",
+                          ), // 10.0.2.2 refers to host when virtualized
                         ),
                         actions: <Widget>[
                           TextButton(
@@ -150,7 +151,8 @@ class _MySettingsPageState extends State<MySettingsPage> {
                             child: const Text('Save'),
                             onPressed: () {
                               // Handle the submit action
-                              _saveApiServer(_textEditingController.text);
+                              _saveApiServer(
+                                  _apiHostTextEditingController.text);
                               Navigator.of(context).pop();
                             },
                           ),
@@ -161,11 +163,13 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 },
               ),
 
+              // TODO create another settings tile type to handle prompted text input
+              //  with validation, error messages, and simple submit function
+
               SettingsTile.navigation(
                 title: const Text('API Token'),
                 leading: const Icon(CupertinoIcons.wrench),
-                description: Text(
-                    _apiServer,), //const Text('Backend servers to process image'),
+                description: Text(_apiToken),
                 onPressed: (context) {
                   showDialog(
                     context: context,
@@ -173,7 +177,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
                       return AlertDialog(
                         title: const Text('API Token'),
                         content: TextField(
-                          controller: _textEditingController,
+                          controller: _apiTokenTextEditingController,
                         ),
                         actions: <Widget>[
                           TextButton(
@@ -187,8 +191,8 @@ class _MySettingsPageState extends State<MySettingsPage> {
                             onPressed: () {
                               // Handle the submit action
                               //_saveApiToken(_textEditingController.text);
-                              // TODO save token 
-                              _accessToken = _textEditingController.text;
+                              // TODO save token
+                              _apiToken = _apiTokenTextEditingController.text;
                               Navigator.of(context).pop();
                             },
                           ),
@@ -198,11 +202,6 @@ class _MySettingsPageState extends State<MySettingsPage> {
                   );
                 },
               ),
-
-
-              //SettingsTile.switchTile(
-              //  title: ,
-              //)
             ],
           ),
           SettingsSection(
@@ -246,6 +245,98 @@ class _MySettingsPageState extends State<MySettingsPage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+
+
+class MyTextInputSettingsTile extends StatefulWidget {
+
+  final String title;
+  final String prefKey;
+  final String defaultText;
+
+  MyTextInputSettingsTile({required this.title, required this.prefKey, this.defaultText=''});
+
+  @override
+  _MyTextInputSettingsTileState createState() =>
+      _MyTextInputSettingsTileState();
+}
+
+class _MyTextInputSettingsTileState extends State<MyTextInputSettingsTile> {
+  
+  //final _controller = TextEditingController();
+
+  //final String title;
+  //final String prefKey;
+  String rawText;
+  late TextEditingController _textEditingController;
+  //_MyTextInputSettingsTileState({required this.title, required this.prefKey, this.rawText=''});
+
+  _MyTextInputSettingsTileState({this.rawText=widget.defaultText});
+
+  void _loadText() {
+    setState(() {
+      rawText = Provider.of<SharedPreferences>(context).getString(widget.prefKey) ?? rawText;
+    });
+  }
+
+  void _saveText(String text) {
+    setState(() {
+      rawText = text;
+      Provider.of<SharedPreferences>(context).setString(widget.prefKey, rawText);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadText();
+    _textEditingController = TextEditingController(text: rawText);
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsTile.navigation(
+      title: Text(widget.title),
+      leading: const Icon(CupertinoIcons.wrench),
+      description: Text(rawText),
+      onPressed: (context) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(widget.title),
+              content: TextField(
+                controller: _textEditingController,
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: const Text('Save'),
+                  onPressed: () {
+                    // Handle the submit action
+                    rawText = _textEditingController.text;
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

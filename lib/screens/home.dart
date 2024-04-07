@@ -14,6 +14,7 @@ import 'package:senior_project_hair_ai/screens/gallery.dart';
 import 'package:senior_project_hair_ai/screens/help.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/tutorial.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -78,13 +79,15 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<void> _tryStartTutorial() async {
-    if (!(await getPref(tutorialCompletedPrefKey, false))) {
+  void _tryStartTutorial() {
+    if (!(Provider.of<SharedPreferences>(context)
+            .getBool(tutorialCompletedPrefKey) ??
+        false)) {
       _startTutorial();
     }
   }
 
-  Future<void> _startTutorial() async {
+  void _startTutorial() {
     Future.delayed(const Duration(microseconds: 200)).then((value) {
       Tutorial.showTutorial(
         context,
@@ -197,9 +200,15 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               onTap: () {
                                 //TODO: ***Open Uploaded/Captured Photo, Navigate to Editing Screen (Colors, Hairstyles, Generate Button)
+                                final prefs =
+                                    Provider.of<SharedPreferences>(context);
                                 api_barber_post(
-                                  'https://10.0.2.2', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxMjQ1NDk3OSwianRpIjoiOWUyMjkyZGMtMzM0OC00MDVhLThkZTQtNWFhNDg4YmVmOGYyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFub255bW91cyIsIm5iZiI6MTcxMjQ1NDk3OSwiY3NyZiI6IjNjNTgwZmYyLTJiZmEtNDRlZS1iNWJhLTFlNzUxMTg3MzkwZiIsImV4cCI6MTcxMjQ1NTg3OX0.XmkuVZmbKvoautbTq1ez8Ti_PrEuozMBp5HEiFElAG8', 
-                                  imagePath, hairStyle, hairColor)
+                                    prefs.getString(apiHostPrefKey)!,
+                                    prefs.getString(apiTokenPrefKey)!,
+                                    //'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxMjQ1NDk3OSwianRpIjoiOWUyMjkyZGMtMzM0OC00MDVhLThkZTQtNWFhNDg4YmVmOGYyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFub255bW91cyIsIm5iZiI6MTcxMjQ1NDk3OSwiY3NyZiI6IjNjNTgwZmYyLTJiZmEtNDRlZS1iNWJhLTFlNzUxMTg3MzkwZiIsImV4cCI6MTcxMjQ1NTg3OX0.XmkuVZmbKvoautbTq1ez8Ti_PrEuozMBp5HEiFElAG8',
+                                    path,
+                                    'bob',
+                                    'dark-blonde');
                               },
                             );
                           }).toList(),
