@@ -196,8 +196,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         }).toList(),
                       );
                     },),
-
-                    /*
                     ListView(
                       padding: const EdgeInsets.only(bottom: 150),
                       children: Provider.of<RecentsProvider>(context, listen: false).savedFiles.reversed.map((path) {
@@ -209,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               Expanded(
                                 child: Center(
                                   child: Image.file(File(path), width: 50,)
-                                ),
+                                ,),
                               ),
                               Expanded(
                                 flex: 10,
@@ -230,7 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         );
                       }).toList(),
                     ),
-                    */
+
 
                     Positioned(
                       top: 500,
