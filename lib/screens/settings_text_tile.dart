@@ -70,6 +70,13 @@ class _MyTextDialogState extends State<MyTextDialog> {
         key: _formKey,
         child: TextFormField(
           controller: _textEditingController,
+          decoration: InputDecoration(
+            //hintText: 'http://10.0.2.2/',
+            suffixIcon: IconButton(
+              onPressed: _textEditingController.clear,
+              icon: const Icon(Icons.clear)
+            )
+          ),
           validator: widget.validator, // Apply the validator function
         ),
       ),
