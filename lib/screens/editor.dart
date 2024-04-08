@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:senior_project_hair_ai/recents_provider.dart';
+import 'package:senior_project_hair_ai/preferences_provider.dart';
+import 'package:senior_project_hair_ai/screens/capture.dart';
 
 
 // TODO properly implement
@@ -57,7 +58,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
   String finalPath = '';
   int selectedStyle = -1;
   int selectedColor = -1;
-  File ? imageUploaded;
+  File? imageUploaded;
 
   Future uploadImage() async{
     final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -66,12 +67,14 @@ class _MyEditorPageState extends State<MyEditorPage> {
     }
     setState(() {
       imageUploaded = File(returnedImage.path);
-      Provider.of<RecentsProvider>(context, listen: false).addFile(returnedImage.path);
+      //Provider.of<RecentsProvider>(context, listen: false).addFile(returnedImage.path);
+      //Provider.of<PreferencesProvider>(context, listen: false).
+      Provider.of<PreferencesProvider>(context, listen: false).createListOrAdd(recentsListPrefKey, <String>[returnedImage.path]);
       finalPath = returnedImage.path;
       imageChange = true;
     });
+  }
 
-    }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
