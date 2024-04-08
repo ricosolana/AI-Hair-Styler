@@ -16,9 +16,9 @@ import 'package:senior_project_hair_ai/screens/settings.dart';
 // TODO properly implement
 
 class MyEditorPage extends StatefulWidget {
-  const MyEditorPage({super.key, required this.inputImagePath});
+  const MyEditorPage({super.key, required this.originalInputImagePath});
 
-  final String inputImagePath; //the camera image path will be saved here
+  final String originalInputImagePath;
 
   @override
   State<MyEditorPage> createState() => _MyEditorPageState();
@@ -29,6 +29,8 @@ class _MyEditorPageState extends State<MyEditorPage> {
     editor
       will contain options relating to ai generation? (more such as weights)
   */
+
+  late String currentInputImagePath;
 
   void styleSelector(int styleIndex) {
     setState(() {
@@ -54,11 +56,8 @@ class _MyEditorPageState extends State<MyEditorPage> {
     return "assets/images/IMG ($funIndex).png";
   }
 
-  bool imageChange = false;
-  //String finalPath = '';
   int selectedStyle = -1;
   int selectedColor = -1;
-  File? imageUploaded;
 
   Future uploadImage() async {
     final returnedImage =
@@ -67,14 +66,17 @@ class _MyEditorPageState extends State<MyEditorPage> {
       return;
     }
     setState(() {
-      imageUploaded = File(returnedImage.path);
-      //Provider.of<RecentsProvider>(context, listen: false).addFile(returnedImage.path);
-      //Provider.of<PreferencesProvider>(context, listen: false).
+      currentInputImagePath = returnedImage.path;
       Provider.of<PreferencesProvider>(context, listen: false)
           .createListOrAdd(recentsListPrefKey, <String>[returnedImage.path]);
-      //finalPath = returnedImage.path;
-      imageChange = true;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    currentInputImagePath = widget.originalInputImagePath;
   }
 
   @override
@@ -84,10 +86,10 @@ class _MyEditorPageState extends State<MyEditorPage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Editor'),
       ),
-      body: ListView(
+      body: Column(
         children: <Widget>[
 
-
+          /*
           GestureDetector(
             onTap: () {
               showDialog(
@@ -108,7 +110,6 @@ class _MyEditorPageState extends State<MyEditorPage> {
                         onPressed: () {
                           // Navigate to the gallery here
                           uploadImage();
-                          imageChange = true;
                           Navigator.pop(context); // Close the dialog
                         },
                         child: const Text('Yes'),
@@ -125,22 +126,11 @@ class _MyEditorPageState extends State<MyEditorPage> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: (imageChange == true && imageUploaded != null)
-                    //? Image.file(File(finalPath))
-                    ? Image.file(imageUploaded!)
-                    : (widget.inputImagePath == '')
-                        ? Image.asset(
-                            'assets/images/default.png',
-                            fit: BoxFit.cover,
-                          )
-                        : Image.file(
-                            File(widget.inputImagePath),
-                            fit: BoxFit.cover,
-                          ),
+                child: Image.file(File(currentInputImagePath)),
               ),
             ),
           ),
-
+          */
 
 
             const SizedBox(height: 20),
@@ -153,6 +143,8 @@ class _MyEditorPageState extends State<MyEditorPage> {
             ),
 
 
+
+            /*
             Container(
               height: 260,
               decoration: BoxDecoration(
@@ -193,10 +185,10 @@ class _MyEditorPageState extends State<MyEditorPage> {
                   ),
                 ),
               ),
-            ),
+            ),*/
 
 
-
+            /*
             const Spacer(),
             const Text(
               "Select Your Hair Color:",
@@ -251,11 +243,13 @@ class _MyEditorPageState extends State<MyEditorPage> {
                 ),
               ),
             ),
+            */
 
 
-
+            
             const SizedBox(height: 10),
             const Spacer(),
+            /*
             ElevatedButton(
               onPressed: (selectedColor != -1 && selectedStyle != -1)
                   ? () {
@@ -265,15 +259,18 @@ class _MyEditorPageState extends State<MyEditorPage> {
                         context,
                         listen: false,
                       );
+
+                      final host = prefs.getOrCreate<String>(apiHostPrefKey, 'http://localhost/'); 
       
                       apiBarberPost(
-                              prefs.get<String>(apiHostPrefKey)!,
-                              prefs.get<String>(apiTokenPrefKey)!,
-                              imageUploaded!.path,
+                              host,
+                              prefs.getOrCreate<String>(apiTokenPrefKey, ''),
+                              currentInputImagePath,
                               selectedStyle.toString(), // 'bob', // style
                               selectedColor
                                   .toString(), // 'dark-blonde' // color
-                              demo: prefs.get(apiDemoPrefKey)!)
+                              demo: prefs.getOrCreate(apiDemoPrefKey, false),
+                          )
                           .then((response) {
                         if (response.statusCode == 200) {
                           // TODO submit to job queue
@@ -287,10 +284,9 @@ class _MyEditorPageState extends State<MyEditorPage> {
       
                           // image not found means its still processing or will never exist
       
-                          String imageUrl = apiGeneratedUrl(
-                              prefs.get<String>(apiHostPrefKey)!, imageName);
+                          String imageUrl = apiGeneratedUrl(host, imageName);
       
-                          Fluttertoast.showToast(msg: 'Success! $imageName');
+                          Fluttertoast.showToast(msg: 'Success! $imageUrl');
                         } else if (response.statusCode == 422) {
                           Fluttertoast.showToast(msg: 'Invalid access token');
                         } else {
@@ -314,11 +310,11 @@ class _MyEditorPageState extends State<MyEditorPage> {
                       // A non-200 response code means the image does not exist, or that the process is still busy
       
                       //TODO Values to barbershop, navigate to the final screen, display results
-                      navigateTo(
-                        context: context,
-                        screen: const MyResultsPage(),
-                        style: NavigationRouteStyle.material,
-                      );
+                      //navigateTo(
+                      //  context: context,
+                      //  screen: const MyResultsPage(),
+                      //  style: NavigationRouteStyle.material,
+                      //);
                     }
                   : null,
               child: const Text(
@@ -326,61 +322,14 @@ class _MyEditorPageState extends State<MyEditorPage> {
                 style: TextStyle(fontSize: 24),
               ),
             ),
+            */
 
 
+                Container(
+                  width: 160.0,
+                  color: Colors.red,
+                ),
 
-            Container(
-              height: 160.0,
-              color: Colors.red,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.blue,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.green,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.yellow,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.orange,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.amber,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.cyan,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.deepOrange,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.indigo,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.orange,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.pink,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.lime,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.orange,
-            ),
         ],
         )
     );
