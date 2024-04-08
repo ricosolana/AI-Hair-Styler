@@ -1,12 +1,16 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/Navigation.dart';
+import 'package:senior_project_hair_ai/api_access.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/capture.dart';
 import 'package:senior_project_hair_ai/screens/results.dart';
+import 'package:senior_project_hair_ai/screens/settings.dart';
 
 // TODO properly implement
 
@@ -20,21 +24,11 @@ class MyEditorPage extends StatefulWidget {
 }
 
 class _MyEditorPageState extends State<MyEditorPage> {
-/*
+  /*
     editor
       will contain options relating to ai generation? (more such as weights)
   */
-//  int _counter = 0;
-  // void _incrementCounter() {
-  //   setState(() {
-  //     // This call to setState tells the Flutter framework that something has
-  //     // changed in this State, which causes it to rerun the build method below
-  //     // so that the display can reflect the updated values. If we changed
-  //     // _counter without calling setState(), then the build method would not be
-  //     // called again, and so nothing would appear to happen.
-  //     _counter++;
-  //   });
-  // }
+
   void styleSelector(int styleIndex) {
     setState(() {
       if (selectedStyle == styleIndex) {
@@ -60,7 +54,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
   }
 
   bool imageChange = false;
-  String finalPath = '';
+  //String finalPath = '';
   int selectedStyle = -1;
   int selectedColor = -1;
   File? imageUploaded;
@@ -77,7 +71,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
       //Provider.of<PreferencesProvider>(context, listen: false).
       Provider.of<PreferencesProvider>(context, listen: false)
           .createListOrAdd(recentsListPrefKey, <String>[returnedImage.path]);
-      finalPath = returnedImage.path;
+      //finalPath = returnedImage.path;
       imageChange = true;
     });
   }
@@ -130,8 +124,9 @@ class _MyEditorPageState extends State<MyEditorPage> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: (imageChange == true)
-                      ? Image.file(File(finalPath))
+                  child: (imageChange == true && imageUploaded != null)
+                      //? Image.file(File(finalPath))
+                      ? Image.file(imageUploaded!)
                       : (widget.inputImagePath == '')
                           ? Image.asset(
                               'assets/images/default.png',
@@ -252,6 +247,41 @@ class _MyEditorPageState extends State<MyEditorPage> {
             ElevatedButton(
               onPressed: (selectedColor != -1 || selectedStyle != -1)
                   ? () {
+                      // TODO
+                      // The API is ready here:
+                      final prefs = Provider.of<PreferencesProvider>(context,
+                          listen: false,);
+                      apiBarberPost(
+                        prefs.get<String>(apiHostPrefKey)!,
+                        prefs.get<String>(apiTokenPrefKey)!,
+                        imageUploaded!.path,
+                        selectedStyle.toString(), // 'bob', // style
+                        selectedColor.toString(), // 'dark-blonde' // color
+                      ).then((response) {
+                        if (response.statusCode == 200) {
+                          // TODO submit to job queue
+                          Fluttertoast.showToast(msg: 'Success!');
+                        } else if (response.statusCode == 422) {
+                          Fluttertoast.showToast(msg: 'Invalid access token');
+                        } else {
+                          Fluttertoast.showToast(
+                              msg: 'Status Code: ${response.statusCode}',);
+                        }
+                      }).onError((error, stackTrace) {
+                        log(error.toString());
+                        Fluttertoast.showToast(
+                            msg: 'Failed to connect: $error',
+                            toastLength: Toast.LENGTH_LONG,);
+                      });
+
+                      // Because the AI process takes a while, use a job queue that shows submitted jobs
+                      //  When the user sends to the API, the API will respond with a path of the eventual generated image
+                      //  as a served file.
+                      // The user can query this image path to see if the job has completed.
+                      // The job queue will store a list of these job paths for the client to poll
+                      //  Polling will query the server for the served image
+                      // A non-200 response code means the image does not exist, or that the process is still busy
+
                       //TODO Values to barbershop, navigate to the final screen, display results
                       navigateTo(
                         context: context,

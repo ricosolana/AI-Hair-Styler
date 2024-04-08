@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
@@ -35,33 +34,35 @@ class _MySettingsPageState extends State<MySettingsPage> {
             title: const Text('General'),
             tiles: [
               createTextSettingsTile(
-                  title: const Text('API Host'),
-                  leading: const Icon(Icons.cloud_queue),
-                  prefKey: apiHostPrefKey,
-                  context: context,
-                  valueAsDescription: true,
-                  validator: (str) {
-                    return (Uri.tryParse(str ?? '')?.hasAbsolutePath ?? false)
-                        ? null
-                        : 'Enter a valid URL; ie: https://10.0.2.2/';
-                  },
-                  extraActions: <TextButton>[
-                    TextButton(
-                      child: const Text('Test'),
-                      onPressed: () {
-                        // try connecting
-                        apiRootPath(Provider.of<PreferencesProvider>(context,
-                                    listen: false,)
-                                .get(apiHostPrefKey)!,)
-                            .then((value) {
-                          Fluttertoast.showToast(
-                              msg: value != null
-                                  ? 'Online'
-                                  : 'Unable to reach server',);
-                        });
-                      },
-                    ),
-                  ],),
+                title: const Text('API Host'),
+                leading: const Icon(Icons.cloud_queue),
+                prefKey: apiHostPrefKey,
+                context: context,
+                valueAsDescription: true,
+                validator: (str) {
+                  return (Uri.tryParse(str ?? '')?.hasAbsolutePath ?? false)
+                      ? null
+                      : 'Enter a valid URL; ie: https://10.0.2.2/';
+                },
+                extraActions: <TextButton>[
+                  TextButton(
+                    child: const Text('Test'),
+                    onPressed: () {
+                      // try connecting
+                      apiRootPath(
+                        Provider.of<PreferencesProvider>(
+                          context,
+                          listen: false,
+                        ).get(apiHostPrefKey)!,
+                      ).then((value) {
+                        Fluttertoast.showToast(msg: 'Online');
+                      }).onError((error, stackTrace) {
+                        Fluttertoast.showToast(msg: 'Failed to reach server');
+                      });
+                    },
+                  ),
+                ],
+              ),
               createTextSettingsTile(
                 title: const Text('API Token'),
                 leading: const Icon(Icons.token),

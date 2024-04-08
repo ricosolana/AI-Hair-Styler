@@ -13,14 +13,15 @@ class MyTextDialog extends StatefulWidget {
   //final bool cancelButton;
   final List<Widget> extraActions;
 
-  const MyTextDialog(
-      {required this.title,
-      required this.prefKey,
-      this.defaultText = '',
-      this.validator, // Initialize the validator function
-      //this.saveButton = true,
-      //this.cancelButton = true,
-      this.extraActions = const <Widget>[],});
+  const MyTextDialog({
+    required this.title,
+    required this.prefKey,
+    this.defaultText = '',
+    this.validator, // Initialize the validator function
+    //this.saveButton = true,
+    //this.cancelButton = true,
+    this.extraActions = const <Widget>[],
+  });
 
   @override
   _MyTextDialogState createState() => _MyTextDialogState();
@@ -97,22 +98,23 @@ class _MyTextDialogState extends State<MyTextDialog> {
   }
 }
 
-SettingsTile createTextSettingsTile(
-    {required BuildContext context,
-    // SettingsTile.navigation ctor:
-    Widget? leading,
-    Widget? trailing,
-    Widget? value,
-    required Text title,
-    Widget? description,
-    bool enabled = true,
-    Key? key,
-    // dialog ctor:
-    required String prefKey,
-    String defaultText = '',
-    bool valueAsDescription = false,
-    String? Function(String?)? validator,
-    List<Widget> extraActions = const <Widget>[],}) {
+SettingsTile createTextSettingsTile({
+  required BuildContext context,
+  // SettingsTile.navigation ctor:
+  Widget? leading,
+  Widget? trailing,
+  Widget? value,
+  required Text title,
+  Widget? description,
+  bool enabled = true,
+  Key? key,
+  // dialog ctor:
+  required String prefKey,
+  String defaultText = '',
+  bool valueAsDescription = false,
+  String? Function(String?)? validator,
+  List<Widget> extraActions = const <Widget>[],
+}) {
   return SettingsTile.navigation(
     leading: leading,
     trailing: trailing,
@@ -120,8 +122,10 @@ SettingsTile createTextSettingsTile(
     title: title,
     //description: description,
     description: valueAsDescription
-        ? Text(Provider.of<PreferencesProvider>(context)
-            .getOr(prefKey, defaultText),)
+        ? Text(
+            Provider.of<PreferencesProvider>(context)
+                .getOr(prefKey, defaultText),
+          )
         : description,
     //description: valueAsDescription ?
     //  Consumer<PreferencesProvider>(

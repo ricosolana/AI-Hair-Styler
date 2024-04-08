@@ -1,4 +1,3 @@
-
 const String darkThemePrefKey = 'dark-theme';
 
 /*

@@ -56,7 +56,9 @@ class PreferencesProvider with ChangeNotifier {
 
   Future<bool> createListOrAdd<T>(String prefKey, List<String> toAdd) async {
     return set(
-        prefKey, (get<List<String>>(prefKey) ?? <String>[])..addAll(toAdd),);
+      prefKey,
+      (get<List<String>>(prefKey) ?? <String>[])..addAll(toAdd),
+    );
   }
 
   //Future<bool> createListOrAdd<T>(String prefKey, List<String> toAdd) async {

@@ -204,6 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       style: NavigationRouteStyle.material,
                                     );
 
+                                    // TODO
                                     // The API is ready here:
                                     //apiBarberPost(
                                     //  prefs.get<String>(apiHostPrefKey)!,
@@ -307,8 +308,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 // TODO add a list clear to PreferencesProvider
                 //Provider.of<RecentsProvider>(context, listen: false).clearFiles();
                 // MUST trigger the change post-clear
-                Provider.of<PreferencesProvider>(context)
+                setState(() {
+                  Provider.of<PreferencesProvider>(context, listen: false)
                     .getOrCreate(recentsListPrefKey, <String>[]).clear();
+                });
               },
               shape: const CircleBorder(),
               child: const Icon(
@@ -370,11 +373,12 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             const Divider(),
             ListTile(
-                leading: Icon(MdiIcons.cloudClock),
-                title: const Text('Queued Tasks'),
-                onTap: () {
-                  // open work queue
-                },),
+              leading: Icon(MdiIcons.cloudClock),
+              title: const Text('Queued Tasks'),
+              onTap: () {
+                // open work queue
+              },
+            ),
             const Spacer(), // filler
             const Divider(),
             ListTile(
