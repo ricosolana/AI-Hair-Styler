@@ -1,13 +1,15 @@
 import 'package:app_tutorial/app_tutorial.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 
 // Code borrowed from https://pub.dev/packages/app_tutorial/example
 
 const String tutorialCompletedPrefKey = 'tutorial-completed';
 
-Future<void> setTutorialCompletedPref(bool isCompleted) async {
-  setPref(tutorialCompletedPrefKey, isCompleted);
+void setTutorialCompletedPref(BuildContext context, bool isCompleted) {
+  Provider.of<PreferencesProvider>(context).set(tutorialCompletedPrefKey, isCompleted);
 }
 
 class TutorialItemContent extends StatelessWidget {
@@ -48,7 +50,7 @@ class TutorialItemContent extends StatelessWidget {
                     // TODO determine whether this calls completer handler
                     onPressed: () {
                       Tutorial.skipAll(context);
-                      setTutorialCompletedPref(true);
+                      setTutorialCompletedPref(context, true);
                     },
                     child: const Text(
                       'Skip All',

@@ -18,11 +18,6 @@ Future<void> main() async {
   // Get a specific camera from the list of available cameras.
   final firstCamera = cameras.first;
 
-  final isDarkTheme = await getThemePref();
-
-  final themeNotifier =
-      ThemeNotifier(isDarkTheme ? ThemeMode.dark : ThemeMode.light);
-
   final prefs = PreferencesProvider(prefs: await SharedPreferences.getInstance());
 
   runApp(
@@ -31,9 +26,6 @@ Future<void> main() async {
         //Provider.value(value: prefs),
         ChangeNotifierProvider.value(
           value: prefs
-        ),
-        ChangeNotifierProvider.value(
-          value: themeNotifier,
         ),
         Provider.value(
           value: firstCamera,
@@ -51,7 +43,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final prefs = Provider.of<PreferencesProvider>(context);
 
     return MaterialApp(
       title: 'Hair Styler',
@@ -63,7 +55,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
       ),
-      themeMode: themeNotifier.themeMode, // use saved pref, not built-in
+      themeMode: prefs.getOr(darkThemePrefKey, false) ? ThemeMode.dark : ThemeMode.light, // use saved pref, not built-in
       home: const MyHomePage(title: "Ai Hair Styler"),
     );
   }

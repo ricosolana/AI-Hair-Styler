@@ -93,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
       Tutorial.showTutorial(
         context,
         tutorialItems,
-        onTutorialComplete: () => setTutorialCompletedPref(true),
+        onTutorialComplete: () => setTutorialCompletedPref(context, true),
       );
     });
   }
@@ -202,8 +202,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               onTap: () {
                                 //TODO: ***Open Uploaded/Captured Photo, Navigate to Editing Screen (Colors, Hairstyles, Generate Button)
                                 final prefs =
-                                    Provider.of<PreferencesProvider>(context);
-                                api_barber_post(
+                                    Provider.of<PreferencesProvider>(context, listen: false);
+                                apiBarberPost(
                                     prefs.get<String>(apiHostPrefKey)!,
                                     prefs.get<String>(apiTokenPrefKey)!,
                                     //'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxMjQ1NDk3OSwianRpIjoiOWUyMjkyZGMtMzM0OC00MDVhLThkZTQtNWFhNDg4YmVmOGYyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFub255bW91cyIsIm5iZiI6MTcxMjQ1NDk3OSwiY3NyZiI6IjNjNTgwZmYyLTJiZmEtNDRlZS1iNWJhLTFlNzUxMTg3MzkwZiIsImV4cCI6MTcxMjQ1NTg3OX0.XmkuVZmbKvoautbTq1ez8Ti_PrEuozMBp5HEiFElAG8',

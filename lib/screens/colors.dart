@@ -2,19 +2,6 @@ import 'package:flutter/material.dart';
 
 const String darkThemePrefKey = 'dark-theme';
 
-class ThemeNotifier extends ChangeNotifier {
-  ThemeMode _themeMode = ThemeMode.light;
-
-  ThemeNotifier(this._themeMode);
-
-  ThemeMode get themeMode => _themeMode;
-
-  set themeMode(ThemeMode themeMode) {
-    _themeMode = themeMode;
-    notifyListeners();
-  }
-}
-
 /*
 class MyColorsPage extends StatefulWidget {
   const MyColorsPage({super.key, required this.camera});
