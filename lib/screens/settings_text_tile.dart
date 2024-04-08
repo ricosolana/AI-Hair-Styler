@@ -13,15 +13,14 @@ class MyTextDialog extends StatefulWidget {
   //final bool cancelButton;
   final List<Widget> extraActions;
 
-  const MyTextDialog({
-    required this.title,
-    required this.prefKey,
-    this.defaultText = '',
-    this.validator, // Initialize the validator function
-    //this.saveButton = true,
-    //this.cancelButton = true,
-    this.extraActions = const <Widget>[]
-  });
+  const MyTextDialog(
+      {required this.title,
+      required this.prefKey,
+      this.defaultText = '',
+      this.validator, // Initialize the validator function
+      //this.saveButton = true,
+      //this.cancelButton = true,
+      this.extraActions = const <Widget>[]});
 
   @override
   _MyTextDialogState createState() => _MyTextDialogState();
@@ -36,7 +35,7 @@ class _MyTextDialogState extends State<MyTextDialog> {
   void _loadText() {
     setState(() {
       textString = Provider.of<PreferencesProvider>(context, listen: false)
-              .getOr<String>(widget.prefKey, widget.defaultText);
+          .getOr<String>(widget.prefKey, widget.defaultText);
     });
   }
 
@@ -75,31 +74,31 @@ class _MyTextDialogState extends State<MyTextDialog> {
       ),
       actions: <Widget>[
         //if (widget.cancelButton)
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
+        TextButton(
+          child: const Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
         //if (widget.saveButton)
-          TextButton(
-            child: const Text('Save'),
-            onPressed: () {
-              //if (_textEditingController.text.isNotEmpty) {
-              if (_formKey.currentState!.validate()) {
-                _saveText(_textEditingController.text);
-                Navigator.of(context).pop();
-              }
-            },
-          ), ...widget.extraActions,
+        TextButton(
+          child: const Text('Save'),
+          onPressed: () {
+            //if (_textEditingController.text.isNotEmpty) {
+            if (_formKey.currentState!.validate()) {
+              _saveText(_textEditingController.text);
+              Navigator.of(context).pop();
+            }
+          },
+        ),
+        ...widget.extraActions,
       ],
     );
   }
 }
 
 SettingsTile createTextSettingsTile(
-    {
-    required BuildContext context,
+    {required BuildContext context,
     // SettingsTile.navigation ctor:
     Widget? leading,
     Widget? trailing,
@@ -114,36 +113,37 @@ SettingsTile createTextSettingsTile(
     bool valueAsDescription = false,
     String? Function(String?)? validator,
     List<Widget> extraActions = const <Widget>[]}) {
-  
-      return SettingsTile.navigation(
-        leading: leading,
-        trailing: trailing,
-        value: value,
-        title: title,
-        //description: description,
-        description: valueAsDescription ? Text(Provider.of<PreferencesProvider>(context).getOr(prefKey, defaultText))
-            : description,
-        //description: valueAsDescription ? 
-        //  Consumer<PreferencesProvider>(
-        //    builder: (context, preferencesProvider, child) {
-        //      return Text(preferencesProvider.getOr(prefKey, defaultText));
-        //    }
-        //  ) : description,
-        enabled: enabled,
-        key: key,
-        onPressed: (context) {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return MyTextDialog(
-                title: title,
-                prefKey: prefKey,
-                defaultText: defaultText,
-                validator: validator,
-                extraActions: extraActions,
-              );
-            },
+  return SettingsTile.navigation(
+    leading: leading,
+    trailing: trailing,
+    value: value,
+    title: title,
+    //description: description,
+    description: valueAsDescription
+        ? Text(Provider.of<PreferencesProvider>(context)
+            .getOr(prefKey, defaultText))
+        : description,
+    //description: valueAsDescription ?
+    //  Consumer<PreferencesProvider>(
+    //    builder: (context, preferencesProvider, child) {
+    //      return Text(preferencesProvider.getOr(prefKey, defaultText));
+    //    }
+    //  ) : description,
+    enabled: enabled,
+    key: key,
+    onPressed: (context) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return MyTextDialog(
+            title: title,
+            prefKey: prefKey,
+            defaultText: defaultText,
+            validator: validator,
+            extraActions: extraActions,
           );
         },
       );
+    },
+  );
 }

@@ -17,15 +17,14 @@ Future<dynamic> apiBarberPost(
   final rootUri = Uri.parse(host);
 
   final uri = Uri(
-    scheme: rootUri.scheme, //'http',
-    host: rootUri.host, // host,
-    port: rootUri.port,
-    path: '/api/barber',
-    queryParameters: {
-      'style': hairStyle,
-      'color': hairColor,
-    }
-  );
+      scheme: rootUri.scheme, //'http',
+      host: rootUri.host, // host,
+      port: rootUri.port,
+      path: '/api/barber',
+      queryParameters: {
+        'style': hairStyle,
+        'color': hairColor,
+      });
 
   final request = http.MultipartRequest('POST', uri)
     ..headers['Authorization'] = 'Bearer $accessToken'
@@ -80,8 +79,6 @@ Future<dynamic> apiRootPath(
     // TODO now we must add the work url to the awaiting list
     //  so that the client may query it later
   } else {
-
-
     log('failed');
   }
 }

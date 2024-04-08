@@ -5,7 +5,6 @@ import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/recents_provider.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
-import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
@@ -18,15 +17,14 @@ Future<void> main() async {
   // Get a specific camera from the list of available cameras.
   final firstCamera = cameras.first;
 
-  final prefs = PreferencesProvider(prefs: await SharedPreferences.getInstance());
+  final prefs =
+      PreferencesProvider(prefs: await SharedPreferences.getInstance());
 
   runApp(
     MultiProvider(
       providers: [
         //Provider.value(value: prefs),
-        ChangeNotifierProvider.value(
-          value: prefs
-        ),
+        ChangeNotifierProvider.value(value: prefs),
         Provider.value(
           value: firstCamera,
         ),
@@ -55,7 +53,9 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
       ),
-      themeMode: prefs.getOr(darkThemePrefKey, false) ? ThemeMode.dark : ThemeMode.light, // use saved pref, not built-in
+      themeMode: prefs.getOr(darkThemePrefKey, false)
+          ? ThemeMode.dark
+          : ThemeMode.light, // use saved pref, not built-in
       home: const MyHomePage(title: "Ai Hair Styler"),
     );
   }

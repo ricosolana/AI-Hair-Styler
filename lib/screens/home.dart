@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:app_tutorial/app_tutorial.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/Navigation.dart';
 import 'package:senior_project_hair_ai/api_access.dart';
@@ -201,8 +202,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               onTap: () {
                                 //TODO: ***Open Uploaded/Captured Photo, Navigate to Editing Screen (Colors, Hairstyles, Generate Button)
-                                final prefs =
-                                    Provider.of<PreferencesProvider>(context, listen: false);
+                                final prefs = Provider.of<PreferencesProvider>(
+                                    context,
+                                    listen: false);
                                 apiBarberPost(
                                     prefs.get<String>(apiHostPrefKey)!,
                                     prefs.get<String>(apiTokenPrefKey)!,
@@ -387,6 +389,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 _startTutorial();
               },
             ),
+            const Divider(),
+            ListTile(
+                leading: Icon(MdiIcons.cloudClock),
+                title: const Text('Queued Tasks'),
+                onTap: () {
+                  // open work queue
+                }),
             const Spacer(), // filler
             const Divider(),
             ListTile(

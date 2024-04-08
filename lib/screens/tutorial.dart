@@ -9,7 +9,8 @@ import 'package:senior_project_hair_ai/screens/settings.dart';
 const String tutorialCompletedPrefKey = 'tutorial-completed';
 
 void setTutorialCompletedPref(BuildContext context, bool isCompleted) {
-  Provider.of<PreferencesProvider>(context).set(tutorialCompletedPrefKey, isCompleted);
+  Provider.of<PreferencesProvider>(context, listen: false)
+      .set(tutorialCompletedPrefKey, isCompleted);
 }
 
 class TutorialItemContent extends StatelessWidget {

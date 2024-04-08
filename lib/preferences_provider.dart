@@ -16,12 +16,12 @@ class PreferencesProvider with ChangeNotifier {
     }
     return def;
     //return pref.get(prefKey) as T ?? def;
-  } 
+  }
 
   T? get<T>(String prefKey) {
     return _prefs.get(prefKey) as T?;
     //return pref.get(prefKey) as T ?? def;
-  } 
+  }
 
   Future<bool> set<T>(String prefKey, T value) async {
     bool status;

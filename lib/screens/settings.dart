@@ -39,29 +39,35 @@ class _MySettingsPageState extends State<MySettingsPage> {
             title: const Text('General'),
             tiles: [
               createTextSettingsTile(
-                title: const Text('API Host'), 
-                leading: const Icon(Icons.cloud_queue),
-                prefKey: apiHostPrefKey,
-                context: context,
-                valueAsDescription: true,
-                validator: (str) {
-                  return (Uri.tryParse(str ?? '')?.hasAbsolutePath ?? false) ? null : 'Enter a valid URL; ie: https://10.0.2.2/';
-                },
-                extraActions: <TextButton>[
-                  TextButton(
-                    child: const Text('Test'),
-                    onPressed: () {
-                      // try connecting
-                      apiRootPath(Provider.of<PreferencesProvider>(context, listen: false).get(apiHostPrefKey)!)
-                        .then((value) {
-                          Fluttertoast.showToast(msg: value != null ? 'Online' : 'Unable to reach server');
+                  title: const Text('API Host'),
+                  leading: const Icon(Icons.cloud_queue),
+                  prefKey: apiHostPrefKey,
+                  context: context,
+                  valueAsDescription: true,
+                  validator: (str) {
+                    return (Uri.tryParse(str ?? '')?.hasAbsolutePath ?? false)
+                        ? null
+                        : 'Enter a valid URL; ie: https://10.0.2.2/';
+                  },
+                  extraActions: <TextButton>[
+                    TextButton(
+                      child: const Text('Test'),
+                      onPressed: () {
+                        // try connecting
+                        apiRootPath(Provider.of<PreferencesProvider>(context,
+                                    listen: false)
+                                .get(apiHostPrefKey)!)
+                            .then((value) {
+                          Fluttertoast.showToast(
+                              msg: value != null
+                                  ? 'Online'
+                                  : 'Unable to reach server');
                         });
-                    },
-                  ),
-                ]
-              ),
+                      },
+                    ),
+                  ]),
               createTextSettingsTile(
-                title: const Text('API Token'), 
+                title: const Text('API Token'),
                 leading: const Icon(Icons.token),
                 prefKey: apiTokenPrefKey,
                 context: context,
@@ -69,7 +75,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 //extraActions: TextButton(
                 //  automatically retrieve from localhost
                 //  child: const Text('Auto'),
-                //  onPressed: onPressed, 
+                //  onPressed: onPressed,
                 //)
               ),
             ],
@@ -93,9 +99,11 @@ class _MySettingsPageState extends State<MySettingsPage> {
               SettingsTile.switchTile(
                 title: const Text('Use Dark Theme'),
                 leading: const Icon(Icons.dark_mode),
-                initialValue: Provider.of<PreferencesProvider>(context).getOr(darkThemePrefKey, false),
+                initialValue: Provider.of<PreferencesProvider>(context)
+                    .getOr(darkThemePrefKey, false),
                 onToggle: (isDarkTheme) {
-                  Provider.of<PreferencesProvider>(context, listen: false).set(darkThemePrefKey, isDarkTheme);
+                  Provider.of<PreferencesProvider>(context, listen: false)
+                      .set(darkThemePrefKey, isDarkTheme);
                 },
               ),
             ], //tiles
