@@ -249,8 +249,10 @@ class _MyEditorPageState extends State<MyEditorPage> {
                   ? () {
                       // TODO
                       // The API is ready here:
-                      final prefs = Provider.of<PreferencesProvider>(context,
-                          listen: false,);
+                      final prefs = Provider.of<PreferencesProvider>(
+                        context,
+                        listen: false,
+                      );
                       apiBarberPost(
                         prefs.get<String>(apiHostPrefKey)!,
                         prefs.get<String>(apiTokenPrefKey)!,
@@ -265,13 +267,15 @@ class _MyEditorPageState extends State<MyEditorPage> {
                           Fluttertoast.showToast(msg: 'Invalid access token');
                         } else {
                           Fluttertoast.showToast(
-                              msg: 'Status Code: ${response.statusCode}',);
+                            msg: 'Status Code: ${response.statusCode}',
+                          );
                         }
                       }).onError((error, stackTrace) {
                         log(error.toString());
                         Fluttertoast.showToast(
-                            msg: 'Failed to connect: $error',
-                            toastLength: Toast.LENGTH_LONG,);
+                          msg: 'Failed to connect: $error',
+                          toastLength: Toast.LENGTH_LONG,
+                        );
                       });
 
                       // Because the AI process takes a while, use a job queue that shows submitted jobs

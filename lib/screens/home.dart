@@ -310,7 +310,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 // MUST trigger the change post-clear
                 setState(() {
                   Provider.of<PreferencesProvider>(context, listen: false)
-                    .getOrCreate(recentsListPrefKey, <String>[]).clear();
+                      .getOrCreate(recentsListPrefKey, <String>[]).clear();
                 });
               },
               shape: const CircleBorder(),

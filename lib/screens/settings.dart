@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
@@ -55,7 +57,16 @@ class _MySettingsPageState extends State<MySettingsPage> {
                           listen: false,
                         ).get(apiHostPrefKey)!,
                       ).then((value) {
-                        Fluttertoast.showToast(msg: 'Online');
+                        if (value.statusCode == 200) {
+                          final map =
+                              jsonDecode(value.body) as Map<String, dynamic>;
+                          if ((map['name'] as String) ==
+                              'ai hair styler generator api') {
+                            Fluttertoast.showToast(msg: 'Server is online');
+                            return;
+                          }
+                        }
+                        Fluttertoast.showToast(msg: 'Failed to verify server');
                       }).onError((error, stackTrace) {
                         Fluttertoast.showToast(msg: 'Failed to reach server');
                       });
