@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Hair Styler',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
         useMaterial3: true,
         brightness: Brightness.light,
       ),
