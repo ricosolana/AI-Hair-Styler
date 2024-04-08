@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
@@ -17,14 +15,15 @@ Future<http.Response> apiBarberPost(
   final rootUri = Uri.parse(host);
 
   final uri = Uri(
-      scheme: rootUri.scheme, //'http',
-      host: rootUri.host, // host,
-      port: rootUri.port,
-      path: '/api/barber',
-      queryParameters: {
-        'style': hairStyle,
-        'color': hairColor,
-      },);
+    scheme: rootUri.scheme, //'http',
+    host: rootUri.host, // host,
+    port: rootUri.port,
+    path: '/api/barber',
+    queryParameters: {
+      'style': hairStyle,
+      'color': hairColor,
+    },
+  );
 
   //http.get(uri)
 
@@ -45,9 +44,7 @@ Future<http.Response> apiBarberPost(
 
   final responseStream =
       await request.send().timeout(const Duration(seconds: 5));
-  final response = await http.Response.fromStream(responseStream);
-
-  return response;
+  return http.Response.fromStream(responseStream);
 
   // TODO parse response image and display?
   //if (response.statusCode == 200) {
@@ -65,7 +62,7 @@ Future<http.Response> apiBarberPost(
   //}
 }
 
-Future<dynamic> apiRootPath(
+Future<http.Response> apiRootPath(
   String host,
 ) async {
   final rootUri = Uri.parse(host);
@@ -79,21 +76,7 @@ Future<dynamic> apiRootPath(
 
   final request = http.Request('GET', uri);
 
-  final responseStream = await request.send();
-  final response = await http.Response.fromStream(responseStream);
-
-  if (response.statusCode == 200) {
-    //final data = jsonDecode(response.body);
-    log("success");
-    log(response.body);
-
-    //Fluttertoast.showToast(msg: 'Online');
-
-    return jsonDecode(response.body);
-
-    // TODO now we must add the work url to the awaiting list
-    //  so that the client may query it later
-  } else {
-    log('failed');
-  }
+  final responseStream =
+      await request.send().timeout(const Duration(seconds: 5));
+  return http.Response.fromStream(responseStream);
 }
