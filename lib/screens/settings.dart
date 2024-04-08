@@ -46,7 +46,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 },
                 extraActions: <TextButton>[
                   TextButton(
-                    child: const Text('Test'),
+                    child: const Text('Probe'),
                     onPressed: () {
                       // try connecting
                       apiRootPath(
