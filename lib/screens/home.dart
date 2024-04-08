@@ -1,14 +1,16 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:app_tutorial/app_tutorial.dart';
+import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/Navigation.dart';
 import 'package:senior_project_hair_ai/api_access.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
-import 'package:senior_project_hair_ai/recents_provider.dart';
 import 'package:senior_project_hair_ai/screens/about.dart';
 import 'package:senior_project_hair_ai/screens/capture.dart';
 import 'package:senior_project_hair_ai/screens/editor.dart';
@@ -16,7 +18,6 @@ import 'package:senior_project_hair_ai/screens/gallery.dart';
 import 'package:senior_project_hair_ai/screens/help.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/tutorial.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -65,19 +66,16 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  // TODO what is this stored as a field for?
-  File? imageUploaded;
-
-  Future uploadImage() async {
+  Future<void> uploadImage() async {
     final returnedImage =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (returnedImage == null) {
       return;
     }
+
+    //Provider.of<PreferencesProvider>(context).createListOrAdd(recentsListPrefKey, [returnedImage.path]);
     setState(() {
-      imageUploaded = File(returnedImage.path);
-      Provider.of<RecentsProvider>(context, listen: false)
-          .addFile(returnedImage.path);
+      Provider.of<PreferencesProvider>(context, listen: false).createListOrAdd(recentsListPrefKey, [returnedImage.path]);
     });
   }
 
@@ -168,12 +166,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 ), // Add padding to the bottom
                 child: Stack(
                   children: [
-                    Consumer<RecentsProvider>(
-                      builder: (context, recentsProvider, child) {
+                    Consumer<PreferencesProvider>(
+                      builder: (context, prefs, child) {
                         return ListView(
                           padding: const EdgeInsets.only(bottom: 150),
-                          children:
-                              recentsProvider.savedFiles.reversed.map((path) {
+                          children: prefs.getOrCreate(recentsListPrefKey, <String>[]).reversed.map((path) {
                             return ListTile(
                               title: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -201,17 +198,25 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ],
                               ),
                               onTap: () {
-                                //TODO: ***Open Uploaded/Captured Photo, Navigate to Editing Screen (Colors, Hairstyles, Generate Button)
-                                final prefs = Provider.of<PreferencesProvider>(
-                                    context,
-                                    listen: false);
                                 apiBarberPost(
-                                    prefs.get<String>(apiHostPrefKey)!,
-                                    prefs.get<String>(apiTokenPrefKey)!,
-                                    //'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxMjQ1NDk3OSwianRpIjoiOWUyMjkyZGMtMzM0OC00MDVhLThkZTQtNWFhNDg4YmVmOGYyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFub255bW91cyIsIm5iZiI6MTcxMjQ1NDk3OSwiY3NyZiI6IjNjNTgwZmYyLTJiZmEtNDRlZS1iNWJhLTFlNzUxMTg3MzkwZiIsImV4cCI6MTcxMjQ1NTg3OX0.XmkuVZmbKvoautbTq1ez8Ti_PrEuozMBp5HEiFElAG8',
-                                    path,
-                                    'bob',
-                                    'dark-blonde');
+                                  prefs.get<String>(apiHostPrefKey)!,
+                                  prefs.get<String>(apiTokenPrefKey)!,
+                                  //'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxMjQ1NDk3OSwianRpIjoiOWUyMjkyZGMtMzM0OC00MDVhLThkZTQtNWFhNDg4YmVmOGYyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFub255bW91cyIsIm5iZiI6MTcxMjQ1NDk3OSwiY3NyZiI6IjNjNTgwZmYyLTJiZmEtNDRlZS1iNWJhLTFlNzUxMTg3MzkwZiIsImV4cCI6MTcxMjQ1NTg3OX0.XmkuVZmbKvoautbTq1ez8Ti_PrEuozMBp5HEiFElAG8',
+                                  path,
+                                  'bob',
+                                  'dark-blonde'
+                                ).then((response) {
+                                  if (response.statusCode == 200) {
+                                    Fluttertoast.showToast(msg: 'Success!');
+                                  } else if (response.statusCode == 422) {
+                                    Fluttertoast.showToast(msg: 'Invalid access token');
+                                  } else {
+                                    Fluttertoast.showToast(msg: 'Status Code: ${response.statusCode}');
+                                  }
+                                }).onError((error, stackTrace) {
+                                  log(error.toString());
+                                  Fluttertoast.showToast(msg: 'Failed to connect: $error', toastLength: Toast.LENGTH_LONG);
+                                });
                               },
                             );
                           }).toList(),

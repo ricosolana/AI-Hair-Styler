@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferencesProvider with ChangeNotifier {
@@ -23,6 +24,18 @@ class PreferencesProvider with ChangeNotifier {
     //return pref.get(prefKey) as T ?? def;
   }
 
+  T getOrCreate<T>(String prefKey, T def) {
+    final Object? value = _prefs.get(prefKey);
+    if (value is T) {
+      return value;
+    } else if (def is List<String> && value is List<Object?>) {
+      return _prefs.getStringList(prefKey) as T;
+    }
+    set(prefKey, def);
+    return def;
+    //return pref.get(prefKey) as T ?? def;
+  }
+
   Future<bool> set<T>(String prefKey, T value) async {
     bool status;
     if (T == int) {
@@ -41,4 +54,12 @@ class PreferencesProvider with ChangeNotifier {
     notifyListeners();
     return status;
   }
+
+  Future<bool> createListOrAdd<T>(String prefKey, List<String> toAdd) async {
+    return set(prefKey, (get<List<String>>(prefKey) ?? <String>[])..addAll(toAdd));
+  } 
+
+  //Future<bool> createListOrAdd<T>(String prefKey, List<String> toAdd) async {
+  //  return set(prefKey, (get<List<String>>(prefKey) ?? <String>[])..addAll(toAdd));
+  //} 
 }

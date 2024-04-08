@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:senior_project_hair_ai/recents_provider.dart';
+import 'package:senior_project_hair_ai/preferences_provider.dart';
+
+const String recentsListPrefKey = 'recent-captures-list';
 
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({super.key});
@@ -145,7 +147,7 @@ class DisplayPictureScreen extends StatelessWidget {
           Navigator.of(context).popUntil((route) => route.isFirst);
 
           Fluttertoast.showToast(msg: 'Image saved as $path');
-          Provider.of<RecentsProvider>(context, listen: false).addFile(path);
+          Provider.of<PreferencesProvider>(context).createListOrAdd(recentsListPrefKey, [path]);
         },
         child: const Icon(Icons.save_alt, size: 28.0),
       ),

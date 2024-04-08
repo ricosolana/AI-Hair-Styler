@@ -2,7 +2,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
-import 'package:senior_project_hair_ai/recents_provider.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,7 +28,7 @@ Future<void> main() async {
           value: firstCamera,
         ),
         // TODO persist the Recents list to disk
-        ChangeNotifierProvider.value(value: RecentsProvider()),
+        //ChangeNotifierProvider.value(value: RecentsProvider()),
       ],
       child: const MyApp(),
     ),
