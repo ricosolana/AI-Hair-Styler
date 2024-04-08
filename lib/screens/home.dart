@@ -230,46 +230,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         );
                       },
                     ),
-                    ListView(
-                      padding: const EdgeInsets.only(bottom: 150),
-                      children: Provider.of<PreferencesProvider>(context,
-                              listen: false,)
-                          .getOrCreate(recentsListPrefKey, <String>[])
-                          .reversed
-                          .map((path) {
-                            return ListTile(
-                              title: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Spacer(),
-                                  Expanded(
-                                    child: Center(
-                                      child: Image.file(
-                                        File(path),
-                                        width: 50,
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 10,
-                                    child: Text(
-                                      path,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 22.0,
-                                      ),
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                ],
-                              ),
-                              onTap: () {
-                                //TODO: Add logic to open recently edited photo
-                              },
-                            );
-                          })
-                          .toList(),
-                    ),
                     Positioned(
                       top: 500,
                       bottom: 0,
