@@ -86,10 +86,16 @@ class _MyEditorPageState extends State<MyEditorPage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Editor'),
       ),
+      //Spacer is flex:
+      //  place under Column or another flex
+      //  otherwise errors occur
+
+      // TODO if clips, place inside singlechildscrollview and center?
+      //  https://stackoverflow.com/questions/52053850/flutter-how-to-make-a-column-screen-scrollable
       body: Column(
         children: <Widget>[
 
-          /*
+          
           GestureDetector(
             onTap: () {
               showDialog(
@@ -130,7 +136,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
               ),
             ),
           ),
-          */
+          
 
 
             const SizedBox(height: 20),
@@ -144,7 +150,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
 
 
-            /*
+            
             Container(
               height: 260,
               decoration: BoxDecoration(
@@ -185,10 +191,10 @@ class _MyEditorPageState extends State<MyEditorPage> {
                   ),
                 ),
               ),
-            ),*/
+            ),
 
 
-            /*
+            
             const Spacer(),
             const Text(
               "Select Your Hair Color:",
@@ -243,13 +249,13 @@ class _MyEditorPageState extends State<MyEditorPage> {
                 ),
               ),
             ),
-            */
+            
 
 
             
             const SizedBox(height: 10),
             const Spacer(),
-            /*
+            
             ElevatedButton(
               onPressed: (selectedColor != -1 && selectedStyle != -1)
                   ? () {
@@ -322,7 +328,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
                 style: TextStyle(fontSize: 24),
               ),
             ),
-            */
+            
 
 
                 Container(

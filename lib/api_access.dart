@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 Future<http.Response> apiBarberPost(
@@ -8,8 +9,9 @@ Future<http.Response> apiBarberPost(
   String accessToken,
   String imagePath,
   String hairStyle,
-  String hairColor,
-) async {
+  String hairColor, {
+  bool demo = false,
+}) async {
   final bytes = await File(imagePath).readAsBytes();
 
   final rootUri = Uri.parse(host);
@@ -22,6 +24,7 @@ Future<http.Response> apiBarberPost(
     queryParameters: {
       'style': hairStyle,
       'color': hairColor,
+      if (demo) 'demo': '1'
     },
   );
 
@@ -79,4 +82,49 @@ Future<http.Response> apiRootPath(
   final responseStream =
       await request.send().timeout(const Duration(seconds: 5));
   return http.Response.fromStream(responseStream);
+}
+
+/*
+Future<Image> apiRetrieveGenerated(
+  String host,
+  String imageName,
+) async {  
+  final rootUri = Uri.parse(host);
+
+  final uri = Uri(
+    scheme: rootUri.scheme, //'http',
+    host: rootUri.host, // host,
+    port: rootUri.port,
+    path: '/generated/$imageName',
+  );
+
+  return Image.network(uri.toString());
+
+  final request = http.Request('GET', uri);
+
+  final responseStream =
+      await request.send().timeout(const Duration(seconds: 5));
+  final response = await http.Response.fromStream(responseStream);
+
+
+
+  response.headers['Context-Type']
+
+  response.body
+}*/
+
+String apiGeneratedUrl(
+  String host,
+  String imageName,
+) {
+  final rootUri = Uri.parse(host);
+
+  final uri = Uri(
+    scheme: rootUri.scheme, //'http',
+    host: rootUri.host, // host,
+    port: rootUri.port,
+    path: '/generated/$imageName',
+  );
+
+  return uri.toString();
 }
