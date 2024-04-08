@@ -60,7 +60,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Take a photo")),
+      appBar: AppBar(title: const Text("Take a Photo")),
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
@@ -71,9 +71,14 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _takePictureAndPrompt,
-        child: const Icon(Icons.camera_alt, size: 28.0),
+      floatingActionButton: SizedBox(
+        width: 80.0,
+        height: 80.0,
+        child: FloatingActionButton(
+          onPressed: _takePictureAndPrompt,
+          shape: const CircleBorder(),
+          child: const Icon(Icons.camera_alt, size: 45.0),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
@@ -119,9 +124,9 @@ class DisplayPictureScreen extends StatelessWidget {
                     color: Colors.black
                         .withOpacity(0.4), // Semi-transparent background
                     child: const Text(
-                      'Save or Retake',
+                      'Save this Image?',
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 32,
                         color: Colors.white,
                       ),
                     ),
@@ -132,22 +137,27 @@ class DisplayPictureScreen extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final directory = await getApplicationDocumentsDirectory();
-          final path =
-              '${directory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
-          final File file = File(path);
-          await file.writeAsBytes(await imageCachedFile.readAsBytes());
+      floatingActionButton: SizedBox(
+        width: 80.0,
+        height: 80.0,
+        child: FloatingActionButton(
+          onPressed: () async {
+            final directory = await getApplicationDocumentsDirectory();
+            final path =
+                '${directory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+            final File file = File(path);
+            await file.writeAsBytes(await imageCachedFile.readAsBytes());
 
-          if (!context.mounted) return;
+            if (!context.mounted) return;
 
-          Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.of(context).popUntil((route) => route.isFirst);
 
-          Fluttertoast.showToast(msg: 'Image saved as $path');
-          Provider.of<RecentsProvider>(context, listen: false).addFile(path);
-        },
-        child: const Icon(Icons.save_alt, size: 28.0),
+            Fluttertoast.showToast(msg: 'Image saved as $path');
+            Provider.of<RecentsProvider>(context, listen: false).addFile(path);
+          },
+          shape: const CircleBorder(),
+          child: const Icon(Icons.save_alt, size: 45.0),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );

@@ -1,49 +1,28 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:senior_project_hair_ai/recents_provider.dart';
+
 
 // TODO properly implement
 
 class MyEditorPage extends StatefulWidget {
-  const MyEditorPage({super.key});
+  const MyEditorPage({super.key, required this.inputImagePath});
+
+  final String inputImagePath;//the camera image path will be saved here
 
   @override
   State<MyEditorPage> createState() => _MyEditorPageState();
 }
 
 class _MyEditorPageState extends State<MyEditorPage> {
-  /*
+/*
     editor
       will contain options relating to ai generation? (more such as weights)
   */
-
-  @override
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Editor',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // Thi
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
 //  int _counter = 0;
-  String inputImagePath = ""; //the camera image path will be saved here
-
   // void _incrementCounter() {
   //   setState(() {
   //     // This call to setState tells the Flutter framework that something has
@@ -54,31 +33,122 @@ class _MyHomePageState extends State<MyHomePage> {
   //     _counter++;
   //   });
   // }
-  String iterate(dynamic funIndex) {
-    return "input/IMG ($funIndex).png";
+  void styleSelector(int styleIndex) {
+    setState(() {
+      if (selectedStyle == styleIndex){
+        selectedStyle = -1;
+      } else {
+        selectedStyle = styleIndex;
+      }    });
   }
+  void colorSelector(int colorIndex) {
+    setState(() {
+      if (selectedColor == colorIndex){
+        selectedColor = -1;
+      } else {
+        selectedColor = colorIndex;
+      }
+    });
+  }
+  String iterate(dynamic funIndex) {
+    return "assets/images/IMG ($funIndex).png";
+  }
+  bool imageChange = false;
+  String finalPath = '';
+  int selectedStyle = -1;
+  int selectedColor = -1;
+  File ? imageUploaded;
 
+  Future uploadImage() async{
+    final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (returnedImage == null) {
+      return;
+    }
+    setState(() {
+      imageUploaded = File(returnedImage.path);
+      Provider.of<RecentsProvider>(context, listen: false).addFile(returnedImage.path);
+      finalPath = returnedImage.path;
+      imageChange = true;
+    });
+
+    }
   @override
-  // FAVOUR'S SAMPLE EDITOR PAGE FROM HERE TO LINE 117
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('Responsive App'),
-      // ),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text('Editor'),
+      ),
       body: Container(
-        padding: const EdgeInsets.all(30),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Image.asset(
-              "input/IMG (1).png",
-              fit: BoxFit.cover,
-              height: 200,
+            GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Change Image'),
+                      content: const Text('Would you like to change this image?'),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('No'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            // Navigate to the gallery here
+                            uploadImage();
+                            imageChange = true;
+                            Navigator.pop(context); // Close the dialog
+                          },
+                          child: const Text('Yes'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: (imageChange == true)
+                      ? Image.file(File(finalPath))
+                      : (widget.inputImagePath == '')
+                      ? Image.asset(
+                    'assets/images/default.png',
+                    fit: BoxFit.cover,
+                  )
+                      : Image.file(
+                    File(widget.inputImagePath),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 20),
-
-//need to start a card here
-            // GridView
-            Expanded(
+            const Text("Select Your Hairstyle:",
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 18.0,
+              ),
+            ),
+            Container(
+              height: 260,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.deepPurple, // Border color
+                  width: 3, // Border width
+                ),
+                borderRadius: BorderRadius.circular(7), // Border radius
+              ),
               child: SingleChildScrollView(
                 child: GridView.count(
                   shrinkWrap: true,
@@ -88,63 +158,89 @@ class _MyHomePageState extends State<MyHomePage> {
                   physics: const NeverScrollableScrollPhysics(),
                   children: List.generate(
                     20,
-                        (index) => Container(
-                        color: Colors.grey[300],
-                        alignment: Alignment.center,
-                        child:
-                        Image.asset(iterate(index)) //Text('Item $index'),
-                    ,),
+                        (index) => GestureDetector(
+                          onTap:(){
+                            styleSelector(index);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: selectedStyle == index ? Colors.deepPurpleAccent : Colors.transparent,
+                              width: 4,
+                            ),
+                          ),
+                      child: Image.asset(
+                          iterate(index),
+                      fit: BoxFit.cover,), //Text('Item $index'),
+                    ),
                   ),
                 ),
-//end card here
               ),
             ),
-
-            const SizedBox(height: 20),
+            ),
+            const Spacer(),
+            const Text("Select Your Hair Color:",
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 18.0,
+              ),
+            ),
             Container(
-              //height: 150,
-     padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  // Add your button functionality here
-                },
-                child: const Text('Button'),
+              height: 100, // Set a smaller height for the container
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.deepPurple, // Border color
+                  width: 5, // Border width
+                ),
+                borderRadius: BorderRadius.circular(7), // Border radius
               ),
-            )
-          ,],
-        ),
-      ),
-    );
-  } //END FAVOUR EDITOR PAGE
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    Colors.redAccent,
+                    Colors.brown,
+                    Colors.black,
+                    Colors.yellow,
+                    Colors.white,
+                  ].asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final color = entry.value;
 
-//OLD EDITOR PAGE
-  /*
- Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Editor'),
-         ),
-      // simplify app,
-      // reduce complexity
-      // no extra editing features except those few absolutely required
-      // aka no cropping, no color changes (for now until main features are implemented)
-
-      // load an image
-      // https://github.com/dnfield/flutter_svg/blob/master/packages/flutter_svg_test/test/flutter_svg_test_test.dart
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Hi',
+                    return GestureDetector(
+                      onTap: () {
+                        colorSelector(index);
+                      },
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        margin: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: color,
+                          border: Border.all(
+                            color: selectedColor == index ? Colors.deepPurpleAccent : Colors.transparent,
+                            width: 4,
+                          ),
+                        borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
             ),
-            SvgPicture.asset('assets/images/smiley.svg'),
-          ],
-        ),
+            const SizedBox(height: 10),
+            const Spacer(),
+            ElevatedButton(
+              onPressed: (selectedColor != -1 || selectedStyle != -1) ? () {
+                //TODO Values to barbershop, navigate to the final screen, display results
+              } : null,
+              child: const Text('Generate',
+              style: TextStyle(fontSize: 24),),
+            ),
+            // Add a SizedBox after the Container to create space between the rows
+          ],),
       ),
     );
   }
-
-   */
 }

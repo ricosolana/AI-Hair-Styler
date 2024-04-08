@@ -9,7 +9,6 @@ import 'package:senior_project_hair_ai/recents_provider.dart';
 import 'package:senior_project_hair_ai/screens/about.dart';
 import 'package:senior_project_hair_ai/screens/capture.dart';
 import 'package:senior_project_hair_ai/screens/editor.dart';
-import 'package:senior_project_hair_ai/screens/gallery.dart';
 import 'package:senior_project_hair_ai/screens/help.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/tutorial.dart';
@@ -24,7 +23,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _currentPage = 'Home';
 
   //final _scaffoldKey = GlobalKey<ScaffoldState>();
   //final hamburgerKey = ValueKey();
@@ -55,11 +53,6 @@ class _MyHomePageState extends State<MyHomePage> {
   //  //((_scaffoldKey.currentState!.widget.appBar!) as AppBar).leading.key = ValueKey('hamburgerButton');
   //}
 
-  void _setPage(String newPage) {
-    setState(() {
-      _currentPage = newPage;
-    });
-  }
 
   File ? imageUploaded;
 
@@ -108,8 +101,8 @@ class _MyHomePageState extends State<MyHomePage> {
       TutorialItem(
         globalKey: editorFloatingKey,
         child: const TutorialItemContent(
-          title: 'Editor button',
-          content: 'Press this to open the editor for image editing',
+          title: 'Refresh button',
+          content: 'Press this to clear the list of recently uploaded photos',
         ),
       ),
     });
@@ -129,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text("${widget.title} (Home)") ,
         //leading: IconButton(
         //  key: ValueKey('hamburgerButton'), // This is the hamburger button
         //  icon: Icon(Icons.menu),
@@ -141,15 +134,18 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           children: <Widget>[
-            const Padding(
+             const Padding(
               padding: EdgeInsets.only(top: 20.0),
-              child: Text(
-                'You are currently on page:',
+                child: Text(
+                  'Upload or Take a Photo to Get Started',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 22.0,
+                  ),
               ),
-            ),
-            Text(
-              _currentPage,
-              style: Theme.of(context).textTheme.headlineMedium,
+             ),
+            const Text(
+              "(Recently Edited Images will appear below)",
             ),
             Expanded(
               child: Padding(
@@ -173,13 +169,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: Center(
                                       child: Image.file(
                                     File(path),
-                                    width: 50,
+                                    width: 100,
                                   ),),
                                 ),
                                 Expanded(
-                                  flex: 10,
+                                  flex: 2,
                                   child: Text(
-                                    path,
+                                    path.length > 20 ? '...${path.substring(path.length - 20)}' : path,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 22.0,
@@ -191,44 +187,17 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                             onTap: () {
                               //TODO: ***Open Uploaded/Captured Photo, Navigate to Editing Screen (Colors, Hairstyles, Generate Button)
+                              // Open Uploaded/Captured Photo, Navigate to Editing Screen
+                              navigateTo(
+                                context: context,
+                                screen: MyEditorPage(inputImagePath: path),
+                                style: NavigationRouteStyle.material,
+                              );
                             },
                           );
                         }).toList(),
                       );
                     },),
-                    ListView(
-                      padding: const EdgeInsets.only(bottom: 150),
-                      children: Provider.of<RecentsProvider>(context, listen: false).savedFiles.reversed.map((path) {
-                        return ListTile(
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Spacer(),
-                              Expanded(
-                                child: Center(
-                                  child: Image.file(File(path), width: 50,)
-                                ,),
-                              ),
-                              Expanded(
-                                flex: 10,
-                                child: Text(
-                                  path,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 22.0,
-                                  ),
-                                ),
-                              ),
-                              const Spacer(),
-                            ],
-                          ),
-                          onTap: () {
-                            //TODO: Add logic to open recently edited photo
-                          },
-                        );
-                      }).toList(),
-                    ),
-
 
                     Positioned(
                       top: 500,
@@ -259,20 +228,19 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            width: 70.0,
-            height: 70.0,
+            width: 80.0,
+            height: 80.0,
             child: FloatingActionButton(
               heroTag: "upload-fab",
               key: uploadFloatingKey,
               onPressed: () {
                 // Upload Button
-                // TODO: Add logic for the upload button
                 uploadImage();
               },
               shape: const CircleBorder(),
               child: const Icon(
                 Icons.file_upload_rounded,
-                size: 30.0,
+                size: 40.0,
               ),
             ),
           ),
@@ -294,24 +262,23 @@ class _MyHomePageState extends State<MyHomePage> {
               shape: const CircleBorder(),
               child: const Icon(
                 Icons.add_a_photo,
-                size: 48.0,
+                size: 55.0,
               ),
             ),
           ),
           const SizedBox(width: 50.0), // Adjust the spacing between buttons
           SizedBox(
-            width: 70.0,
-            height: 70.0,
+            width: 80.0,
+            height: 80.0,
             child: FloatingActionButton(
               key: editorFloatingKey,
               onPressed: () {
-                // AI Edit Button
-                // TODO: Add logic to open screen that enables AI edits (or whatever this button is for)
+                Provider.of<RecentsProvider>(context, listen: false).clearFiles();
               },
               shape: const CircleBorder(),
               child: const Icon(
-                Icons.auto_fix_high_rounded,
-                size: 30.0,
+                Icons.refresh_rounded,
+                size: 40.0,
               ),
             ),
           ),
@@ -322,13 +289,14 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: <Widget>[
             const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.lightBlue),
+              decoration: BoxDecoration(color: Colors.deepPurple),
               child: Text(
-                'AI Hair Styler',
+                'AI Hair Styler\n(Options)',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
                 ),
+                textAlign: TextAlign.center,
               ),
             ),
             ListTile(
@@ -336,19 +304,17 @@ class _MyHomePageState extends State<MyHomePage> {
               title: const Text('Editor'),
               onTap: () => navigateTo(
                 context: context,
-                screen: const MyEditorPage(),
+                screen: const MyEditorPage(inputImagePath: '',),
                 style: NavigationRouteStyle.material,
               ),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
               title: const Text('Gallery'),
-              onTap: () => navigateTo(
-                context: context,
-                screen: const MyGalleryPage(),
-                style: NavigationRouteStyle.material,
+              onTap: () {
+                uploadImage();
+              },
               ),
-            ),
             ListTile(
               leading: const Icon(Icons.directions_walk),
               title: const Text('Walkthrough'),
@@ -405,12 +371,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      onDrawerChanged: (isDrawerOpen) {
-        if (!isDrawerOpen) {
-          _setPage('Home');
-        }
-      },
     );
-
   }
 }

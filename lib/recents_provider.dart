@@ -9,4 +9,8 @@ class RecentsProvider with ChangeNotifier {
     _savedFiles.add(filePath);
     notifyListeners();
   }
+  void clearFiles() {
+    savedFiles.clear();
+    notifyListeners();
+  }
 }
