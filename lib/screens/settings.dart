@@ -1,7 +1,4 @@
-import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +7,6 @@ import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/settings_text_tile.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 // TODO properly implement
 // https://docs.flutter.dev/cookbook/persistence/key-value
@@ -55,17 +51,17 @@ class _MySettingsPageState extends State<MySettingsPage> {
                       onPressed: () {
                         // try connecting
                         apiRootPath(Provider.of<PreferencesProvider>(context,
-                                    listen: false)
-                                .get(apiHostPrefKey)!)
+                                    listen: false,)
+                                .get(apiHostPrefKey)!,)
                             .then((value) {
                           Fluttertoast.showToast(
                               msg: value != null
                                   ? 'Online'
-                                  : 'Unable to reach server');
+                                  : 'Unable to reach server',);
                         });
                       },
                     ),
-                  ]),
+                  ],),
               createTextSettingsTile(
                 title: const Text('API Token'),
                 leading: const Icon(Icons.token),

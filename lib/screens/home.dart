@@ -1,15 +1,11 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:app_tutorial/app_tutorial.dart';
-import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/Navigation.dart';
-import 'package:senior_project_hair_ai/api_access.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/about.dart';
 import 'package:senior_project_hair_ai/screens/capture.dart';
@@ -28,7 +24,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   //final _scaffoldKey = GlobalKey<ScaffoldState>();
   //final hamburgerKey = ValueKey();
 
@@ -58,7 +53,6 @@ class _MyHomePageState extends State<MyHomePage> {
   //  //((_scaffoldKey.currentState!.widget.appBar!) as AppBar).leading.key = ValueKey('hamburgerButton');
   //}
 
-
   Future<void> uploadImage() async {
     final returnedImage =
         await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -68,7 +62,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     //Provider.of<PreferencesProvider>(context).createListOrAdd(recentsListPrefKey, [returnedImage.path]);
     setState(() {
-      Provider.of<PreferencesProvider>(context, listen: false).createListOrAdd(recentsListPrefKey, [returnedImage.path]);
+      Provider.of<PreferencesProvider>(context, listen: false)
+          .createListOrAdd(recentsListPrefKey, [returnedImage.path]);
     });
   }
 
@@ -130,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text("${widget.title} (Home)") ,
+        title: Text("${widget.title} (Home)"),
         //leading: IconButton(
         //  key: ValueKey('hamburgerButton'), // This is the hamburger button
         //  icon: Icon(Icons.menu),
@@ -142,16 +137,16 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           children: <Widget>[
-             const Padding(
+            const Padding(
               padding: EdgeInsets.only(top: 20.0),
-                child: Text(
-                  'Upload or Take a Photo to Get Started',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 22.0,
-                  ),
+              child: Text(
+                'Upload or Take a Photo to Get Started',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 22.0,
+                ),
               ),
-             ),
+            ),
             const Text(
               "(Recently Edited Images will appear below)",
             ),
@@ -166,7 +161,82 @@ class _MyHomePageState extends State<MyHomePage> {
                       builder: (context, prefs, child) {
                         return ListView(
                           padding: const EdgeInsets.only(bottom: 150),
-                          children: prefs.getOrCreate(recentsListPrefKey, <String>[]).reversed.map((path) {
+                          children: prefs
+                              .getOrCreate(recentsListPrefKey, <String>[])
+                              .reversed
+                              .map((path) {
+                                return ListTile(
+                                  title: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Spacer(),
+                                      Expanded(
+                                        child: Center(
+                                          child: Image.file(
+                                            File(path),
+                                            width: 100,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 2,
+                                        child: Text(
+                                          path.length > 20
+                                              ? '...${path.substring(path.length - 20)}'
+                                              : path,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 22.0,
+                                          ),
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    //TODO: ***Open Uploaded/Captured Photo, Navigate to Editing Screen (Colors, Hairstyles, Generate Button)
+
+                                    // TODO what should be done here?
+                                    navigateTo(
+                                      context: context,
+                                      screen:
+                                          MyEditorPage(inputImagePath: path),
+                                      style: NavigationRouteStyle.material,
+                                    );
+
+                                    // The API is ready here:
+                                    //apiBarberPost(
+                                    //  prefs.get<String>(apiHostPrefKey)!,
+                                    //  prefs.get<String>(apiTokenPrefKey)!,
+                                    //  path,
+                                    //  'bob',
+                                    //  'dark-blonde'
+                                    //).then((response) {
+                                    //  if (response.statusCode == 200) {
+                                    //    Fluttertoast.showToast(msg: 'Success!');
+                                    //  } else if (response.statusCode == 422) {
+                                    //    Fluttertoast.showToast(msg: 'Invalid access token');
+                                    //  } else {
+                                    //    Fluttertoast.showToast(msg: 'Status Code: ${response.statusCode}');
+                                    //  }
+                                    //}).onError((error, stackTrace) {
+                                    //  log(error.toString());
+                                    //  Fluttertoast.showToast(msg: 'Failed to connect: $error', toastLength: Toast.LENGTH_LONG);
+                                    //});
+                                  },
+                                );
+                              })
+                              .toList(),
+                        );
+                      },
+                    ),
+                    ListView(
+                      padding: const EdgeInsets.only(bottom: 150),
+                      children: Provider.of<PreferencesProvider>(context,
+                              listen: false,)
+                          .getOrCreate(recentsListPrefKey, <String>[])
+                          .reversed
+                          .map((path) {
                             return ListTile(
                               title: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -176,95 +246,30 @@ class _MyHomePageState extends State<MyHomePage> {
                                     child: Center(
                                       child: Image.file(
                                         File(path),
-                                        width: 100,
+                                        width: 50,
                                       ),
                                     ),
                                   ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    path.length > 20 ? '...${path.substring(path.length - 20)}' : path,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 22.0,
+                                  Expanded(
+                                    flex: 10,
+                                    child: Text(
+                                      path,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 22.0,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const Spacer(),
-                              ],
-                            ),
-                            onTap: () {
-                              //TODO: ***Open Uploaded/Captured Photo, Navigate to Editing Screen (Colors, Hairstyles, Generate Button)
-                              
-                              // TODO what should be done here?
-                              navigateTo(
-                                context: context,
-                                screen: MyEditorPage(inputImagePath: path),
-                                style: NavigationRouteStyle.material,
-                              );
-
-                              // The API is ready here:
-                              //apiBarberPost(
-                              //  prefs.get<String>(apiHostPrefKey)!,
-                              //  prefs.get<String>(apiTokenPrefKey)!,
-                              //  path,
-                              //  'bob',
-                              //  'dark-blonde'
-                              //).then((response) {
-                              //  if (response.statusCode == 200) {
-                              //    Fluttertoast.showToast(msg: 'Success!');
-                              //  } else if (response.statusCode == 422) {
-                              //    Fluttertoast.showToast(msg: 'Invalid access token');
-                              //  } else {
-                              //    Fluttertoast.showToast(msg: 'Status Code: ${response.statusCode}');
-                              //  }
-                              //}).onError((error, stackTrace) {
-                              //  log(error.toString());
-                              //  Fluttertoast.showToast(msg: 'Failed to connect: $error', toastLength: Toast.LENGTH_LONG);
-                              //});
-
-                            },
-                          );
-                        }).toList(),
-                      );
-                    },),
-                    ListView(
-                      padding: const EdgeInsets.only(bottom: 150),
-                      children: Provider.of<PreferencesProvider>(context, listen: false).getOrCreate(recentsListPrefKey, <String>[]).reversed.map((path) {
-                        return ListTile(
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Spacer(),
-                              Expanded(
-                                child: Center(
-                                  child: Image.file(
-                                    File(path), 
-                                    width: 50,
-                                  ),
-                                ),
+                                  const Spacer(),
+                                ],
                               ),
-                              Expanded(
-                                flex: 10,
-                                child: Text(
-                                  path,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 22.0,
-                                  ),
-                                ),
-                              ),
-                              const Spacer(),
-                            ],
-                          ),
-                          onTap: () {
-                            //TODO: Add logic to open recently edited photo
-                          },
-                        );
-                      }).toList(),
+                              onTap: () {
+                                //TODO: Add logic to open recently edited photo
+                              },
+                            );
+                          })
+                          .toList(),
                     ),
-
-
                     Positioned(
                       top: 500,
                       bottom: 0,
@@ -341,8 +346,9 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 // TODO add a list clear to PreferencesProvider
                 //Provider.of<RecentsProvider>(context, listen: false).clearFiles();
-                // MUST trigger the change post-clear 
-                Provider.of<PreferencesProvider>(context).getOrCreate(recentsListPrefKey, <String>[]).clear();
+                // MUST trigger the change post-clear
+                Provider.of<PreferencesProvider>(context)
+                    .getOrCreate(recentsListPrefKey, <String>[]).clear();
               },
               shape: const CircleBorder(),
               child: const Icon(
@@ -373,7 +379,9 @@ class _MyHomePageState extends State<MyHomePage> {
               title: const Text('Editor'),
               onTap: () => navigateTo(
                 context: context,
-                screen: const MyEditorPage(inputImagePath: '',),
+                screen: const MyEditorPage(
+                  inputImagePath: '',
+                ),
                 style: NavigationRouteStyle.material,
               ),
             ),
@@ -383,7 +391,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 uploadImage();
               },
-              ),
+            ),
             ListTile(
               leading: const Icon(Icons.directions_walk),
               title: const Text('Walkthrough'),
@@ -406,7 +414,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 title: const Text('Queued Tasks'),
                 onTap: () {
                   // open work queue
-                }),
+                },),
             const Spacer(), // filler
             const Divider(),
             ListTile(

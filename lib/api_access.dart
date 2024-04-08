@@ -1,9 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:async';
 
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 Future<http.Response> apiBarberPost(
@@ -25,7 +24,7 @@ Future<http.Response> apiBarberPost(
       queryParameters: {
         'style': hairStyle,
         'color': hairColor,
-      });
+      },);
 
   //http.get(uri)
 
@@ -44,10 +43,8 @@ Future<http.Response> apiBarberPost(
       http.MultipartFile.fromBytes('image', bytes, filename: 'image.jpeg'),
     );
 
-  final responseStream = 
-    await request
-    .send()
-    .timeout(const Duration(seconds: 5));
+  final responseStream =
+      await request.send().timeout(const Duration(seconds: 5));
   final response = await http.Response.fromStream(responseStream);
 
   return response;

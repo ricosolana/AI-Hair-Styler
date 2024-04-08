@@ -3,18 +3,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:senior_project_hair_ai/Navigation.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/capture.dart';
-import 'package:senior_project_hair_ai/Navigation.dart';
 import 'package:senior_project_hair_ai/screens/results.dart';
-
 
 // TODO properly implement
 
 class MyEditorPage extends StatefulWidget {
   const MyEditorPage({super.key, required this.inputImagePath});
 
-  final String inputImagePath;//the camera image path will be saved here
+  final String inputImagePath; //the camera image path will be saved here
 
   @override
   State<MyEditorPage> createState() => _MyEditorPageState();
@@ -38,32 +37,37 @@ class _MyEditorPageState extends State<MyEditorPage> {
   // }
   void styleSelector(int styleIndex) {
     setState(() {
-      if (selectedStyle == styleIndex){
+      if (selectedStyle == styleIndex) {
         selectedStyle = -1;
       } else {
         selectedStyle = styleIndex;
-      }    });
+      }
+    });
   }
+
   void colorSelector(int colorIndex) {
     setState(() {
-      if (selectedColor == colorIndex){
+      if (selectedColor == colorIndex) {
         selectedColor = -1;
       } else {
         selectedColor = colorIndex;
       }
     });
   }
+
   String iterate(dynamic funIndex) {
     return "assets/images/IMG ($funIndex).png";
   }
+
   bool imageChange = false;
   String finalPath = '';
   int selectedStyle = -1;
   int selectedColor = -1;
   File? imageUploaded;
 
-  Future uploadImage() async{
-    final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+  Future uploadImage() async {
+    final returnedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (returnedImage == null) {
       return;
     }
@@ -71,7 +75,8 @@ class _MyEditorPageState extends State<MyEditorPage> {
       imageUploaded = File(returnedImage.path);
       //Provider.of<RecentsProvider>(context, listen: false).addFile(returnedImage.path);
       //Provider.of<PreferencesProvider>(context, listen: false).
-      Provider.of<PreferencesProvider>(context, listen: false).createListOrAdd(recentsListPrefKey, <String>[returnedImage.path]);
+      Provider.of<PreferencesProvider>(context, listen: false)
+          .createListOrAdd(recentsListPrefKey, <String>[returnedImage.path]);
       finalPath = returnedImage.path;
       imageChange = true;
     });
@@ -95,7 +100,8 @@ class _MyEditorPageState extends State<MyEditorPage> {
                   builder: (BuildContext context) {
                     return AlertDialog(
                       title: const Text('Change Image'),
-                      content: const Text('Would you like to change this image?'),
+                      content:
+                          const Text('Would you like to change this image?'),
                       actions: <Widget>[
                         TextButton(
                           onPressed: () {
@@ -127,19 +133,20 @@ class _MyEditorPageState extends State<MyEditorPage> {
                   child: (imageChange == true)
                       ? Image.file(File(finalPath))
                       : (widget.inputImagePath == '')
-                      ? Image.asset(
-                    'assets/images/default.png',
-                    fit: BoxFit.cover,
-                  )
-                      : Image.file(
-                    File(widget.inputImagePath),
-                    fit: BoxFit.cover,
-                  ),
+                          ? Image.asset(
+                              'assets/images/default.png',
+                              fit: BoxFit.cover,
+                            )
+                          : Image.file(
+                              File(widget.inputImagePath),
+                              fit: BoxFit.cover,
+                            ),
                 ),
               ),
             ),
             const SizedBox(height: 20),
-            const Text("Select Your Hairstyle:",
+            const Text(
+              "Select Your Hairstyle:",
               style: TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 18.0,
@@ -163,28 +170,32 @@ class _MyEditorPageState extends State<MyEditorPage> {
                   physics: const NeverScrollableScrollPhysics(),
                   children: List.generate(
                     20,
-                        (index) => GestureDetector(
-                          onTap:(){
-                            styleSelector(index);
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: selectedStyle == index ? Colors.deepPurpleAccent : Colors.transparent,
-                              width: 4,
-                            ),
+                    (index) => GestureDetector(
+                      onTap: () {
+                        styleSelector(index);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: selectedStyle == index
+                                ? Colors.deepPurpleAccent
+                                : Colors.transparent,
+                            width: 4,
                           ),
-                      child: Image.asset(
+                        ),
+                        child: Image.asset(
                           iterate(index),
-                      fit: BoxFit.cover,), //Text('Item $index'),
+                          fit: BoxFit.cover,
+                        ), //Text('Item $index'),
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-            ),
             const Spacer(),
-            const Text("Select Your Hair Color:",
+            const Text(
+              "Select Your Hair Color:",
               style: TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 18.0,
@@ -223,10 +234,12 @@ class _MyEditorPageState extends State<MyEditorPage> {
                         decoration: BoxDecoration(
                           color: color,
                           border: Border.all(
-                            color: selectedColor == index ? Colors.deepPurpleAccent : Colors.transparent,
+                            color: selectedColor == index
+                                ? Colors.deepPurpleAccent
+                                : Colors.transparent,
                             width: 4,
                           ),
-                        borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                     );
@@ -237,18 +250,24 @@ class _MyEditorPageState extends State<MyEditorPage> {
             const SizedBox(height: 10),
             const Spacer(),
             ElevatedButton(
-              onPressed: (selectedColor != -1 || selectedStyle != -1) ? () {
-                //TODO Values to barbershop, navigate to the final screen, display results
-                navigateTo(
-                  context: context,
-                  screen: const MyResultsPage(),
-                  style: NavigationRouteStyle.material,
-                );             } : null,
-              child: const Text('Generate',
-              style: TextStyle(fontSize: 24),),
+              onPressed: (selectedColor != -1 || selectedStyle != -1)
+                  ? () {
+                      //TODO Values to barbershop, navigate to the final screen, display results
+                      navigateTo(
+                        context: context,
+                        screen: const MyResultsPage(),
+                        style: NavigationRouteStyle.material,
+                      );
+                    }
+                  : null,
+              child: const Text(
+                'Generate',
+                style: TextStyle(fontSize: 24),
+              ),
             ),
             // Add a SizedBox after the Container to create space between the rows
-          ],),
+          ],
+        ),
       ),
     );
   }

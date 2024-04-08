@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 
 class MyResultsPage extends StatefulWidget {
   const MyResultsPage({super.key});
@@ -13,7 +12,6 @@ class MyResultsPage extends StatefulWidget {
 class _MyResultsPageState extends State<MyResultsPage> {
   late XFile imageCachedFile = XFile('');
   String editedPhotoPath = '';
-
 
   @override
   Widget build(BuildContext context) {
@@ -31,14 +29,14 @@ class _MyResultsPageState extends State<MyResultsPage> {
               child: editedPhotoPath.isEmpty && imageCachedFile.path.isEmpty
                   ? Image.asset('assets/images/default.png')
                   : editedPhotoPath.isNotEmpty
-                  ? Image.file(
-                File(editedPhotoPath),
-                fit: BoxFit.cover,
-              )
-                  : Image.file(
-                File(imageCachedFile.path),
-                fit: BoxFit.cover,
-              ),
+                      ? Image.file(
+                          File(editedPhotoPath),
+                          fit: BoxFit.cover,
+                        )
+                      : Image.file(
+                          File(imageCachedFile.path),
+                          fit: BoxFit.cover,
+                        ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -59,7 +57,7 @@ class _MyResultsPageState extends State<MyResultsPage> {
                   height: 85.0,
                   child: FloatingActionButton(
                     onPressed: () {
-                    //TODO Share Photo
+                      //TODO Share Photo
                     },
                     shape: const CircleBorder(),
                     child: const Icon(Icons.download_rounded, size: 45.0),

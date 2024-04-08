@@ -7,10 +7,7 @@
 
 import 'dart:developer';
 
-import 'package:flutter_test/flutter_test.dart';
-import 'package:senior_project_hair_ai/api_access.dart';
 
-import 'package:senior_project_hair_ai/main.dart';
 
 void main() {
   log('api_test running');

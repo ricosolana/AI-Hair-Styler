@@ -2,7 +2,6 @@ import 'package:app_tutorial/app_tutorial.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
-import 'package:senior_project_hair_ai/screens/settings.dart';
 
 // Code borrowed from https://pub.dev/packages/app_tutorial/example
 

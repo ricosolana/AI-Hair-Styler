@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 
 const String darkThemePrefKey = 'dark-theme';
 

@@ -20,7 +20,7 @@ class MyTextDialog extends StatefulWidget {
       this.validator, // Initialize the validator function
       //this.saveButton = true,
       //this.cancelButton = true,
-      this.extraActions = const <Widget>[]});
+      this.extraActions = const <Widget>[],});
 
   @override
   _MyTextDialogState createState() => _MyTextDialogState();
@@ -112,7 +112,7 @@ SettingsTile createTextSettingsTile(
     String defaultText = '',
     bool valueAsDescription = false,
     String? Function(String?)? validator,
-    List<Widget> extraActions = const <Widget>[]}) {
+    List<Widget> extraActions = const <Widget>[],}) {
   return SettingsTile.navigation(
     leading: leading,
     trailing: trailing,
@@ -121,7 +121,7 @@ SettingsTile createTextSettingsTile(
     //description: description,
     description: valueAsDescription
         ? Text(Provider.of<PreferencesProvider>(context)
-            .getOr(prefKey, defaultText))
+            .getOr(prefKey, defaultText),)
         : description,
     //description: valueAsDescription ?
     //  Consumer<PreferencesProvider>(
