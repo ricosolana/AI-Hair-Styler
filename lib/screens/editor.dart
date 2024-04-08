@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:senior_project_hair_ai/Navigation.dart';
 import 'package:senior_project_hair_ai/recents_provider.dart';
+import 'package:senior_project_hair_ai/screens/results.dart';
 
 
 // TODO properly implement
@@ -234,7 +236,11 @@ class _MyEditorPageState extends State<MyEditorPage> {
             ElevatedButton(
               onPressed: (selectedColor != -1 || selectedStyle != -1) ? () {
                 //TODO Values to barbershop, navigate to the final screen, display results
-              } : null,
+                navigateTo(
+                  context: context,
+                  screen: const MyResultsPage(),
+                  style: NavigationRouteStyle.material,
+                );             } : null,
               child: const Text('Generate',
               style: TextStyle(fontSize: 24),),
             ),
