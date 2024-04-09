@@ -86,60 +86,60 @@ class _MyEditorPageState extends State<MyEditorPage> {
       ),
       body: ListView(
         children: <Widget>[
-            Container(
-              height: 160.0,
-              color: Colors.red,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.blue,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.green,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.yellow,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.orange,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.amber,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.cyan,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.deepOrange,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.indigo,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.orange,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.pink,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.lime,
-            ),
-            Container(
-              height: 160.0,
-              color: Colors.orange,
-            ),
+          Container(
+            height: 160.0,
+            color: Colors.red,
+          ),
+          Container(
+            height: 160.0,
+            color: Colors.blue,
+          ),
+          Container(
+            height: 160.0,
+            color: Colors.green,
+          ),
+          Container(
+            height: 160.0,
+            color: Colors.yellow,
+          ),
+          Container(
+            height: 160.0,
+            color: Colors.orange,
+          ),
+          Container(
+            height: 160.0,
+            color: Colors.amber,
+          ),
+          Container(
+            height: 160.0,
+            color: Colors.cyan,
+          ),
+          Container(
+            height: 160.0,
+            color: Colors.deepOrange,
+          ),
+          Container(
+            height: 160.0,
+            color: Colors.indigo,
+          ),
+          Container(
+            height: 160.0,
+            color: Colors.orange,
+          ),
+          Container(
+            height: 160.0,
+            color: Colors.pink,
+          ),
+          Container(
+            height: 160.0,
+            color: Colors.lime,
+          ),
+          Container(
+            height: 160.0,
+            color: Colors.orange,
+          ),
         ],
-        )
+      )
     );
   }
 }
