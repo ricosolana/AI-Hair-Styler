@@ -14,7 +14,6 @@ import 'package:settings_ui/settings_ui.dart';
 
 const String apiHostPrefKey = 'api-host';
 const String apiTokenPrefKey = 'api-token';
-const String apiDemoPrefKey = 'api-demo';
 
 class MySettingsPage extends StatefulWidget {
   const MySettingsPage({super.key});
@@ -86,17 +85,6 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 //  child: const Text('Auto'),
                 //  onPressed: onPressed,
                 //)
-              ),
-              SettingsTile.switchTile(
-                title: const Text('Demo'),
-                description: const Text('API responds with a fast dummy image'),
-                leading: const Icon(Icons.dark_mode),
-                initialValue: Provider.of<PreferencesProvider>(context)
-                    .getOr(apiDemoPrefKey, false),
-                onToggle: (value) {
-                  Provider.of<PreferencesProvider>(context, listen: false)
-                      .set(apiDemoPrefKey, value);
-                },
               ),
             ],
           ),
