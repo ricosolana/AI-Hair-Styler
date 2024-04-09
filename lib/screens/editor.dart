@@ -16,9 +16,9 @@ import 'package:senior_project_hair_ai/screens/settings.dart';
 // TODO properly implement
 
 class MyEditorPage extends StatefulWidget {
-  const MyEditorPage({super.key, required this.inputImagePath});
+  const MyEditorPage({super.key, required this.initialInputImagePath});
 
-  final String inputImagePath; //the camera image path will be saved here
+  final String initialInputImagePath; //the camera image path will be saved here
 
   @override
   State<MyEditorPage> createState() => _MyEditorPageState();
@@ -54,11 +54,11 @@ class _MyEditorPageState extends State<MyEditorPage> {
     return "assets/images/IMG ($funIndex).png";
   }
 
-  bool imageChange = false;
-  //String finalPath = '';
+  //bool imageChange = false;
+  String currentImagePath = '';
   int selectedStyle = -1;
   int selectedColor = -1;
-  File? imageUploaded;
+  //File? imageUploaded;
 
   Future uploadImage() async {
     final returnedImage =
@@ -67,14 +67,21 @@ class _MyEditorPageState extends State<MyEditorPage> {
       return;
     }
     setState(() {
-      imageUploaded = File(returnedImage.path);
+      currentImagePath = returnedImage.path;
+      //imageUploaded = File(returnedImage.path);
       //Provider.of<RecentsProvider>(context, listen: false).addFile(returnedImage.path);
       //Provider.of<PreferencesProvider>(context, listen: false).
       Provider.of<PreferencesProvider>(context, listen: false)
           .createListOrAdd(recentsListPrefKey, <String>[returnedImage.path]);
       //finalPath = returnedImage.path;
-      imageChange = true;
+      //imageChange = true;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    currentImagePath = widget.initialInputImagePath;
   }
 
   @override
