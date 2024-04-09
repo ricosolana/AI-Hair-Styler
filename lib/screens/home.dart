@@ -200,7 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     navigateTo(
                                       context: context,
                                       screen:
-                                          MyEditorPage(inputImagePath: path),
+                                          MyEditorPage(initialInputImagePath: path),
                                       style: NavigationRouteStyle.material,
                                     );
 
@@ -343,7 +343,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () => navigateTo(
                 context: context,
                 screen: const MyEditorPage(
-                  inputImagePath: '',
+                  initialInputImagePath: '',
                 ),
                 style: NavigationRouteStyle.material,
               ),
