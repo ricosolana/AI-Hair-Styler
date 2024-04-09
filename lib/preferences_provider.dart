@@ -19,6 +19,9 @@ class PreferencesProvider with ChangeNotifier {
   }
 
   T? get<T>(String prefKey) {
+    if (T == List<String>) {
+      return _prefs.getStringList(prefKey) as T?;
+    }
     return _prefs.get(prefKey) as T?;
     //return pref.get(prefKey) as T ?? def;
   }

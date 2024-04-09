@@ -15,6 +15,7 @@ import 'package:settings_ui/settings_ui.dart';
 const String apiHostPrefKey = 'api-host';
 const String apiTokenPrefKey = 'api-token';
 const String apiDemoPrefKey = 'api-demo';
+const String apiCachedTemplateListPrefKey = 'api-cached-template-list';
 
 class MySettingsPage extends StatefulWidget {
   const MySettingsPage({super.key});
@@ -49,28 +50,49 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 },
                 extraActions: <TextButton>[
                   TextButton(
-                    child: const Text('Probe'),
+                    child: const Text('Login'), // will probe / cache / ...
                     onPressed: () {
                       // try connecting
-                      apiRootPath(
-                        Provider.of<PreferencesProvider>(
-                          context,
-                          listen: false,
-                        ).get(apiHostPrefKey)!,
+                      final prefs = Provider.of<PreferencesProvider>(context, listen: false);
+
+                      bapiApiTemplatesList(
+                        prefs.get<String>(apiHostPrefKey)!
+                      ).then((response) {
+                        //prefs.get(apiCachedTemplateListPrefKey)
+                        if (response.statusCode == 200) {
+                          // TODO how to handle exceptions
+                          final list = List<String>.from(jsonDecode(response.body) as List<dynamic>);
+                          prefs.set(apiCachedTemplateListPrefKey, list);
+                          Fluttertoast.showToast(msg: 'Successfully cached templates');
+                          return;
+                        }
+                        Fluttertoast.showToast(msg: 'Failed to cache template list');
+                      }).onError((error, stackTrace) {
+                        Fluttertoast.showToast(msg: 'Failed to reach server');
+                      });
+
+                      /*
+                      bapiGet(
+                        prefs.get(apiHostPrefKey)!,
                       ).then((value) {
+                        //final prefs = Provider.of<PreferencesProvider>(context, listen: false);
+                        
                         if (value.statusCode == 200) {
-                          final map =
-                              jsonDecode(value.body) as Map<String, dynamic>;
-                          if ((map['name'] as String) ==
-                              'ai hair styler generator api') {
-                            Fluttertoast.showToast(msg: 'Server is online');
+                          final map = jsonDecode(value.body) as Map<String, dynamic>;
+                          
+                          if (map['name'] == 'ai hair styler generator api') {
+                            if (map['version'] == 'v1.1.0') {                                
+                              Fluttertoast.showToast(msg: 'Server is online');
+                            } else {
+                              Fluttertoast.showToast(msg: 'Server version is incompatible');
+                            }
                             return;
                           }
                         }
                         Fluttertoast.showToast(msg: 'Failed to verify server');
                       }).onError((error, stackTrace) {
                         Fluttertoast.showToast(msg: 'Failed to reach server');
-                      });
+                      });*/
                     },
                   ),
                 ],

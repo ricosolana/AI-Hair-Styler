@@ -9,8 +9,8 @@ class MyTextDialog extends StatefulWidget {
   final String prefKey;
   final String defaultText;
   final String? Function(String?)? validator;
-  //final bool saveButton;
-  //final bool cancelButton;
+  final bool saveButton;
+  final bool cancelButton;
   final List<Widget> extraActions;
 
   const MyTextDialog({
@@ -18,8 +18,8 @@ class MyTextDialog extends StatefulWidget {
     required this.prefKey,
     this.defaultText = '',
     this.validator, // Initialize the validator function
-    //this.saveButton = true,
-    //this.cancelButton = true,
+    this.saveButton = true,
+    this.cancelButton = true,
     this.extraActions = const <Widget>[],
   });
 
@@ -79,14 +79,14 @@ class _MyTextDialogState extends State<MyTextDialog> {
         ),
       ),
       actions: <Widget>[
-        //if (widget.cancelButton)
+        if (widget.cancelButton)
         TextButton(
           child: const Text('Cancel'),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
-        //if (widget.saveButton)
+        if (widget.saveButton)
         TextButton(
           child: const Text('Save'),
           onPressed: () {
@@ -119,6 +119,8 @@ SettingsTile createTextSettingsTile({
   bool valueAsDescription = false,
   String? Function(String?)? validator,
   List<Widget> extraActions = const <Widget>[],
+  bool saveButton = true,
+  bool cancelButton = true,
 }) {
   return SettingsTile.navigation(
     leading: leading,
@@ -150,6 +152,8 @@ SettingsTile createTextSettingsTile({
             defaultText: defaultText,
             validator: validator,
             extraActions: extraActions,
+            saveButton: saveButton,
+            cancelButton: cancelButton,
           );
         },
       );

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -73,8 +74,6 @@ class _MyEditorPageState extends State<MyEditorPage> {
       //Provider.of<PreferencesProvider>(context, listen: false).
       Provider.of<PreferencesProvider>(context, listen: false)
           .createListOrAdd(recentsListPrefKey, <String>[returnedImage.path]);
-      //finalPath = returnedImage.path;
-      //imageChange = true;
     });
   }
 
@@ -86,6 +85,11 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final prefs = Provider.of<PreferencesProvider>(context, listen: false);
+
+    // TODO ensure prefkey is set
+    final cachedTemplatesList = prefs.get<List<String>>(apiCachedTemplateListPrefKey)!;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -164,7 +168,8 @@ class _MyEditorPageState extends State<MyEditorPage> {
                 mainAxisSpacing: 10,
                 physics: const NeverScrollableScrollPhysics(),
                 children: List.generate(
-                  20,
+                  // TODO recurring issue with settings, perform this at start or somewhere else
+                  cachedTemplatesList.length,
                   (index) => GestureDetector(
                     onTap: () {
                       styleSelector(index);
@@ -178,10 +183,15 @@ class _MyEditorPageState extends State<MyEditorPage> {
                           width: 4,
                         ),
                       ),
-                      child: Image.asset(
-                        iterate(index),
-                        fit: BoxFit.cover,
-                      ), //Text('Item $index'),
+                      child: CachedNetworkImage(
+                        imageUrl: bapiTemplatesUrl(prefs.get<String>(apiHostPrefKey)!, cachedTemplatesList[index]),
+                        progressIndicatorBuilder: (context, url, progress) => CircularProgressIndicator(value: progress.progress),
+                        errorWidget:(context, url, error) => const Icon(Icons.error),
+                      ),                      
+                      //Image.asset(
+                      //  iterate(index),
+                      //  fit: BoxFit.cover,
+                      //), //Text('Item $index'),
                     ),
                   ),
                 ),
@@ -272,7 +282,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
                     final host = prefs.getOrCreate<String>(apiHostPrefKey, 'http://localhost/'); 
 
-                    apiBarberPost(
+                    bapiApiBarberPost(
                             host,
                             // TODO ensure that pref defaults are loaded prior to this
                             //  SettingsPage is responsible for defaults,
