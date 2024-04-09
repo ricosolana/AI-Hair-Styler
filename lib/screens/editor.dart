@@ -274,12 +274,15 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
                     apiBarberPost(
                             host,
+                            // TODO ensure that pref defaults are loaded prior to this
+                            //  SettingsPage is responsible for defaults,
+                            //  why duplicate this?
                             prefs.getOrCreate<String>(apiTokenPrefKey, ''),
                             currentImagePath,
                             selectedStyle.toString(), // 'bob', // style
                             selectedColor
                                 .toString(), // 'dark-blonde' // color
-                            //demo: prefs.getOrCreate(apiDemoPrefKey, false),
+                            demo: prefs.getOrCreate(apiDemoPrefKey, false),
                         )
                         .then((response) {
                       if (response.statusCode == 200) {

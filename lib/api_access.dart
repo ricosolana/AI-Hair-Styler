@@ -9,6 +9,9 @@ Future<http.Response> apiBarberPost(
   String imagePath,
   String hairStyle,
   String hairColor,
+  {
+    bool demo = false,
+  }
 ) async {
   final bytes = await File(imagePath).readAsBytes();
 
@@ -22,6 +25,7 @@ Future<http.Response> apiBarberPost(
     queryParameters: {
       'style': hairStyle,
       'color': hairColor,
+      if (demo) 'demo': '1'
     },
   );
 
@@ -79,4 +83,20 @@ Future<http.Response> apiRootPath(
   final responseStream =
       await request.send().timeout(const Duration(seconds: 5));
   return http.Response.fromStream(responseStream);
+}
+
+String apiGeneratedUrl(
+  String host,
+  String imageName,
+) {
+  final rootUri = Uri.parse(host);
+
+  final uri = Uri(
+    scheme: rootUri.scheme, //'http',
+    host: rootUri.host, // host,
+    port: rootUri.port,
+    path: '/generated/$imageName',
+  );
+
+  return uri.toString();
 }
