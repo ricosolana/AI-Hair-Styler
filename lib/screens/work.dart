@@ -84,13 +84,13 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                   return ListTile(
                     title: Text(cachedImageWorkName),
                     trailing: CachedNetworkImage(
-                      imageUrl: bapiGeneratedUrl(host, cachedImageWorkName),
-                      progressIndicatorBuilder: (context, url, progress) => CircularProgressIndicator(value: progress.progress),
-                      errorWidget:(context, url, error) {
-                        // TODO on-click, refresh to re-query server
-                        return const Icon(Icons.error);
-                      }
-                    ),
+                        imageUrl: bapiGeneratedUrl(host, cachedImageWorkName),
+                        progressIndicatorBuilder: (context, url, progress) =>
+                            CircularProgressIndicator(value: progress.progress),
+                        errorWidget: (context, url, error) {
+                          // TODO on-click, refresh to re-query server
+                          return const Icon(Icons.error);
+                        },),
                     //trailing: true //workIDStatuses.containsKey(workID)
                     //    ? Text(workIDStatuses[workID]!)
                     //    : IconButton(
@@ -98,7 +98,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                     //        onPressed: () => updateWorkIDStatus(workID),
                     //      ),
                     onTap: () async {
-                      await Clipboard.setData(ClipboardData(text: bapiGeneratedUrl(host, cachedImageWorkName)));
+                      await Clipboard.setData(ClipboardData(
+                          text: bapiGeneratedUrl(host, cachedImageWorkName),),);
                       Fluttertoast.showToast(msg: 'Copied url');
                       log('clicked on queued work');
                       //if (workIDStatuses.containsKey(workID) &&
@@ -124,6 +125,5 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
         ),
       ),
     );
-
   }
 }

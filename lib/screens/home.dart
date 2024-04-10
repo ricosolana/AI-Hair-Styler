@@ -200,8 +200,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                     // TODO what should be done here?
                                     navigateTo(
                                       context: context,
-                                      screen:
-                                          MyEditorPage(initialInputImagePath: path),
+                                      screen: MyEditorPage(
+                                          initialInputImagePath: path,),
                                       style: NavigationRouteStyle.material,
                                     );
 

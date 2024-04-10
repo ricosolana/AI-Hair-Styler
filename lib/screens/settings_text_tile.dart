@@ -74,29 +74,29 @@ class _MyTextDialogState extends State<MyTextDialog> {
               //hintText: 'http://10.0.2.2/',
               suffixIcon: IconButton(
                   onPressed: _textEditingController.clear,
-                  icon: const Icon(Icons.clear))),
+                  icon: const Icon(Icons.clear),),),
           validator: widget.validator, // Apply the validator function
         ),
       ),
       actions: <Widget>[
         if (widget.cancelButton)
-        TextButton(
-          child: const Text('Cancel'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        if (widget.saveButton)
-        TextButton(
-          child: const Text('Save'),
-          onPressed: () {
-            //if (_textEditingController.text.isNotEmpty) {
-            if (_formKey.currentState!.validate()) {
-              _saveText(_textEditingController.text);
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
               Navigator.of(context).pop();
-            }
-          },
-        ),
+            },
+          ),
+        if (widget.saveButton)
+          TextButton(
+            child: const Text('Save'),
+            onPressed: () {
+              //if (_textEditingController.text.isNotEmpty) {
+              if (_formKey.currentState!.validate()) {
+                _saveText(_textEditingController.text);
+                Navigator.of(context).pop();
+              }
+            },
+          ),
         ...widget.extraActions,
       ],
     );

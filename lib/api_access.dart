@@ -8,11 +8,9 @@ Future<http.Response> bapiApiBarberPost(
   String accessToken,
   String imagePath,
   String hairStyle,
-  String hairColor,
-  {
-    bool demo = false,
-  }
-) async {
+  String hairColor, {
+  bool demo = false,
+}) async {
   final bytes = await File(imagePath).readAsBytes();
 
   final rootUri = Uri.parse(host);
@@ -25,7 +23,7 @@ Future<http.Response> bapiApiBarberPost(
     queryParameters: {
       'style-file': hairStyle,
       'color-file': hairColor,
-      if (demo) 'demo': '1'
+      if (demo) 'demo': '1',
     },
   );
 
@@ -40,12 +38,7 @@ Future<http.Response> bapiApiBarberPost(
   return http.Response.fromStream(responseStream);
 }
 
-Future<http.Response> bapiGet(
-  String host, 
-  {
-    String path = '/'
-  }
-) async {
+Future<http.Response> bapiGet(String host, {String path = '/'}) async {
   final rootUri = Uri.parse(host);
 
   final uri = Uri(
@@ -95,7 +88,7 @@ Future<http.Response> bapiApiTemplatesList(
 }
 
 String bapiUrl(
-  String host, 
+  String host,
   String path,
 ) {
   final rootUri = Uri.parse(host);
@@ -123,5 +116,3 @@ String bapiTemplatesUrl(
 ) {
   return bapiUrl(host, '/templates/$imageName');
 }
-
-
