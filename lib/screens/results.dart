@@ -1,8 +1,9 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart'; //just added
 import 'package:path/path.dart' as path; //just added
+import 'package:path_provider/path_provider.dart'; //just added
+import 'package:share_plus/share_plus.dart';
 
 class MyResultsPage extends StatefulWidget {
   const MyResultsPage({super.key});
@@ -12,8 +13,7 @@ class MyResultsPage extends StatefulWidget {
 }
 
 class _MyResultsPageState extends State<MyResultsPage> {
-  late XFile imageCachedFile = XFile('');
-  String editedPhotoPath = '';
+  late XFile imageCachedFile = XFile('assets/images/default.png');
 
   @override
   Widget build(BuildContext context) {
@@ -28,14 +28,9 @@ class _MyResultsPageState extends State<MyResultsPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              child: editedPhotoPath.isEmpty && imageCachedFile.path.isEmpty
+              child: imageCachedFile.path.isEmpty
                   ? Image.asset('assets/images/default.png')
-                  : editedPhotoPath.isNotEmpty
-                      ? Image.file(
-                          File(editedPhotoPath),
-                          fit: BoxFit.cover,
-                        )
-                      : Image.file(
+                  :  Image.file(
                           File(imageCachedFile.path),
                           fit: BoxFit.cover,
                         ),
@@ -49,7 +44,7 @@ class _MyResultsPageState extends State<MyResultsPage> {
                   child: FloatingActionButton(
                     onPressed: () {
                       //TODO Share Photo
-                      Share.shareXFiles([XFile(imageCachedFile)]);//just added, might need tweaking not sure.
+                      Share.shareXFiles([XFile(imageCachedFile.path)]);//just added, might need tweaking not sure.
                     },
                     shape: const CircleBorder(),
                     child: const Icon(Icons.share, size: 45.0),
@@ -59,11 +54,11 @@ class _MyResultsPageState extends State<MyResultsPage> {
                   width: 85.0,
                   height: 85.0,
                   child: FloatingActionButton(
-                    onPressed: () {
+                    onPressed: () async {
                       //TODO Download Photo
-                      DIrectory documentDirectory = await getApplicationDocumentsDirectory();//just added
-                      File file = new File(documentDirectory.path); //just added
-                      await file.writeAsBytes(imageCachedFile.bodyBytes); //just added
+                      final Directory documentDirectory = await getApplicationDocumentsDirectory();//just added
+                      final File file = File(path.join(documentDirectory.path, 'filename.jpg')); //just added
+                      await file.writeAsBytes(await imageCachedFile.readAsBytes());
                     },
                     shape: const CircleBorder(),
                     child: const Icon(Icons.download_rounded, size: 45.0),
