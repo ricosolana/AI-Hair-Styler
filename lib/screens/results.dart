@@ -47,6 +47,7 @@ class _MyResultsPageState extends State<MyResultsPage> {
                   child: FloatingActionButton(
                     onPressed: () {
                       //TODO Share Photo
+                      Share.shareXFiles([XFile(imageCachedFile)]);//just added, might need tweaking not sure.
                     },
                     shape: const CircleBorder(),
                     child: const Icon(Icons.share, size: 45.0),
@@ -57,7 +58,7 @@ class _MyResultsPageState extends State<MyResultsPage> {
                   height: 85.0,
                   child: FloatingActionButton(
                     onPressed: () {
-                      //TODO Share Photo
+                      //TODO Download Photo
                     },
                     shape: const CircleBorder(),
                     child: const Icon(Icons.download_rounded, size: 45.0),
