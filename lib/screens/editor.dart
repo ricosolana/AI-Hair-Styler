@@ -323,11 +323,11 @@ class _MyEditorPageState extends State<MyEditorPage> {
                     // A non-200 response code means the image does not exist, or that the process is still busy
 
                     //TODO Values to barbershop, navigate to the final screen, display results
-                    //navigateTo(
-                    //  context: context,
-                    //  screen: const MyResultsPage(),
-                    //  style: NavigationRouteStyle.material,
-                    //);
+                    navigateTo(
+                      context: context,
+                      screen: const MyResultsPage(),
+                      style: NavigationRouteStyle.material,
+                    );
                   }
                 : null,
             child: const Text(
@@ -340,6 +340,6 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
         ],
       )
-    );
+    ,);
   }
 }

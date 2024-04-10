@@ -26,7 +26,7 @@ Future<http.Response> apiBarberPost(
       'style': hairStyle,
       'color': hairColor,
       if (demo) 'demo': '1'
-    },
+    ,},
   );
 
   //http.get(uri)
