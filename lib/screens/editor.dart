@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -33,20 +34,20 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
   void styleSelector(int styleIndex) {
     setState(() {
-      if (selectedStyle == styleIndex) {
-        selectedStyle = -1;
+      if (selectedStyleIndex == styleIndex) {
+        selectedStyleIndex = -1;
       } else {
-        selectedStyle = styleIndex;
+        selectedStyleIndex = styleIndex;
       }
     });
   }
 
   void colorSelector(int colorIndex) {
     setState(() {
-      if (selectedColor == colorIndex) {
-        selectedColor = -1;
+      if (selectedColorIndex == colorIndex) {
+        selectedColorIndex = -1;
       } else {
-        selectedColor = colorIndex;
+        selectedColorIndex = colorIndex;
       }
     });
   }
@@ -57,8 +58,8 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
   //bool imageChange = false;
   String currentImagePath = '';
-  int selectedStyle = -1;
-  int selectedColor = -1;
+  int selectedStyleIndex = -1;
+  int selectedColorIndex = -1;
   //File? imageUploaded;
 
   Future uploadImage() async {
@@ -177,8 +178,8 @@ class _MyEditorPageState extends State<MyEditorPage> {
                     child: Container(
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: selectedStyle == index
-                              ? Colors.deepPurpleAccent
+                          color: selectedStyleIndex == index
+                              ? Colors.deepOrangeAccent
                               : Colors.transparent,
                           width: 4,
                         ),
@@ -201,10 +202,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
 
 
-          const Row(
-            children: [Spacer()],
-          ),
-          //const Spacer(),
+          const SizedBox(height: 20,),
           const Text(
             "Select Your Hair Color:",
             style: TextStyle(
@@ -215,12 +213,13 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
 
 
+          /*
           Container(
             height: 100, // Set a smaller height for the container
             decoration: BoxDecoration(
               border: Border.all(
                 color: Colors.deepPurple, // Border color
-                width: 5, // Border width
+                width: 3, // Border width
               ),
               borderRadius: BorderRadius.circular(7), // Border radius
             ),
@@ -260,18 +259,82 @@ class _MyEditorPageState extends State<MyEditorPage> {
                 }).toList(),
               ),
             ),
+          ),*/
+
+
+
+          // TODO repurpose as color selector box
+          Container(
+            height: 260,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.deepPurple, // Border color
+                width: 3, // Border width
+              ),
+              borderRadius: BorderRadius.circular(7), // Border radius
+            ),
+            child: SingleChildScrollView(
+              child: GridView.count(
+                shrinkWrap: true,
+                crossAxisCount: 4,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                physics: const NeverScrollableScrollPhysics(),
+                children: List.generate(
+                  // TODO recurring issue with settings, perform this at start or somewhere else
+                  cachedTemplatesList.length,
+                  (index) => GestureDetector(
+                    onTap: () {
+                      colorSelector(index);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: selectedColorIndex == index
+                              ? Colors.deepOrangeAccent
+                              : Colors.transparent,
+                          width: 4,
+                        ),
+                      ),
+                      // TODO apply a blurring to the center of each image?
+                      //  maybe to focus the hair, not the face
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: <Widget>[
+                          CachedNetworkImage(
+                            imageUrl: bapiTemplatesUrl(prefs.get<String>(apiHostPrefKey)!, cachedTemplatesList[index]),
+                            progressIndicatorBuilder: (context, url, progress) => CircularProgressIndicator(value: progress.progress),
+                            errorWidget:(context, url, error) => const Icon(Icons.error),
+                          ),
+                          //ClipOval(
+                          //  child: BackdropFilter(
+                          //    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                          //    child: Container(
+                          //      width: 50,
+                          //      height: 50,
+                          //      color: Colors.transparent,
+                          //    ),
+                          //  ),
+                          //),
+                        ]
+                      ),      
+                      //Image.asset(
+                      //  iterate(index),
+                      //  fit: BoxFit.cover,
+                      //), //Text('Item $index'),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
 
 
 
-          const SizedBox(height: 10),
-          const Row(
-            children: [Spacer()],
-          ),
-          //const Spacer(),
+          const SizedBox(height: 20),
           
           ElevatedButton(
-            onPressed: (selectedColor != -1 && selectedStyle != -1)
+            onPressed: (selectedColorIndex != -1 && selectedStyleIndex != -1)
                 ? () {
                     // TODO
                     // The API is ready here:
@@ -280,34 +343,38 @@ class _MyEditorPageState extends State<MyEditorPage> {
                       listen: false,
                     );
 
-                    final host = prefs.getOrCreate<String>(apiHostPrefKey, 'http://localhost/'); 
+                    final host = prefs.get<String>(apiHostPrefKey)!; 
+
+                    final styleTemplateFileName = (prefs.get<List<String>>(apiCachedTemplateListPrefKey)!)[selectedStyleIndex];
+                    final colorTemplateFileName = (prefs.get<List<String>>(apiCachedTemplateListPrefKey)!)[selectedColorIndex];
 
                     bapiApiBarberPost(
                             host,
                             // TODO ensure that pref defaults are loaded prior to this
                             //  SettingsPage is responsible for defaults,
                             //  why duplicate this?
-                            prefs.getOrCreate<String>(apiTokenPrefKey, ''),
+                            prefs.get<String>(apiTokenPrefKey)!,
                             currentImagePath,
-                            selectedStyle.toString(), // 'bob', // style
-                            selectedColor
-                                .toString(), // 'dark-blonde' // color
-                            demo: prefs.getOrCreate(apiDemoPrefKey, false),
+                            styleTemplateFileName, // 'bob', // style
+                            colorTemplateFileName, // 'dark-blonde' // color
+                            demo: prefs.get(apiDemoPrefKey)!,
                         )
                         .then((response) {
                       if (response.statusCode == 200) {
                         // TODO submit to job queue
                         final map = jsonDecode(response.body)
                             as Map<String, dynamic>;
+
+                        // submit to work queue
                         final imageName = map['name'] as String;
 
-                        // Submit the workPath to Awaiting Work Queue list, and screen
-
-                        // either access now or wait for the image to finish
-
-                        // image not found means its still processing or will never exist
-
                         //String imageUrl = apiGeneratedUrl(host, imageName);
+
+                        navigateTo(
+                          context: context,
+                          screen: const MyResultsPage(),
+                          style: NavigationRouteStyle.material,
+                        );
 
                         //Fluttertoast.showToast(msg: 'Success! $imageUrl');
                       } else if (response.statusCode == 422) {
@@ -333,11 +400,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
                     // A non-200 response code means the image does not exist, or that the process is still busy
 
                     //TODO Values to barbershop, navigate to the final screen, display results
-                    //navigateTo(
-                    //  context: context,
-                    //  screen: const MyResultsPage(),
-                    //  style: NavigationRouteStyle.material,
-                    //);
+                    
                   }
                 : null,
             child: const Text(
