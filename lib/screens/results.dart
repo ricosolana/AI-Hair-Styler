@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart'; //just added
+import 'package:path/path.dart' as path; //just added
 
 class MyResultsPage extends StatefulWidget {
   const MyResultsPage({super.key});
@@ -59,6 +61,9 @@ class _MyResultsPageState extends State<MyResultsPage> {
                   child: FloatingActionButton(
                     onPressed: () {
                       //TODO Download Photo
+                      DIrectory documentDirectory = await getApplicationDocumentsDirectory();//just added
+                      File file = new File(documentDirectory.path); //just added
+                      await file.writeAsBytes(imageCachedFile.bodyBytes); //just added
                     },
                     shape: const CircleBorder(),
                     child: const Icon(Icons.download_rounded, size: 45.0),
