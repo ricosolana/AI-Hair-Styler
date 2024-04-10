@@ -53,8 +53,10 @@ class _MySettingsPageState extends State<MySettingsPage> {
                     child: const Text('Login'), // will probe / cache / ...
                     onPressed: () {
                       // try connecting
-                      final prefs = Provider.of<PreferencesProvider>(context,
-                          listen: false,);
+                      final prefs = Provider.of<PreferencesProvider>(
+                        context,
+                        listen: false,
+                      );
 
                       bapiApiTemplatesList(prefs.get<String>(apiHostPrefKey)!)
                           .then((response) {
@@ -62,14 +64,17 @@ class _MySettingsPageState extends State<MySettingsPage> {
                         if (response.statusCode == 200) {
                           // TODO how to handle exceptions
                           final list = List<String>.from(
-                              jsonDecode(response.body) as List<dynamic>,);
+                            jsonDecode(response.body) as List<dynamic>,
+                          );
                           prefs.set(apiCachedTemplateListPrefKey, list);
                           Fluttertoast.showToast(
-                              msg: 'Successfully cached templates',);
+                            msg: 'Successfully cached templates',
+                          );
                           return;
                         }
                         Fluttertoast.showToast(
-                            msg: 'Failed to cache template list',);
+                          msg: 'Failed to cache template list',
+                        );
                       }).onError((error, stackTrace) {
                         Fluttertoast.showToast(msg: 'Failed to reach server');
                       });

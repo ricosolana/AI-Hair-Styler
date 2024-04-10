@@ -92,127 +92,128 @@ class _MyEditorPageState extends State<MyEditorPage> {
         prefs.get<List<String>>(apiCachedTemplateListPrefKey)!;
 
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: const Text('Editor'),
-        ),
-        body: ListView(
-          children: <Widget>[
-            GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Change Image'),
-                      content:
-                          const Text('Would you like to change this image?'),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('No'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            // Navigate to the gallery here
-                            uploadImage();
-                            Navigator.pop(context); // Close the dialog
-                          },
-                          child: const Text('Yes'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              child: Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.file(File(currentImagePath)),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-            const Text(
-              "Select Your Hairstyle:",
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 18.0,
-              ),
-            ),
-
-            Container(
-              height: 260,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.deepPurple, // Border color
-                  width: 3, // Border width
-                ),
-                borderRadius: BorderRadius.circular(7), // Border radius
-              ),
-              child: SingleChildScrollView(
-                child: GridView.count(
-                  shrinkWrap: true,
-                  crossAxisCount: 4,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: List.generate(
-                    // TODO recurring issue with settings, perform this at start or somewhere else
-                    cachedTemplatesList.length,
-                    (index) => GestureDetector(
-                      onTap: () {
-                        styleSelector(index);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: selectedStyleIndex == index
-                                ? Colors.deepOrangeAccent
-                                : Colors.transparent,
-                            width: 4,
-                          ),
-                        ),
-                        child: CachedNetworkImage(
-                          imageUrl: bapiTemplatesUrl(
-                              prefs.get<String>(apiHostPrefKey)!,
-                              cachedTemplatesList[index],),
-                          progressIndicatorBuilder: (context, url, progress) =>
-                              CircularProgressIndicator(
-                                  value: progress.progress,),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
-                        ),
-                        //Image.asset(
-                        //  iterate(index),
-                        //  fit: BoxFit.cover,
-                        //), //Text('Item $index'),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text('Editor'),
+      ),
+      body: ListView(
+        children: <Widget>[
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('Change Image'),
+                    content: const Text('Would you like to change this image?'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('No'),
                       ),
+                      TextButton(
+                        onPressed: () {
+                          // Navigate to the gallery here
+                          uploadImage();
+                          Navigator.pop(context); // Close the dialog
+                        },
+                        child: const Text('Yes'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            child: Container(
+              height: 200,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.file(File(currentImagePath)),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+          const Text(
+            "Select Your Hairstyle:",
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 18.0,
+            ),
+          ),
+
+          Container(
+            height: 260,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.deepPurple, // Border color
+                width: 3, // Border width
+              ),
+              borderRadius: BorderRadius.circular(7), // Border radius
+            ),
+            child: SingleChildScrollView(
+              child: GridView.count(
+                shrinkWrap: true,
+                crossAxisCount: 4,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                physics: const NeverScrollableScrollPhysics(),
+                children: List.generate(
+                  // TODO recurring issue with settings, perform this at start or somewhere else
+                  cachedTemplatesList.length,
+                  (index) => GestureDetector(
+                    onTap: () {
+                      styleSelector(index);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: selectedStyleIndex == index
+                              ? Colors.deepOrangeAccent
+                              : Colors.transparent,
+                          width: 4,
+                        ),
+                      ),
+                      child: CachedNetworkImage(
+                        imageUrl: bapiTemplatesUrl(
+                          prefs.get<String>(apiHostPrefKey)!,
+                          cachedTemplatesList[index],
+                        ),
+                        progressIndicatorBuilder: (context, url, progress) =>
+                            CircularProgressIndicator(
+                          value: progress.progress,
+                        ),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                      ),
+                      //Image.asset(
+                      //  iterate(index),
+                      //  fit: BoxFit.cover,
+                      //), //Text('Item $index'),
                     ),
                   ),
                 ),
               ),
             ),
+          ),
 
-            const SizedBox(
-              height: 20,
+          const SizedBox(
+            height: 20,
+          ),
+          const Text(
+            "Select Your Hair Color:",
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 18.0,
             ),
-            const Text(
-              "Select Your Hair Color:",
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 18.0,
-              ),
-            ),
+          ),
 
-            /*
+          /*
           Container(
             height: 100, // Set a smaller height for the container
             decoration: BoxDecoration(
@@ -260,159 +261,167 @@ class _MyEditorPageState extends State<MyEditorPage> {
             ),
           ),*/
 
-            // TODO repurpose as color selector box
-            Container(
-              height: 260,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.deepPurple, // Border color
-                  width: 3, // Border width
-                ),
-                borderRadius: BorderRadius.circular(7), // Border radius
+          // TODO repurpose as color selector box
+          Container(
+            height: 260,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.deepPurple, // Border color
+                width: 3, // Border width
               ),
-              child: SingleChildScrollView(
-                child: GridView.count(
-                  shrinkWrap: true,
-                  crossAxisCount: 4,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: List.generate(
-                    // TODO recurring issue with settings, perform this at start or somewhere else
-                    cachedTemplatesList.length,
-                    (index) => GestureDetector(
-                      onTap: () {
-                        colorSelector(index);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: selectedColorIndex == index
-                                ? Colors.deepOrangeAccent
-                                : Colors.transparent,
-                            width: 4,
-                          ),
+              borderRadius: BorderRadius.circular(7), // Border radius
+            ),
+            child: SingleChildScrollView(
+              child: GridView.count(
+                shrinkWrap: true,
+                crossAxisCount: 4,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                physics: const NeverScrollableScrollPhysics(),
+                children: List.generate(
+                  // TODO recurring issue with settings, perform this at start or somewhere else
+                  cachedTemplatesList.length,
+                  (index) => GestureDetector(
+                    onTap: () {
+                      colorSelector(index);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: selectedColorIndex == index
+                              ? Colors.deepOrangeAccent
+                              : Colors.transparent,
+                          width: 4,
                         ),
-                        // TODO apply a blurring to the center of each image?
-                        //  maybe to focus the hair, not the face
-                        child: Stack(
-                            alignment: Alignment.center,
-                            children: <Widget>[
-                              CachedNetworkImage(
-                                imageUrl: bapiTemplatesUrl(
-                                    prefs.get<String>(apiHostPrefKey)!,
-                                    cachedTemplatesList[index],),
-                                progressIndicatorBuilder:
-                                    (context, url, progress) =>
-                                        CircularProgressIndicator(
-                                            value: progress.progress,),
-                                errorWidget: (context, url, error) =>
-                                    const Icon(Icons.error),
-                              ),
-                              //ClipOval(
-                              //  child: BackdropFilter(
-                              //    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                              //    child: Container(
-                              //      width: 50,
-                              //      height: 50,
-                              //      color: Colors.transparent,
-                              //    ),
-                              //  ),
-                              //),
-                            ],),
-                        //Image.asset(
-                        //  iterate(index),
-                        //  fit: BoxFit.cover,
-                        //), //Text('Item $index'),
                       ),
+                      // TODO apply a blurring to the center of each image?
+                      //  maybe to focus the hair, not the face
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: <Widget>[
+                          CachedNetworkImage(
+                            imageUrl: bapiTemplatesUrl(
+                              prefs.get<String>(apiHostPrefKey)!,
+                              cachedTemplatesList[index],
+                            ),
+                            progressIndicatorBuilder:
+                                (context, url, progress) =>
+                                    CircularProgressIndicator(
+                              value: progress.progress,
+                            ),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                          ),
+                          //ClipOval(
+                          //  child: BackdropFilter(
+                          //    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                          //    child: Container(
+                          //      width: 50,
+                          //      height: 50,
+                          //      color: Colors.transparent,
+                          //    ),
+                          //  ),
+                          //),
+                        ],
+                      ),
+                      //Image.asset(
+                      //  iterate(index),
+                      //  fit: BoxFit.cover,
+                      //), //Text('Item $index'),
                     ),
                   ),
                 ),
               ),
             ),
+          ),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            ElevatedButton(
-              onPressed: (selectedColorIndex != -1 && selectedStyleIndex != -1)
-                  ? () {
-                      // TODO
-                      // The API is ready here:
-                      final prefs = Provider.of<PreferencesProvider>(
-                        context,
-                        listen: false,
-                      );
+          ElevatedButton(
+            onPressed: (selectedColorIndex != -1 && selectedStyleIndex != -1)
+                ? () {
+                    // TODO
+                    // The API is ready here:
+                    final prefs = Provider.of<PreferencesProvider>(
+                      context,
+                      listen: false,
+                    );
 
-                      final host = prefs.get<String>(apiHostPrefKey)!;
+                    final host = prefs.get<String>(apiHostPrefKey)!;
 
-                      final styleTemplateFileName = (prefs.get<List<String>>(
-                          apiCachedTemplateListPrefKey,)!)[selectedStyleIndex];
-                      final colorTemplateFileName = (prefs.get<List<String>>(
-                          apiCachedTemplateListPrefKey,)!)[selectedColorIndex];
+                    final styleTemplateFileName = (prefs.get<List<String>>(
+                      apiCachedTemplateListPrefKey,
+                    )!)[selectedStyleIndex];
+                    final colorTemplateFileName = (prefs.get<List<String>>(
+                      apiCachedTemplateListPrefKey,
+                    )!)[selectedColorIndex];
 
-                      bapiApiBarberPost(
-                        host,
-                        // TODO ensure that pref defaults are loaded prior to this
-                        //  SettingsPage is responsible for defaults,
-                        //  why duplicate this?
-                        prefs.get<String>(apiTokenPrefKey)!,
-                        currentImagePath,
-                        styleTemplateFileName, // 'bob', // style
-                        colorTemplateFileName, // 'dark-blonde' // color
-                        demo: prefs.get(apiDemoPrefKey)!,
-                      ).then((response) {
-                        if (response.statusCode == 200) {
-                          // TODO submit to job queue
-                          final map =
-                              jsonDecode(response.body) as Map<String, dynamic>;
+                    bapiApiBarberPost(
+                      host,
+                      // TODO ensure that pref defaults are loaded prior to this
+                      //  SettingsPage is responsible for defaults,
+                      //  why duplicate this?
+                      prefs.get<String>(apiTokenPrefKey)!,
+                      currentImagePath,
+                      styleTemplateFileName, // 'bob', // style
+                      colorTemplateFileName, // 'dark-blonde' // color
+                      demo: prefs.get(apiDemoPrefKey)!,
+                    ).then((response) {
+                      if (response.statusCode == 200) {
+                        // TODO submit to job queue
+                        final map =
+                            jsonDecode(response.body) as Map<String, dynamic>;
 
-                          // submit to work queue
-                          final imageName = map['name'] as String;
+                        // submit to work queue
+                        final imageName = map['name'] as String;
 
-                          prefs.createListOrAdd(
-                              apiCachedWorkListPrefKey, [imageName],);
-
-                          //String imageUrl = apiGeneratedUrl(host, imageName);
-
-                          navigateTo(
-                            context: context,
-                            //screen: const MyResultsPage(),
-                            screen: MyQueuedWorkPage(),
-                            style: NavigationRouteStyle.material,
-                          );
-
-                          //Fluttertoast.showToast(msg: 'Success! $imageUrl');
-                        } else if (response.statusCode == 422) {
-                          Fluttertoast.showToast(msg: 'Invalid access token');
-                        } else {
-                          Fluttertoast.showToast(
-                            msg: 'Status Code: ${response.statusCode}',
-                          );
-                        }
-                      }).onError((error, stackTrace) {
-                        log(error.toString());
-                        Fluttertoast.showToast(
-                          msg: 'Failed to connect: $error',
+                        prefs.createListOrAdd(
+                          apiCachedWorkListPrefKey,
+                          [imageName],
                         );
-                      });
 
-                      // Because the AI process takes a while, use a job queue that shows submitted jobs
-                      //  When the user sends to the API, the API will respond with a path of the eventual generated image
-                      //  as a served file.
-                      // The user can query this image path to see if the job has completed.
-                      // The job queue will store a list of these job paths for the client to poll
-                      //  Polling will query the server for the served image
-                      // A non-200 response code means the image does not exist, or that the process is still busy
+                        //String imageUrl = apiGeneratedUrl(host, imageName);
 
-                      //TODO Values to barbershop, navigate to the final screen, display results
-                    }
-                  : null,
-              child: const Text(
-                'Generate',
-                style: TextStyle(fontSize: 24),
-              ),
+                        navigateTo(
+                          context: context,
+                          //screen: const MyResultsPage(),
+                          screen: MyQueuedWorkPage(),
+                          style: NavigationRouteStyle.material,
+                        );
+
+                        //Fluttertoast.showToast(msg: 'Success! $imageUrl');
+                      } else if (response.statusCode == 422) {
+                        Fluttertoast.showToast(msg: 'Invalid access token');
+                      } else {
+                        Fluttertoast.showToast(
+                          msg: 'Status Code: ${response.statusCode}',
+                        );
+                      }
+                    }).onError((error, stackTrace) {
+                      log(error.toString());
+                      Fluttertoast.showToast(
+                        msg: 'Failed to connect: $error',
+                      );
+                    });
+
+                    // Because the AI process takes a while, use a job queue that shows submitted jobs
+                    //  When the user sends to the API, the API will respond with a path of the eventual generated image
+                    //  as a served file.
+                    // The user can query this image path to see if the job has completed.
+                    // The job queue will store a list of these job paths for the client to poll
+                    //  Polling will query the server for the served image
+                    // A non-200 response code means the image does not exist, or that the process is still busy
+
+                    //TODO Values to barbershop, navigate to the final screen, display results
+                  }
+                : null,
+            child: const Text(
+              'Generate',
+              style: TextStyle(fontSize: 24),
             ),
-          ],
-        ),);
+          ),
+        ],
+      ),
+    );
   }
 }

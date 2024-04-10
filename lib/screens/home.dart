@@ -201,7 +201,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                     navigateTo(
                                       context: context,
                                       screen: MyEditorPage(
-                                          initialInputImagePath: path,),
+                                        initialInputImagePath: path,
+                                      ),
                                       style: NavigationRouteStyle.material,
                                     );
 
@@ -310,13 +311,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 //Provider.of<RecentsProvider>(context, listen: false).clearFiles();
                 // MUST trigger the change post-clear
                 setState(() {
+                  // not necessary here
                   Provider.of<PreferencesProvider>(context, listen: false)
-                      .getOrCreate(recentsListPrefKey, <String>[]).clear();
+                      .set(recentsListPrefKey, <String>[]);
                 });
               },
               shape: const CircleBorder(),
-              child: const Icon(
-                Icons.refresh_rounded,
+              child: Icon(
+                MdiIcons.trashCan,
                 size: 40.0,
               ),
             ),
