@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
+import 'package:senior_project_hair_ai/screens/settings.dart';
+import 'package:senior_project_hair_ai/screens/work.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
@@ -18,6 +20,13 @@ Future<void> main() async {
 
   final prefs =
       PreferencesProvider(prefs: await SharedPreferences.getInstance());
+
+  // init defaults here
+  prefs.getOrCreate(apiHostPrefKey, 'http://10.0.2.2/');
+  prefs.getOrCreate(apiCachedTemplateListPrefKey, <String>[]);
+  prefs.getOrCreate(apiTokenPrefKey, '');
+  prefs.getOrCreate(apiDemoPrefKey, false);
+  prefs.getOrCreate(apiCachedWorkListPrefKey, <String>[]);
 
   runApp(
     MultiProvider(

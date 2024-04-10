@@ -13,6 +13,7 @@ import 'package:senior_project_hair_ai/screens/editor.dart';
 import 'package:senior_project_hair_ai/screens/help.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/tutorial.dart';
+import 'package:senior_project_hair_ai/screens/work.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -377,6 +378,12 @@ class _MyHomePageState extends State<MyHomePage> {
               title: const Text('Queued Tasks'),
               onTap: () {
                 // open work queue
+                navigateTo(
+                  context: context,
+                  //screen: const MyResultsPage(),
+                  screen: MyQueuedWorkPage(),
+                  style: NavigationRouteStyle.material,
+                );
               },
             ),
             const Spacer(), // filler

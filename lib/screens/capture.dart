@@ -155,7 +155,7 @@ class DisplayPictureScreen extends StatelessWidget {
             Navigator.of(context).popUntil((route) => route.isFirst);
 
             Fluttertoast.showToast(msg: 'Image saved as $path');
-            Provider.of<PreferencesProvider>(context)
+            Provider.of<PreferencesProvider>(context, listen: false)
                 .createListOrAdd(recentsListPrefKey, [path]);
           },
           shape: const CircleBorder(),

@@ -14,6 +14,7 @@ import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/capture.dart';
 import 'package:senior_project_hair_ai/screens/results.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
+import 'package:senior_project_hair_ai/screens/work.dart';
 
 // TODO properly implement
 
@@ -368,11 +369,14 @@ class _MyEditorPageState extends State<MyEditorPage> {
                         // submit to work queue
                         final imageName = map['name'] as String;
 
+                        prefs.createListOrAdd(apiCachedWorkListPrefKey, [imageName]);
+
                         //String imageUrl = apiGeneratedUrl(host, imageName);
 
                         navigateTo(
                           context: context,
-                          screen: const MyResultsPage(),
+                          //screen: const MyResultsPage(),
+                          screen: MyQueuedWorkPage(),
                           style: NavigationRouteStyle.material,
                         );
 

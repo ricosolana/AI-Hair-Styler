@@ -35,7 +35,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
       body: SettingsList(
         sections: [
           SettingsSection(
-            title: const Text('General'),
+            title: const Text('API Settings'),
             tiles: [
               createTextSettingsTile(
                 title: const Text('API Host'),
@@ -114,7 +114,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 description: const Text('API responds with a fast dummy image'),
                 leading: const Icon(Icons.dark_mode),
                 initialValue: Provider.of<PreferencesProvider>(context)
-                    .getOr(apiDemoPrefKey, false),
+                    .get(apiDemoPrefKey),
                 onToggle: (value) {
                   Provider.of<PreferencesProvider>(context, listen: false)
                       .set(apiDemoPrefKey, value);
@@ -122,19 +122,19 @@ class _MySettingsPageState extends State<MySettingsPage> {
               ),
             ],
           ),
-          SettingsSection(
-            title: const Text('Options'),
-            tiles: [
-              SettingsTile(
-                title: const Text('Option 1'),
-                leading: const Icon(Icons.screen_lock_landscape),
-              ),
-              SettingsTile(
-                title: const Text('Option 2'),
-                leading: const Icon(Icons.screen_lock_landscape),
-              ),
-            ],
-          ),
+          //SettingsSection(
+          //  title: const Text('Options'),
+          //  tiles: [
+          //    SettingsTile(
+          //      title: const Text('Option 1'),
+          //      leading: const Icon(Icons.screen_lock_landscape),
+          //    ),
+          //    SettingsTile(
+          //      title: const Text('Option 2'),
+          //      leading: const Icon(Icons.screen_lock_landscape),
+          //    ),
+          //  ],
+          //),
           SettingsSection(
             title: const Text('Customization'),
             tiles: [
@@ -142,7 +142,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 title: const Text('Use Dark Theme'),
                 leading: const Icon(Icons.dark_mode),
                 initialValue: Provider.of<PreferencesProvider>(context)
-                    .getOr(darkThemePrefKey, false),
+                    .get(darkThemePrefKey),
                 onToggle: (isDarkTheme) {
                   Provider.of<PreferencesProvider>(context, listen: false)
                       .set(darkThemePrefKey, isDarkTheme);
