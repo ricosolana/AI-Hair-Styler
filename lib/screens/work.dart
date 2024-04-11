@@ -27,7 +27,7 @@ enum WorkPopupItems {
   copyUrl,
 }
 
-const String apiCachedWorkListPrefKey = 'api-cached-work-list';
+const String apiCachedWorkIDListPrefKey = 'api-cached-work-list';
 
 class MyQueuedWorkPage extends StatefulWidget {
   @override
@@ -80,7 +80,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
   @override
   Widget build(BuildContext context) {
     final prefs = Provider.of<PreferencesProvider>(context, listen: false);
-    final cachedWorkList = prefs.get<List<String>>(apiCachedWorkListPrefKey)!;
+    final cachedWorkIDList = prefs.get<List<String>>(apiCachedWorkIDListPrefKey)!;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -93,9 +93,9 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
           children: [
             Expanded(
               child: ListView.builder(
-                itemCount: cachedWorkList.length,
+                itemCount: cachedWorkIDList.length,
                 itemBuilder: (context, index) {
-                  final cachedImageWorkName = cachedWorkList[index];
+                  final cachedWorkID = cachedWorkIDList[index];
                   final host = prefs.get<String>(apiHostPrefKey)!;
                   return ListTile(
                     title: Row(
@@ -106,7 +106,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                           flex: 2,
                           child: Center(
                             child: CachedNetworkImage(
-                              imageUrl: bapiGeneratedUrl(host, cachedImageWorkName),
+                              imageUrl: bapiGeneratedUrl(host, cachedWorkID),
                               progressIndicatorBuilder: (context, url, progress) =>
                                   CircularProgressIndicator(value: progress.progress),
                               errorWidget: (context, url, error) {
@@ -123,7 +123,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                         Expanded(
                           flex: 2,
                           child: Text(
-                            cachedImageWorkName, //cachedImageWorkName.limit(40),
+                            cachedWorkID, //cachedImageWorkName.limit(40),
                             style: const TextStyle(
                               fontWeight: FontWeight.w500,
                               fontSize: 16.0,
@@ -142,7 +142,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                               case WorkPopupItems.copyFileName:
                                 await Clipboard.setData(
                                   ClipboardData(
-                                    text: cachedImageWorkName, // bapiGeneratedUrl(host, cachedImageWorkName),
+                                    text: cachedWorkID, // bapiGeneratedUrl(host, cachedImageWorkName),
                                   ),
                                 );
                                 Fluttertoast.showToast(msg: 'Copied filename');
@@ -150,7 +150,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                               case WorkPopupItems.copyUrl:
                                 await Clipboard.setData(
                                   ClipboardData(
-                                    text: bapiGeneratedUrl(host, cachedImageWorkName),
+                                    text: bapiGeneratedUrl(host, cachedWorkID),
                                   ),
                                 );
                                 Fluttertoast.showToast(msg: 'Copied generated url');
@@ -229,7 +229,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          prefs.set(apiCachedWorkListPrefKey, <String>[]);
+          prefs.set(apiCachedWorkIDListPrefKey, <String>[]);
           setState(() {
             // reset
             //this menu page should be stateless?

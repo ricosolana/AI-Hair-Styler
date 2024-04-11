@@ -105,9 +105,9 @@ String bapiUrl(
 
 String bapiGeneratedUrl(
   String host,
-  String imageName,
+  String workID,
 ) {
-  return bapiUrl(host, '/generated/$imageName');
+  return bapiUrl(host, '/generated/$workID');
 }
 
 String bapiTemplatesUrl(

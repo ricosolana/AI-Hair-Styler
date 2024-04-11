@@ -373,11 +373,11 @@ class _MyEditorPageState extends State<MyEditorPage> {
                             jsonDecode(response.body) as Map<String, dynamic>;
 
                         // submit to work queue
-                        final imageName = map['name'] as String;
+                        final workID = map['work-id'] as String;
 
                         prefs.createListOrAdd(
-                          apiCachedWorkListPrefKey,
-                          [imageName],
+                          apiCachedWorkIDListPrefKey,
+                          [workID],
                         );
 
                         //String imageUrl = apiGeneratedUrl(host, imageName);

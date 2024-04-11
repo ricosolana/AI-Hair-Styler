@@ -26,7 +26,7 @@ Future<void> main() async {
   prefs.getOrCreate(apiCachedTemplateListPrefKey, <String>[]);
   prefs.getOrCreate(apiTokenPrefKey, '');
   prefs.getOrCreate(apiDemoPrefKey, false);
-  prefs.getOrCreate(apiCachedWorkListPrefKey, <String>[]);
+  prefs.getOrCreate(apiCachedWorkIDListPrefKey, <String>[]);
 
   runApp(
     MultiProvider(
