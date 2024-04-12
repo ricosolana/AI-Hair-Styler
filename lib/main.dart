@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:senior_project_hair_ai/camera_provider.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
@@ -13,10 +14,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Obtain a list of the available cameras on the device.
-  final cameras = await availableCameras();
-
-  // Get a specific camera from the list of available cameras.
-  final firstCamera = cameras.first;
+  final cameras = CameraProvider(cameras: await availableCameras());
 
   final prefs =
       PreferencesProvider(prefs: await SharedPreferences.getInstance());
@@ -34,7 +32,7 @@ Future<void> main() async {
         //Provider.value(value: prefs),
         ChangeNotifierProvider.value(value: prefs),
         Provider.value(
-          value: firstCamera,
+          value: cameras,
         ),
         // TODO persist the Recents list to disk
         //ChangeNotifierProvider.value(value: RecentsProvider()),

@@ -10,6 +10,7 @@ Future<http.Response> bapiApiBarberPost(
   String hairStyle,
   String hairColor, {
   bool demo = false,
+  double quality = 1.0
 }) async {
   final bytes = await File(imagePath).readAsBytes();
 
@@ -23,7 +24,8 @@ Future<http.Response> bapiApiBarberPost(
     queryParameters: {
       'style-file': hairStyle,
       'color-file': hairColor,
-      if (demo) 'demo': '1',
+      'demo': demo ? 'true' : 'false',
+      'quality': quality.toString()
     },
   );
 

@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:senior_project_hair_ai/camera_provider.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 
 const String recentsListPrefKey = 'recent-captures-list';
@@ -20,18 +22,11 @@ class TakePictureScreen extends StatefulWidget {
 class _TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
+  bool _useFrontCamera = false;
 
   @override
   void initState() {
     super.initState();
-    final camera = Provider.of<CameraDescription>(context, listen: false);
-
-    _controller = CameraController(
-      camera,
-      ResolutionPreset.high,
-    );
-
-    _initializeControllerFuture = _controller.initialize();
   }
 
   @override
@@ -61,6 +56,15 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cameras = Provider.of<CameraProvider>(context, listen: false);
+
+    _controller = CameraController(
+      _useFrontCamera ? cameras.getFrontCamera() : cameras.getBackCamera(),
+      ResolutionPreset.high,
+    );
+
+    _initializeControllerFuture = _controller.initialize();
+
     return Scaffold(
       appBar: AppBar(title: const Text("Take a Photo")),
       body: FutureBuilder<void>(
@@ -73,14 +77,31 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
           }
         },
       ),
-      floatingActionButton: SizedBox(
-        width: 80.0,
-        height: 80.0,
-        child: FloatingActionButton(
-          onPressed: _takePictureAndPrompt,
-          shape: const CircleBorder(),
-          child: const Icon(Icons.camera_alt, size: 45.0),
-        ),
+      floatingActionButton: Row(
+        children: [
+          SizedBox(
+            width: 80.0,
+            height: 80.0,
+            child: FloatingActionButton(
+              onPressed: _takePictureAndPrompt,
+              shape: const CircleBorder(),
+              child: const Icon(Icons.camera_alt, size: 45.0),
+            ),
+          ),
+          SizedBox(
+            width: 80.0,
+            height: 80.0,
+            child: FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  _useFrontCamera = !_useFrontCamera;
+                });
+              },
+              shape: const CircleBorder(),
+              child: const Icon(Icons.flip_camera_android, size: 45.0),
+            ),
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );

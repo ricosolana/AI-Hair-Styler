@@ -137,7 +137,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                               // TODO grey-out menu item if work is not completed
                               case WorkPopupItems.save:
                                 // trigger save?
-
+    
                                 // for now user can just copy url regardless
                               case WorkPopupItems.copyFileName:
                                 await Clipboard.setData(
@@ -200,11 +200,11 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                       //  button to copy work file name
                       //  button to copy /generated url for work file
                       // a GestureDetector to the side that refreshes
-
+    
                       // some kind of pop-up
                       // 
                       
-
+    
                       //if (workIDStatuses.containsKey(workID) &&
                       //    workIDStatuses[workID] == 'Finished') {
                       //  // Show cached result
@@ -227,18 +227,34 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          prefs.set(apiCachedWorkIDListPrefKey, <String>[]);
-          setState(() {
-            // reset
-            //this menu page should be stateless?
-          });
-        },
-        //foregroundColor: customizations[index].$1,
-        //backgroundColor: customizations[index].$2,
-        //shape: customizations[index].$3,
-        child: Icon(MdiIcons.trashCan),
+      floatingActionButton: Row(
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              prefs.set(apiCachedWorkIDListPrefKey, <String>[]);
+              setState(() {
+                // reset
+                //this menu page should be stateless?
+              });
+            },
+            //foregroundColor: customizations[index].$1,
+            //backgroundColor: customizations[index].$2,
+            //shape: customizations[index].$3,
+            child: Icon(MdiIcons.trashCan),
+          ),
+          // Navigator.of(context).popUntil((route) => route.isFirst);
+          FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                //this menu page should be stateless?
+              });
+            },
+            //foregroundColor: customizations[index].$1,
+            //backgroundColor: customizations[index].$2,
+            //shape: customizations[index].$3,
+            child: const Icon(Icons.refresh),
+          ),
+        ],
       ),
     );
   }

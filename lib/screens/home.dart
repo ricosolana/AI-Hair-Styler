@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:app_tutorial/app_tutorial.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -55,16 +56,22 @@ class _MyHomePageState extends State<MyHomePage> {
   //}
 
   Future<void> uploadImage() async {
-    final returnedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    //final returnedImage = await FilePicker.platform.pickFiles(
+    //  type: FileType.custom,
+    //  allowedExtensions: ['jpg', 'jpeg', 'png'],
+    //);
     if (returnedImage == null) {
       return;
     }
 
     //Provider.of<PreferencesProvider>(context).createListOrAdd(recentsListPrefKey, [returnedImage.path]);
     setState(() {
+      //Provider.of<PreferencesProvider>(context, listen: false)
+          //.createListOrAdd(recentsListPrefKey, [result.paths.first!]);
+
       Provider.of<PreferencesProvider>(context, listen: false)
-          .createListOrAdd(recentsListPrefKey, [returnedImage.path]);
+        .createListOrAdd(recentsListPrefKey, [returnedImage.path]);
     });
   }
 
