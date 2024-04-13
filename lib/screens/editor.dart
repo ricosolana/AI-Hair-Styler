@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,33 +20,6 @@ import 'package:senior_project_hair_ai/screens/capture.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/work.dart';
 
-
-class MyApeep extends StatelessWidget {
- @override
- Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: Stack(
-          children: <Widget>[
-            // Your main content here
-            Center(child: Text('Main Content')),
-            // SpinKitFadingCircle at the bottom center
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SpinKitFadingCircle(
-                color: Colors.white,
-                size: 50.0,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
- }
-}
-
-//GlobalKey<State> loadingDialogKey = GlobalKey<State>();
-
 void navigateToEditor(BuildContext context, {String imagePath = '', bool quietSuccess=false}) {
   final host = Provider.of<PreferencesProvider>(context, listen: false).get<String>(apiHostPrefKey)!;
   final accessToken = Provider.of<PreferencesProvider>(context, listen: false).get<String>(apiTokenPrefKey)!;
@@ -53,10 +30,7 @@ void navigateToEditor(BuildContext context, {String imagePath = '', bool quietSu
   showDialog(
     context: context, 
     barrierColor: null, 
-    builder: (_) => SpinKitFadingCircle(
-      //key: loadingDialogKey, 
-      color: Colors.white,
-    ),
+    builder: (_) => const SpinKitFadingCircle(color: Colors.white),
   );
   //navigateTo(context: context, screen: screen, style: style)
 
@@ -72,15 +46,15 @@ void navigateToEditor(BuildContext context, {String imagePath = '', bool quietSu
         style: NavigationRouteStyle.material,
       );
     }
-  }).onError((error, stackTrace) {
-    Navigator.pop(context); // Pops the loading circle
-    Fluttertoast.showToast(msg: 'Failed to connect: $error', toastLength: Toast.LENGTH_LONG);
   });
-  //.whenComplete(() {
-  //  if (false) {
-  //  Navigator.of(context, rootNavigator: true).pop(loadingDialogKey.currentContext);
-  //  }
-  //});
+}
+
+
+
+class EditorItemModel with ChangeNotifier {
+  void update() {
+    notifyListeners();
+  }
 }
 
 class MyEditorPage extends StatefulWidget {
@@ -93,32 +67,40 @@ class MyEditorPage extends StatefulWidget {
 }
 
 class _MyEditorPageState extends State<MyEditorPage> {
-  /*
-    editor
-      will contain options relating to ai generation? (more such as weights)
-  */
+  String _currentImagePath = '';
+  int _selectedStyleIndex = -1; // TODO should we just select index 0 for safety?
+  int _selectedColorIndex = -1;
+  late List<EditorItemModel> _selectedStyleIndexNotifiers;// = List.generate(length, (index) => null) [];
+  late List<EditorItemModel> _selectedColorIndexNotifiers;
+  //final _selectedStyleIndexProvider = StatePro
+  final ValueNotifier<double> _qualityValueNotifier = ValueNotifier(1.0);
 
-  void styleSelector(int styleIndex) {
-    setState(() {
-      selectedStyleIndex = styleIndex;
-    });
+  late List<String> cachedTemplatesList;
+
+
+  void _styleSelector(int styleIndex) {
+    //setState(() {
+
+      // TODO update the list old, and new item
+    if (_selectedStyleIndex != -1) {
+      _selectedStyleIndexNotifiers[_selectedStyleIndex].update();
+    }
+    _selectedStyleIndex = styleIndex;
+    _selectedStyleIndexNotifiers[_selectedStyleIndex].update();
+    //});
   }
 
-  void colorSelector(int colorIndex) {
-    setState(() {
-        selectedColorIndex = colorIndex;
-    });
+  void _colorSelector(int colorIndex) {
+    //setState(() {
+    // TODO test
+      //_selectedColorIndex.value = colorIndex;
+    //});
+    if (_selectedColorIndex != -1) {
+      _selectedColorIndexNotifiers[_selectedColorIndex].update();
+    }
+    _selectedColorIndex = colorIndex;
+    _selectedColorIndexNotifiers[_selectedColorIndex].update();
   }
-
-  //bool imageChange = false;
-  String currentImagePath = '';
-  //Uint8List currentImageBytes;
-  //bool imageFileExists = false;
-  int selectedStyleIndex = -1;
-  int selectedColorIndex = -1;
-  //File? imageUploaded;
-
-  double _qualityValue = 1.0;
 
   Future uploadImage() async {
     final returnedImage =
@@ -129,7 +111,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
     }
 
     setState(() {
-      currentImagePath = returnedImage.path;
+      _currentImagePath = returnedImage.path;
       //imageUploaded = File(returnedImage.path);
       //Provider.of<RecentsProvider>(context, listen: false).addFile(returnedImage.path);
       //Provider.of<PreferencesProvider>(context, listen: false).
@@ -141,7 +123,13 @@ class _MyEditorPageState extends State<MyEditorPage> {
   @override
   void initState() {
     super.initState();
-    currentImagePath = widget.initialInputImagePath;
+    _currentImagePath = widget.initialInputImagePath;
+
+    final prefs = Provider.of<PreferencesProvider>(context, listen: false);
+    cachedTemplatesList = prefs.get<List<String>>(apiCachedTemplateListPrefKey)!;
+
+    _selectedStyleIndexNotifiers = List.generate(cachedTemplatesList.length, (_) => EditorItemModel());
+    _selectedColorIndexNotifiers = List.generate(cachedTemplatesList.length, (_) => EditorItemModel());
   }
 
   @override
@@ -149,10 +137,9 @@ class _MyEditorPageState extends State<MyEditorPage> {
     final prefs = Provider.of<PreferencesProvider>(context, listen: false);
 
     // TODO ensure prefkey is set
-    final cachedTemplatesList =
-        prefs.get<List<String>>(apiCachedTemplateListPrefKey)!;
 
-    
+
+    final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
 
     return Scaffold(
       appBar: AppBar(
@@ -197,7 +184,8 @@ class _MyEditorPageState extends State<MyEditorPage> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.file(
-                  File(currentImagePath),
+                  File(_currentImagePath),
+                  cacheWidth: (200 * devicePixelRatio).round(),
                   errorBuilder:(context, error, stackTrace) {
                     return const Icon(Icons.person);
                   },
@@ -208,12 +196,14 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
           const SizedBox(height: 20),
           Text(
-            "Select Your Hairstyle: ${selectedStyleIndex != -1 ? selectedStyleIndex.toString() : ''}",
+            "Select Your Hairstyle: ${_selectedStyleIndex != -1 ? _selectedStyleIndex.toString() : ''}",
             style: const TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 18.0,
             ),
           ),
+
+
 
           Container(
             height: 260,
@@ -225,47 +215,50 @@ class _MyEditorPageState extends State<MyEditorPage> {
               borderRadius: BorderRadius.circular(7), // Border radius
             ),
             child: SingleChildScrollView(
-              child: GridView.count(
+              child: GridView.builder(
                 shrinkWrap: true,
-                crossAxisCount: 4,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                physics: const NeverScrollableScrollPhysics(),
-                children: List.generate(
-                  // TODO recurring issue with settings, perform this at start or somewhere else
-                  cachedTemplatesList.length,
-                  (index) => GestureDetector(
-                    onTap: () {
-                      styleSelector(index);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: selectedStyleIndex == index
-                              ? Colors.deepOrangeAccent
-                              : Colors.transparent,
-                          width: 4,
-                        ),
-                      ),
-                      child: CachedNetworkImage(
-                        imageUrl: bapiTemplatesUrl(
-                          prefs.get<String>(apiHostPrefKey)!,
-                          cachedTemplatesList[index],
-                        ),
-                        progressIndicatorBuilder: (context, url, progress) =>
-                            CircularProgressIndicator(
-                          value: progress.progress,
-                        ),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
-                      ),
-                      //Image.asset(
-                      //  iterate(index),
-                      //  fit: BoxFit.cover,
-                      //), //Text('Item $index'),
-                    ),
-                  ),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
                 ),
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: cachedTemplatesList.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      _styleSelector(index);
+                    },
+                    child: ListenableBuilder(
+                      listenable: _selectedStyleIndexNotifiers[index], // _selectedStyleIndex,
+                      builder: (context, child) {
+                        return Container(
+                          decoration: _selectedStyleIndex == index ?
+                            BoxDecoration(
+                              border: Border.all(
+                                color: Colors.deepOrangeAccent,
+                                width: 4,
+                              ),
+                            ) : null,
+                          child: CachedNetworkImage(
+                            imageUrl: bapiTemplatesUrl(
+                              prefs.get<String>(apiHostPrefKey)!,
+                              cachedTemplatesList[index],
+                            ),
+                            memCacheWidth: (100 * devicePixelRatio).round(),
+                            progressIndicatorBuilder: (context, url,
+                                progress) =>
+                                CircularProgressIndicator(
+                                  value: progress.progress,
+                                ),
+                            errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                          ),
+                        );
+                      }
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -274,7 +267,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
             height: 20,
           ),
           Text(
-            "Select Your Hair Color: ${selectedColorIndex != -1 ? selectedColorIndex.toString() : ''}",
+            "Select Your Hair Color: ${_selectedColorIndex != -1 ? _selectedColorIndex.toString() : ''}",
             style: const TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 18.0,
@@ -329,7 +322,8 @@ class _MyEditorPageState extends State<MyEditorPage> {
             ),
           ),*/
 
-          // TODO repurpose as color selector box
+
+
           Container(
             height: 260,
             decoration: BoxDecoration(
@@ -340,65 +334,50 @@ class _MyEditorPageState extends State<MyEditorPage> {
               borderRadius: BorderRadius.circular(7), // Border radius
             ),
             child: SingleChildScrollView(
-              child: GridView.count(
+              child: GridView.builder(
                 shrinkWrap: true,
-                crossAxisCount: 4,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                physics: const NeverScrollableScrollPhysics(),
-                children: List.generate(
-                  // TODO recurring issue with settings, perform this at start or somewhere else
-                  cachedTemplatesList.length,
-                  (index) => GestureDetector(
-                    onTap: () {
-                      colorSelector(index);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: selectedColorIndex == index
-                              ? Colors.deepOrangeAccent
-                              : Colors.transparent,
-                          width: 4,
-                        ),
-                      ),
-                      // TODO apply a blurring to the center of each image?
-                      //  maybe to focus the hair, not the face
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: <Widget>[
-                          CachedNetworkImage(
-                            imageUrl: bapiTemplatesUrl(
-                              prefs.get<String>(apiHostPrefKey)!,
-                              cachedTemplatesList[index],
-                            ),
-                            progressIndicatorBuilder:
-                                (context, url, progress) =>
-                                    CircularProgressIndicator(
-                              value: progress.progress,
-                            ),
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.error),
-                          ),
-                          //ClipOval(
-                          //  child: BackdropFilter(
-                          //    filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                          //    child: Container(
-                          //      width: 50,
-                          //      height: 50,
-                          //      color: Colors.transparent,
-                          //    ),
-                          //  ),
-                          //),
-                        ],
-                      ),
-                      //Image.asset(
-                      //  iterate(index),
-                      //  fit: BoxFit.cover,
-                      //), //Text('Item $index'),
-                    ),
-                  ),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
                 ),
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: cachedTemplatesList.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      _colorSelector(index);
+                    },
+                    child: ListenableBuilder(
+                        listenable: _selectedColorIndexNotifiers[index], // _selectedStyleIndex,
+                        builder: (context, child) {
+                          return Container(
+                            decoration: _selectedColorIndex == index ?
+                              BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.deepOrangeAccent,
+                                  width: 4,
+                                ),
+                              ) : null,
+                            child: CachedNetworkImage(
+                              imageUrl: bapiTemplatesUrl(
+                                prefs.get<String>(apiHostPrefKey)!,
+                                cachedTemplatesList[index],
+                              ),
+                              memCacheWidth: (100 * devicePixelRatio).round(),
+                              progressIndicatorBuilder: (context, url,
+                                  progress) =>
+                                  CircularProgressIndicator(
+                                    value: progress.progress,
+                                  ),
+                              errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                            ),
+                          );
+                        }
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -413,23 +392,25 @@ class _MyEditorPageState extends State<MyEditorPage> {
             ),
           ),
 
-          Slider(
-            min: 0,
-            max: 100,
-            divisions: 100,
-            value: _qualityValue,
-            label: '${_qualityValue.toInt()}%',
-            onChanged: (value) {
-              setState(() {
-                _qualityValue = value;
-              });
-            },
+
+          ValueListenableBuilder(
+              valueListenable: _qualityValueNotifier,
+              builder: (context, value, child) => Slider(
+                min: 0.0,
+                max: 100,
+                divisions: 100,
+                value: _qualityValueNotifier.value,
+                label: _qualityValueNotifier.value.toStringAsFixed(1), // '${_qualityValue.toInt()}%',
+                onChanged: (value) {
+                  _qualityValueNotifier.value = value;
+                },
+              ),
           ),
 
           const SizedBox(height: 20),
 
           ElevatedButton(
-            onPressed: (selectedColorIndex != -1 && selectedStyleIndex != -1)
+            onPressed: (_selectedColorIndex != -1 && _selectedStyleIndex != -1)
                 ? () {
                     //if (File(path))
 
@@ -444,10 +425,10 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
                     final styleTemplateFileName = (prefs.get<List<String>>(
                       apiCachedTemplateListPrefKey,
-                    )!)[selectedStyleIndex];
+                    )!)[_selectedStyleIndex];
                     final colorTemplateFileName = (prefs.get<List<String>>(
                       apiCachedTemplateListPrefKey,
-                    )!)[selectedColorIndex];
+                    )!)[_selectedColorIndex];
 
                     bapiApiBarberPost(
                       host: host,
@@ -456,12 +437,12 @@ class _MyEditorPageState extends State<MyEditorPage> {
                       //  why duplicate this?
                       accessToken: prefs.get<String>(apiTokenPrefKey)!,
                       // TODO determine what to do with this
-                      imagePath: currentImagePath, // require that image actually exists
+                      imagePath: _currentImagePath, // require that image actually exists
                       //imageBytes: ,
                       hairStyle: styleTemplateFileName, // 'bob', // style
                       hairColor: colorTemplateFileName, // 'dark-blonde' // color
                       demo: prefs.get(apiDemoPrefKey)!,
-                      quality: _qualityValue / 100.0
+                      quality: _qualityValueNotifier.value / 100.0
                     ).then((response) {
                       if (response.statusCode == 200) {
                         // TODO submit to job queue

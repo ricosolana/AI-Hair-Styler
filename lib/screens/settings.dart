@@ -51,9 +51,13 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 context: context,
                 valueAsDescription: true,
                 validator: (str) {
-                  return (Uri.tryParse(str ?? '')?.hasAbsolutePath ?? false)
-                      ? null
-                      : 'Enter a valid URL; ie: https://10.0.2.2/';
+                  if (str == null || str.isEmpty) {
+                    return 'Must not be empty';
+                  } else {
+                    return (Uri.tryParse(str.endsWith('/') ? str : '$str/')?.hasAbsolutePath ?? false)
+                        ? null
+                        : 'Enter a valid URL; ie: https://10.0.2.2/';
+                  }
                 },
                 onSave: (str) {
                   bapiApiTemplatesList(str!)

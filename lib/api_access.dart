@@ -33,7 +33,7 @@ Future<http.Response> bapiApiBarberPost(
       'style-file': hairStyle,
       'color-file': hairColor,
       'demo': demo ? 'true' : 'false',
-      'quality': quality.toString()
+      'quality': quality.toString(),
     },
   );
 
@@ -72,16 +72,25 @@ Future<bool> checkAccessToken(String host, String accessToken, {bool quietSucces
     return false;
   }
 
-  final response = await bapiAuthCheck(host, accessToken);
-  if (response.statusCode == 200) {
-    if (!quietSuccess) {
-      Fluttertoast.showToast(msg: 'Verified');
+  return bapiAuthCheck(host, accessToken).then((response) {
+    final code = response.statusCode;
+    if (code == 200) {
+      if (!quietSuccess) {
+        Fluttertoast.showToast(msg: 'Verified');
+      }
+      return true;
+    } else if (code >= 400 && code < 500) {
+      Fluttertoast.showToast(msg: 'Expired or invalid access token ($code)');
+    } else if (code >= 500) {
+      Fluttertoast.showToast(msg: 'Server error or backend unavailable($code)');
+    } else {
+      Fluttertoast.showToast(msg: 'Unknown error (${response.reasonPhrase}, $code)');
     }
-    return true;
-  } else {
-    Fluttertoast.showToast(msg: 'Expired or invalid access token');
     return false;
-  }
+  }).onError((error, stackTrace) {
+    Fluttertoast.showToast(msg: 'Error connecting ($error)');
+    return false;
+  });
 }
 
 Future<http.Response> bapiGet(String host, {String path = '/'}) async {

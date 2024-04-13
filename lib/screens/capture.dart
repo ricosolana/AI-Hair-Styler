@@ -60,7 +60,8 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
 
     _controller = CameraController(
       _useFrontCamera ? cameras.getFrontCamera() : cameras.getBackCamera(),
-      ResolutionPreset.high,
+      ResolutionPreset.veryHigh,
+      enableAudio: false,
     );
 
     _initializeControllerFuture = _controller.initialize();
@@ -71,7 +72,12 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return CameraPreview(_controller);
+            return Center(
+              child: AspectRatio(
+                aspectRatio: _controller.value.aspectRatio,
+                child: CameraPreview(_controller),
+              ),
+            );
           } else {
             return const Center(child: CircularProgressIndicator());
           }
@@ -83,6 +89,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
             width: 80.0,
             height: 80.0,
             child: FloatingActionButton(
+              heroTag: "capture-take-fab",
               onPressed: _takePictureAndPrompt,
               shape: const CircleBorder(),
               child: const Icon(Icons.camera_alt, size: 45.0),
@@ -92,6 +99,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
             width: 80.0,
             height: 80.0,
             child: FloatingActionButton(
+              heroTag: "capture-flip-fab",
               onPressed: () {
                 setState(() {
                   _useFrontCamera = !_useFrontCamera;

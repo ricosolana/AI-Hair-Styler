@@ -129,6 +129,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -167,6 +169,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     Consumer<PreferencesProvider>(
                       builder: (context, prefs, child) {
+                        // TODO this is BAD
+                        //  Use ListView.Builder to not render offscreen widgets
                         return ListView(
                           padding: const EdgeInsets.only(bottom: 150),
                           children: prefs
@@ -182,7 +186,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                         child: Center(
                                           child: Image.file(
                                             File(path),
-                                            width: 100,
+                                            width: 150,
+                                            cacheWidth: (150 * devicePixelRatio).round(),
                                           ),
                                         ),
                                       ),

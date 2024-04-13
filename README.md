@@ -2,6 +2,8 @@
  
 Main project files in `/lib/`
 
+`flutter build apk --release --split-debug-info --build-number --build-name="1.0.0"`
+
 ## Commiting / Workflows
 
 The linter / formatter is there to make the code fit within guidelines for readability.

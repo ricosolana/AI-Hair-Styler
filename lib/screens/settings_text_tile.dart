@@ -33,7 +33,7 @@ class MyTextDialog extends StatefulWidget {
 class _MyTextDialogState extends State<MyTextDialog> {
   late String textString;
   late TextEditingController _textEditingController;
-
+  final FocusNode _focusNode = FocusNode();
   final _formKey = GlobalKey<FormState>();
 
   void _loadText() {
@@ -73,10 +73,14 @@ class _MyTextDialogState extends State<MyTextDialog> {
         key: _formKey,
         child: TextFormField(
           controller: _textEditingController,
+          focusNode: _focusNode,
           decoration: InputDecoration(
             //hintText: 'http://10.0.2.2/',
             suffixIcon: IconButton(
-              onPressed: _textEditingController.clear,
+              onPressed: () {
+                _textEditingController.clear();
+                _focusNode.requestFocus();
+              },
               icon: const Icon(Icons.clear),
             ),
           ),
