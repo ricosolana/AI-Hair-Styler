@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +16,72 @@ import 'package:senior_project_hair_ai/screens/capture.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/work.dart';
 
-// TODO properly implement
+
+class MyApeep extends StatelessWidget {
+ @override
+ Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: Stack(
+          children: <Widget>[
+            // Your main content here
+            Center(child: Text('Main Content')),
+            // SpinKitFadingCircle at the bottom center
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SpinKitFadingCircle(
+                color: Colors.white,
+                size: 50.0,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+ }
+}
+
+//GlobalKey<State> loadingDialogKey = GlobalKey<State>();
+
+void navigateToEditor(BuildContext context, {String imagePath = '', bool quietSuccess=false}) {
+  final host = Provider.of<PreferencesProvider>(context, listen: false).get<String>(apiHostPrefKey)!;
+  final accessToken = Provider.of<PreferencesProvider>(context, listen: false).get<String>(apiTokenPrefKey)!;
+
+  // add this to the screen momentarily
+  //SpinKitFadingCircle
+
+  showDialog(
+    context: context, 
+    barrierColor: null, 
+    builder: (_) => SpinKitFadingCircle(
+      //key: loadingDialogKey, 
+      color: Colors.white,
+    ),
+  );
+  //navigateTo(context: context, screen: screen, style: style)
+
+  checkAccessToken(host, accessToken, quietSuccess: quietSuccess)
+  .then((valid) {
+    Navigator.pop(context); // Pops the loading circle
+    if (valid) {
+      navigateTo(
+        context: context,
+        screen: MyEditorPage(
+          initialInputImagePath: imagePath,
+        ),
+        style: NavigationRouteStyle.material,
+      );
+    }
+  }).onError((error, stackTrace) {
+    Navigator.pop(context); // Pops the loading circle
+    Fluttertoast.showToast(msg: 'Failed to connect: $error', toastLength: Toast.LENGTH_LONG);
+  });
+  //.whenComplete(() {
+  //  if (false) {
+  //  Navigator.of(context, rootNavigator: true).pop(loadingDialogKey.currentContext);
+  //  }
+  //});
+}
 
 class MyEditorPage extends StatefulWidget {
   const MyEditorPage({super.key, required this.initialInputImagePath});
@@ -33,40 +100,34 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
   void styleSelector(int styleIndex) {
     setState(() {
-      if (selectedStyleIndex == styleIndex) {
-        selectedStyleIndex = -1;
-      } else {
-        selectedStyleIndex = styleIndex;
-      }
+      selectedStyleIndex = styleIndex;
     });
   }
 
   void colorSelector(int colorIndex) {
     setState(() {
-      if (selectedColorIndex == colorIndex) {
-        selectedColorIndex = -1;
-      } else {
         selectedColorIndex = colorIndex;
-      }
     });
-  }
-
-  String iterate(dynamic funIndex) {
-    return "assets/images/IMG ($funIndex).png";
   }
 
   //bool imageChange = false;
   String currentImagePath = '';
+  //Uint8List currentImageBytes;
+  //bool imageFileExists = false;
   int selectedStyleIndex = -1;
   int selectedColorIndex = -1;
   //File? imageUploaded;
 
+  double _qualityValue = 1.0;
+
   Future uploadImage() async {
     final returnedImage =
         await ImagePicker().pickImage(source: ImageSource.gallery);
+    
     if (returnedImage == null) {
       return;
     }
+
     setState(() {
       currentImagePath = returnedImage.path;
       //imageUploaded = File(returnedImage.path);
@@ -90,6 +151,8 @@ class _MyEditorPageState extends State<MyEditorPage> {
     // TODO ensure prefkey is set
     final cachedTemplatesList =
         prefs.get<List<String>>(apiCachedTemplateListPrefKey)!;
+
+    
 
     return Scaffold(
       appBar: AppBar(
@@ -133,15 +196,20 @@ class _MyEditorPageState extends State<MyEditorPage> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.file(File(currentImagePath)),
+                child: Image.file(
+                  File(currentImagePath),
+                  errorBuilder:(context, error, stackTrace) {
+                    return const Icon(Icons.person);
+                  },
+                ),
               ),
             ),
           ),
 
           const SizedBox(height: 20),
-          const Text(
-            "Select Your Hairstyle:",
-            style: TextStyle(
+          Text(
+            "Select Your Hairstyle: ${selectedStyleIndex != -1 ? selectedStyleIndex.toString() : ''}",
+            style: const TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 18.0,
             ),
@@ -205,9 +273,9 @@ class _MyEditorPageState extends State<MyEditorPage> {
           const SizedBox(
             height: 20,
           ),
-          const Text(
-            "Select Your Hair Color:",
-            style: TextStyle(
+          Text(
+            "Select Your Hair Color: ${selectedColorIndex != -1 ? selectedColorIndex.toString() : ''}",
+            style: const TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 18.0,
             ),
@@ -337,9 +405,34 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
           const SizedBox(height: 20),
 
+          const Text(
+            "Determine the quality (higher looks better but also much slower):",
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 18.0,
+            ),
+          ),
+
+          Slider(
+            min: 0,
+            max: 100,
+            divisions: 100,
+            value: _qualityValue,
+            label: '${_qualityValue.toInt()}%',
+            onChanged: (value) {
+              setState(() {
+                _qualityValue = value;
+              });
+            },
+          ),
+
+          const SizedBox(height: 20),
+
           ElevatedButton(
             onPressed: (selectedColorIndex != -1 && selectedStyleIndex != -1)
                 ? () {
+                    //if (File(path))
+
                     // TODO
                     // The API is ready here:
                     final prefs = Provider.of<PreferencesProvider>(
@@ -357,15 +450,18 @@ class _MyEditorPageState extends State<MyEditorPage> {
                     )!)[selectedColorIndex];
 
                     bapiApiBarberPost(
-                      host,
+                      host: host,
                       // TODO ensure that pref defaults are loaded prior to this
                       //  SettingsPage is responsible for defaults,
                       //  why duplicate this?
-                      prefs.get<String>(apiTokenPrefKey)!,
-                      currentImagePath,
-                      styleTemplateFileName, // 'bob', // style
-                      colorTemplateFileName, // 'dark-blonde' // color
+                      accessToken: prefs.get<String>(apiTokenPrefKey)!,
+                      // TODO determine what to do with this
+                      imagePath: currentImagePath, // require that image actually exists
+                      //imageBytes: ,
+                      hairStyle: styleTemplateFileName, // 'bob', // style
+                      hairColor: colorTemplateFileName, // 'dark-blonde' // color
                       demo: prefs.get(apiDemoPrefKey)!,
+                      quality: _qualityValue / 100.0
                     ).then((response) {
                       if (response.statusCode == 200) {
                         // TODO submit to job queue

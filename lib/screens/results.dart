@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:path/path.dart' as path; //just added
 import 'package:path_provider/path_provider.dart'; //just added
 import 'package:share_plus/share_plus.dart';
@@ -29,7 +30,8 @@ class _MyResultsPageState extends State<MyResultsPage> {
           children: [
             Expanded(
               child: imageCachedFile.path.isEmpty
-                  ? Image.asset('assets/images/default.png')
+                  // TODO test this icon
+                  ? const Icon(Icons.person) // Image.asset('assets/images/default.png')
                   :  Image.file(
                           File(imageCachedFile.path),
                           fit: BoxFit.cover,

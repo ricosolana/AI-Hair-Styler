@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -27,6 +28,11 @@ class MySettingsPage extends StatefulWidget {
 class _MySettingsPageState extends State<MySettingsPage> {
   @override
   Widget build(BuildContext context) {
+    final prefs = Provider.of<PreferencesProvider>(
+      context,
+      listen: false,
+    );
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -37,6 +43,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
           SettingsSection(
             title: const Text('API Settings'),
             tiles: [
+              // HOST INPUT
               createTextSettingsTile(
                 title: const Text('API Host'),
                 leading: const Icon(Icons.cloud_queue),
@@ -48,62 +55,29 @@ class _MySettingsPageState extends State<MySettingsPage> {
                       ? null
                       : 'Enter a valid URL; ie: https://10.0.2.2/';
                 },
-                extraActions: <TextButton>[
-                  TextButton(
-                    child: const Text('Login'), // will probe / cache / ...
-                    onPressed: () {
-                      // try connecting
-                      final prefs = Provider.of<PreferencesProvider>(
-                        context,
-                        listen: false,
-                      );
-
-                      bapiApiTemplatesList(prefs.get<String>(apiHostPrefKey)!)
-                          .then((response) {
-                        //prefs.get(apiCachedTemplateListPrefKey)
-                        if (response.statusCode == 200) {
-                          // TODO how to handle exceptions
-                          final list = List<String>.from(
-                            jsonDecode(response.body) as List<dynamic>,
-                          );
-                          prefs.set(apiCachedTemplateListPrefKey, list);
-                          Fluttertoast.showToast(
-                            msg: 'Successfully cached templates',
-                          );
-                          return;
-                        }
-                        Fluttertoast.showToast(
-                          msg: 'Failed to cache template list',
+                onSave: (str) {
+                  bapiApiTemplatesList(str!)
+                    .then((response) {
+                      if (response.statusCode == 200) {
+                        final list = List<String>.from(
+                          jsonDecode(response.body) as List<dynamic>,
                         );
-                      }).onError((error, stackTrace) {
-                        Fluttertoast.showToast(msg: 'Failed to reach server');
-                      });
+                        prefs.set(apiCachedTemplateListPrefKey, list);
+                        Fluttertoast.showToast(
+                          msg: 'Templates successfully cached',
+                        );
+                      } else {
+                        Fluttertoast.showToast(
+                          msg: 'Failed to cache templates',
+                        );
+                      }
+                    }).onError((error, stackTrace) {
+                      Fluttertoast.showToast(msg: 'Failed to reach server');
+                      log('Error while contacting server', error: error);
+                    });
 
-                      /*
-                      bapiGet(
-                        prefs.get(apiHostPrefKey)!,
-                      ).then((value) {
-                        //final prefs = Provider.of<PreferencesProvider>(context, listen: false);
-                        
-                        if (value.statusCode == 200) {
-                          final map = jsonDecode(value.body) as Map<String, dynamic>;
-                          
-                          if (map['name'] == 'ai hair styler generator api') {
-                            if (map['version'] == 'v1.1.0') {                                
-                              Fluttertoast.showToast(msg: 'Server is online');
-                            } else {
-                              Fluttertoast.showToast(msg: 'Server version is incompatible');
-                            }
-                            return;
-                          }
-                        }
-                        Fluttertoast.showToast(msg: 'Failed to verify server');
-                      }).onError((error, stackTrace) {
-                        Fluttertoast.showToast(msg: 'Failed to reach server');
-                      });*/
-                    },
-                  ),
-                ],
+                  return true;
+                },
               ),
               createTextSettingsTile(
                 title: const Text('API Token'),
@@ -111,6 +85,15 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 prefKey: apiTokenPrefKey,
                 context: context,
                 valueAsDescription: true,
+                validator: (str) => (str ?? '').isEmpty ? 'Must not be empty' : null,
+                onSave: (str) {
+                  checkAccessToken(prefs.get(apiHostPrefKey)!, str!)
+                    .then((value) => null)
+                    .onError((error, stackTrace) {
+                      Fluttertoast.showToast(msg: 'Error connecting: $error', toastLength: Toast.LENGTH_LONG);
+                    });
+                  return true;
+                }
                 //extraActions: TextButton(
                 //  automatically retrieve from localhost
                 //  child: const Text('Auto'),
@@ -119,7 +102,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
               ),
               SettingsTile.switchTile(
                 title: const Text('Demo'),
-                description: const Text('API responds with a fast dummy image'),
+                description: const Text('Request that the API immediately completes a fake sample'),
                 leading: const Icon(Icons.dark_mode),
                 initialValue: Provider.of<PreferencesProvider>(context)
                     .get(apiDemoPrefKey),

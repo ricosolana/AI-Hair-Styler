@@ -201,39 +201,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       const Spacer(),
                                     ],
                                   ),
-                                  onTap: () {
-                                    //TODO: ***Open Uploaded/Captured Photo, Navigate to Editing Screen (Colors, Hairstyles, Generate Button)
-
-                                    // TODO what should be done here?
-                                    navigateTo(
-                                      context: context,
-                                      screen: MyEditorPage(
-                                        initialInputImagePath: path,
-                                      ),
-                                      style: NavigationRouteStyle.material,
-                                    );
-
-                                    // TODO
-                                    // The API is ready here:
-                                    //apiBarberPost(
-                                    //  prefs.get<String>(apiHostPrefKey)!,
-                                    //  prefs.get<String>(apiTokenPrefKey)!,
-                                    //  path,
-                                    //  'bob',
-                                    //  'dark-blonde'
-                                    //).then((response) {
-                                    //  if (response.statusCode == 200) {
-                                    //    Fluttertoast.showToast(msg: 'Success!');
-                                    //  } else if (response.statusCode == 422) {
-                                    //    Fluttertoast.showToast(msg: 'Invalid access token');
-                                    //  } else {
-                                    //    Fluttertoast.showToast(msg: 'Status Code: ${response.statusCode}');
-                                    //  }
-                                    //}).onError((error, stackTrace) {
-                                    //  log(error.toString());
-                                    //  Fluttertoast.showToast(msg: 'Failed to connect: $error', toastLength: Toast.LENGTH_LONG);
-                                    //});
-                                  },
+                                  onTap: () => navigateToEditor(context, imagePath: path, quietSuccess: true),
                                 );
                               })
                               .toList(),
@@ -268,11 +236,12 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // Upload image from gallery
           SizedBox(
             width: 80.0,
             height: 80.0,
             child: FloatingActionButton(
-              heroTag: "upload-fab",
+              heroTag: "home-upload-fab",
               key: uploadFloatingKey,
               onPressed: () {
                 // Upload Button
@@ -285,12 +254,13 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
-          const SizedBox(width: 50.0), // Adjust the spacing between buttons
+          const SizedBox(width: 50.0),
+          // Prepare a capture to upload 
           SizedBox(
             width: 100.0,
             height: 100.0,
             child: FloatingActionButton(
-              heroTag: "capture-fab",
+              heroTag: "home-capture-fab",
               key: captureFloatingKey,
               onPressed: () {
                 // Camera Button
@@ -312,6 +282,7 @@ class _MyHomePageState extends State<MyHomePage> {
             width: 80.0,
             height: 80.0,
             child: FloatingActionButton(
+              heroTag: 'home-clear-fab',
               key: editorFloatingKey,
               onPressed: () {
                 // TODO add a list clear to PreferencesProvider
@@ -339,7 +310,7 @@ class _MyHomePageState extends State<MyHomePage> {
             const DrawerHeader(
               decoration: BoxDecoration(color: Colors.deepPurple),
               child: Text(
-                'AI Hair Styler\n(Options)',
+                'AI Hair Styler',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -350,20 +321,19 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               leading: const Icon(Icons.edit),
               title: const Text('Editor'),
-              onTap: () => navigateTo(
-                context: context,
-                screen: const MyEditorPage(
-                  initialInputImagePath: '',
-                ),
-                style: NavigationRouteStyle.material,
-              ),
+              onTap: () => navigateToEditor(context, quietSuccess: true),
+              //() => navigateTo(
+              //  context: context,
+              //  screen: const MyEditorPage(
+              //    initialInputImagePath: '',
+              //  ),
+              //  style: NavigationRouteStyle.material,
+              //),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
               title: const Text('Gallery'),
-              onTap: () {
-                uploadImage();
-              },
+              onTap: () => uploadImage(),
             ),
             ListTile(
               leading: const Icon(Icons.directions_walk),

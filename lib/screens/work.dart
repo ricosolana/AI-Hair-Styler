@@ -92,8 +92,147 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
         child: Column(
           children: [
             Expanded(
+              child: ListView(
+                children: cachedWorkIDList.reversed.map((workID) {
+                  final host = prefs.get<String>(apiHostPrefKey)!;
+                  return ListTile(
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        //const Spacer(),
+                        Expanded(
+                          flex: 2,
+                          child: Center(
+                            child: CachedNetworkImage(
+                              imageUrl: bapiGeneratedUrl(host, workID),
+                              progressIndicatorBuilder: (context, url, progress) =>
+                                  CircularProgressIndicator(value: progress.progress),
+                              errorWidget: (context, url, error) {
+                                // TODO on-click, refresh to re-query server
+                                return const Icon(Icons.error);
+                              },
+                            ),
+                            //child: Image.file(
+                            //  File(path),
+                            //  width: 100,
+                            //),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            workID, //cachedImageWorkName.limit(40),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16.0,
+                            ),
+                          ),
+                        ),
+                        PopupMenuButton<WorkPopupItems>(
+                          initialValue: selectedItem,
+                          onSelected: (WorkPopupItems item) async {
+                            switch (item) {
+                              // TODO grey-out menu item if work is not completed
+                              case WorkPopupItems.save:
+                                // trigger save?
+    
+                                // for now user can just copy url regardless
+                              case WorkPopupItems.copyFileName:
+                                await Clipboard.setData(
+                                  ClipboardData(
+                                    text: workID, // bapiGeneratedUrl(host, cachedImageWorkName),
+                                  ),
+                                );
+                                Fluttertoast.showToast(msg: 'Copied filename');
+                                log('clicked on queued work');
+                              case WorkPopupItems.copyUrl:
+                                await Clipboard.setData(
+                                  ClipboardData(
+                                    text: bapiGeneratedUrl(host, workID),
+                                  ),
+                                );
+                                Fluttertoast.showToast(msg: 'Copied generated url');
+                                log('clicked on queued work');
+                            }
+                            setState(() {
+                              selectedItem = item;
+                            });
+                          },
+                          itemBuilder: (BuildContext context) => <PopupMenuEntry<WorkPopupItems>>[
+                            const PopupMenuItem<WorkPopupItems>(
+                              value: WorkPopupItems.save,
+                              child: Text('Save (NYI)'),
+                            ),
+                            const PopupMenuItem<WorkPopupItems>(
+                              value: WorkPopupItems.copyFileName,
+                              child: Text('Copy file name'),
+                            ),
+                            const PopupMenuItem<WorkPopupItems>(
+                              value: WorkPopupItems.copyUrl,
+                              child: Text('Copy generated URL'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    // TODO I can barely see the image; it's so small
+                    ///title: Text(cachedImageWorkName),
+                    ///trailing: CachedNetworkImage(
+                    ///  imageUrl: bapiGeneratedUrl(host, cachedImageWorkName),
+                    ///  progressIndicatorBuilder: (context, url, progress) =>
+                    ///      CircularProgressIndicator(value: progress.progress),
+                    ///  errorWidget: (context, url, error) {
+                    ///    // TODO on-click, refresh to re-query server
+                    ///    return const Icon(Icons.error);
+                    ///  },
+                    ///),
+                    //trailing: true //workIDStatuses.containsKey(workID)
+                    //    ? Text(workIDStatuses[workID]!)
+                    //    : IconButton(
+                    //        icon: const Icon(Icons.refresh),
+                    //        onPressed: () => updateWorkIDStatus(workID),
+                    //      ),
+                    onTap: () async {
+                      // TODO clicking on any work will bring up a little menu
+                      //  button to save the completed work to disk
+                      //  button to copy work file name
+                      //  button to copy /generated url for work file
+                      // a GestureDetector to the side that refreshes
+    
+                      // some kind of pop-up
+                      // 
+                      
+    
+                      //if (workIDStatuses.containsKey(workID) &&
+                      //    workIDStatuses[workID] == 'Finished') {
+                      //  // Show cached result
+                      //  showDialog(
+                      //    context: context,
+                      //    builder: (context) => AlertDialog(
+                      //      title: const Text('Cached Result'),
+                      //      content: Text('This is the cached result for $workID'),
+                      //    ),
+                      //  );
+                      //} else {
+                      //  // Query server for status
+                      //  updateWorkIDStatus(workID);
+                      //}
+                    },
+                  );
+
+
+                }).toList(),
+              ),
+
+
+
+
+
+              // garbo...
+              /*
               child: ListView.builder(
                 itemCount: cachedWorkIDList.length,
+                reverse: true,
                 itemBuilder: (context, index) {
                   final cachedWorkID = cachedWorkIDList[index];
                   final host = prefs.get<String>(apiHostPrefKey)!;
@@ -223,6 +362,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                   );
                 },
               ),
+              */
             ),
           ],
         ),
@@ -230,6 +370,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
       floatingActionButton: Row(
         children: [
           FloatingActionButton(
+            heroTag: 'work-clear-fab',
             onPressed: () {
               prefs.set(apiCachedWorkIDListPrefKey, <String>[]);
               setState(() {
@@ -244,6 +385,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
           ),
           // Navigator.of(context).popUntil((route) => route.isFirst);
           FloatingActionButton(
+            heroTag: 'work-refresh-fab',
             onPressed: () {
               setState(() {
                 //this menu page should be stateless?

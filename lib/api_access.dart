@@ -1,18 +1,26 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
+const int timeout = 5;
+
 Future<http.Response> bapiApiBarberPost(
-  String host,
-  String accessToken,
-  String imagePath,
-  String hairStyle,
-  String hairColor, {
-  bool demo = false,
-  double quality = 1.0
+  {
+    required String host,
+    required String accessToken,
+    @Deprecated('specify the imageBytes instead') String ?imagePath, 
+    Uint8List ?imageBytes, 
+    required String hairStyle,
+    required String hairColor,
+    bool demo = false,
+    double quality = 1.0
 }) async {
-  final bytes = await File(imagePath).readAsBytes();
+  if (imagePath != null) {
+    imageBytes = await File(imagePath).readAsBytes();
+  }  
 
   final rootUri = Uri.parse(host);
 
@@ -32,12 +40,48 @@ Future<http.Response> bapiApiBarberPost(
   final request = http.MultipartRequest('POST', uri)
     ..headers['Authorization'] = 'Bearer $accessToken'
     ..files.add(
-      http.MultipartFile.fromBytes('image', bytes, filename: 'image.jpeg'),
+      http.MultipartFile.fromBytes('image', imageBytes!, filename: 'image.jpeg'),
     );
 
   final responseStream =
-      await request.send().timeout(const Duration(seconds: 5));
+      await request.send().timeout(const Duration(seconds: timeout));
   return http.Response.fromStream(responseStream);
+}
+
+Future<http.Response> bapiAuthCheck(String host, String accessToken) async {
+  final rootUri = Uri.parse(host);
+
+  final uri = Uri(
+    scheme: rootUri.scheme, //'http',
+    host: rootUri.host, // host,
+    port: rootUri.port,
+    path: '/auth/check',
+  );
+
+  final request = http.Request('GET', uri)
+    ..headers['Authorization'] = 'Bearer $accessToken';
+
+  final responseStream =
+      await request.send().timeout(const Duration(seconds: timeout));
+  return http.Response.fromStream(responseStream);
+}
+
+Future<bool> checkAccessToken(String host, String accessToken, {bool quietSuccess=false}) async {  
+  if (accessToken.isEmpty) {  
+    Fluttertoast.showToast(msg: 'Set an access token first');
+    return false;
+  }
+
+  final response = await bapiAuthCheck(host, accessToken);
+  if (response.statusCode == 200) {
+    if (!quietSuccess) {
+      Fluttertoast.showToast(msg: 'Verified');
+    }
+    return true;
+  } else {
+    Fluttertoast.showToast(msg: 'Expired or invalid access token');
+    return false;
+  }
 }
 
 Future<http.Response> bapiGet(String host, {String path = '/'}) async {
@@ -53,7 +97,7 @@ Future<http.Response> bapiGet(String host, {String path = '/'}) async {
   final request = http.Request('GET', uri);
 
   final responseStream =
-      await request.send().timeout(const Duration(seconds: 5));
+      await request.send().timeout(const Duration(seconds: timeout));
   return http.Response.fromStream(responseStream);
 }
 

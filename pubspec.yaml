@@ -54,6 +54,7 @@ dependencies:
   dio: ^5.4.2
   share_plus: ^8.0.3
   file_picker: ^8.0.0+1
+  flutter_spinkit: ^5.2.1
 
 
 dev_dependencies:
