@@ -55,6 +55,8 @@ dependencies:
   share_plus: ^8.0.3
   file_picker: ^8.0.0+1
   flutter_spinkit: ^5.2.1
+  flutter_cache_manager: ^3.3.1
+  flutter_file_dialog: ^3.0.2
 
 
 dev_dependencies:

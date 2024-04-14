@@ -3,9 +3,13 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:path/path.dart' as path;
 import 'package:senior_project_hair_ai/api_access.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
@@ -82,6 +86,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
     final prefs = Provider.of<PreferencesProvider>(context, listen: false);
     final cachedWorkIDList = prefs.get<List<String>>(apiCachedWorkIDListPrefKey)!;
 
+    final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -105,6 +111,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                           child: Center(
                             child: CachedNetworkImage(
                               imageUrl: bapiGeneratedUrl(host, workID),
+                              memCacheWidth: (100 * devicePixelRatio).round(),
                               progressIndicatorBuilder: (context, url, progress) =>
                                   CircularProgressIndicator(value: progress.progress),
                               errorWidget: (context, url, error) {
@@ -135,7 +142,33 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                               // TODO grey-out menu item if work is not completed
                               case WorkPopupItems.save:
                                 // trigger save?
-    
+                                final cache = DefaultCacheManager();
+                                final file = await cache.getFileFromCache(bapiGeneratedUrl(host, workID));
+
+                                //var filePath = file. path.join(documentDirectory.path, 'image.jpg');
+                                //File file = File(filePath);
+                                //file.writeAsBytesSync(response.bodyBytes);
+
+                                if (file != null) {
+                                  final params = SaveFileDialogParams(
+                                      sourceFilePath: file.file.path,
+                                  fileName: workID + path.extension(file.file.basename));
+                                  final filePath = await FlutterFileDialog.saveFile(params: params);
+
+
+                                  Fluttertoast.showToast(msg: 'Saved in directory $filePath', toastLength: Toast.LENGTH_LONG);
+
+                                  //final documentDirectory = await getApplicationDocumentsDirectory();
+                                  //final documentPath = documentDirectory.path;
+                                  //file.file.copy(
+                                  //  path.join(
+                                  //      documentPath,
+                                  //    workID + path.extension(file.file.basename)
+                                  //  )
+                                  //).then((value) => Fluttertoast.showToast(msg: 'Saved to $documentDirectory'))
+                                  //.onError((error, stackTrace) => Fluttertoast.showToast(msg: 'Error saving file $error', toastLength: Toast.LENGTH_LONG));
+                                }
+
                                 // for now user can just copy url regardless
                               case WorkPopupItems.copyFileName:
                                 await Clipboard.setData(
@@ -161,7 +194,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                           itemBuilder: (BuildContext context) => <PopupMenuEntry<WorkPopupItems>>[
                             const PopupMenuItem<WorkPopupItems>(
                               value: WorkPopupItems.save,
-                              child: Text('Save (NYI)'),
+                              child: Text('Save'),
                             ),
                             const PopupMenuItem<WorkPopupItems>(
                               value: WorkPopupItems.copyFileName,

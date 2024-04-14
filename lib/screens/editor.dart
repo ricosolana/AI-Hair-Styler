@@ -256,63 +256,13 @@ class _MyEditorPageState extends State<MyEditorPage> {
           const SizedBox(
             height: 20,
           ),
-          Text(
+          const Text(
             "Select Your Hair Color:",
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 18.0,
             ),
           ),
-
-          /*
-          Container(
-            height: 100, // Set a smaller height for the container
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.deepPurple, // Border color
-                width: 3, // Border width
-              ),
-              borderRadius: BorderRadius.circular(7), // Border radius
-            ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  Colors.redAccent,
-                  Colors.brown,
-                  Colors.black,
-                  Colors.yellow,
-                  Colors.white,
-                ].asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final color = entry.value;
-
-                  return GestureDetector(
-                    onTap: () {
-                      colorSelector(index);
-                    },
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      margin: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: color,
-                        border: Border.all(
-                          color: selectedColor == index
-                              ? Colors.deepPurpleAccent
-                              : Colors.transparent,
-                          width: 4,
-                        ),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),*/
-
-
 
           Container(
             height: 260,
@@ -390,7 +340,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
                 max: 100,
                 divisions: 100,
                 value: _qualityValueNotifier.value,
-                label: _qualityValueNotifier.value.toStringAsFixed(1), // '${_qualityValue.toInt()}%',
+                label: '${_qualityValueNotifier.value.toStringAsFixed(1)}%', // '${_qualityValue.toInt()}%',
                 onChanged: (value) {
                   _qualityValueNotifier.value = value;
                 },
