@@ -1,14 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:ffi';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,21 +15,25 @@ import 'package:senior_project_hair_ai/screens/capture.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/work.dart';
 
-void navigateToEditor(BuildContext context, {String imagePath = '', bool quietSuccess=false}) async {
-  final host = Provider.of<PreferencesProvider>(context, listen: false).get<String>(apiHostPrefKey)!;
-  final accessToken = Provider.of<PreferencesProvider>(context, listen: false).get<String>(apiTokenPrefKey)!;
+Future<void> navigateToEditor(BuildContext context,
+    {String imagePath = '', bool quietSuccess = false,}) async {
+  final host = Provider.of<PreferencesProvider>(context, listen: false)
+      .get<String>(apiHostPrefKey)!;
+  final accessToken = Provider.of<PreferencesProvider>(context, listen: false)
+      .get<String>(apiTokenPrefKey)!;
 
   // add this to the screen momentarily
   //SpinKitFadingCircle
 
   showDialog(
-    context: context, 
-    barrierColor: null, 
+    context: context,
+    barrierColor: null,
     builder: (_) => const SpinKitFadingCircle(color: Colors.white),
   );
   //navigateTo(context: context, screen: screen, style: style)
 
-  final valid = await checkAccessToken(host, accessToken, quietSuccess: quietSuccess);
+  final valid =
+      await checkAccessToken(host, accessToken, quietSuccess: quietSuccess);
   if (!context.mounted) {
     return;
   }
@@ -50,8 +49,6 @@ void navigateToEditor(BuildContext context, {String imagePath = '', bool quietSu
     );
   }
 }
-
-
 
 class EditorItemModel with ChangeNotifier {
   void update() {
@@ -78,9 +75,8 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
   late List<String> cachedTemplatesList;
 
-
   void _styleSelector(int styleIndex) {
-      // TODO update the list old, and new item
+    // TODO update the list old, and new item
     _selectedStyleIndexNotifiers[_selectedStyleIndex].update();
     _selectedStyleIndex = styleIndex;
     _selectedStyleIndexNotifiers[_selectedStyleIndex].update();
@@ -95,7 +91,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
   Future uploadImage() async {
     final returnedImage =
         await ImagePicker().pickImage(source: ImageSource.gallery);
-    
+
     if (returnedImage == null) {
       return;
     }
@@ -116,10 +112,13 @@ class _MyEditorPageState extends State<MyEditorPage> {
     _currentImagePath = widget.initialInputImagePath;
 
     final prefs = Provider.of<PreferencesProvider>(context, listen: false);
-    cachedTemplatesList = prefs.get<List<String>>(apiCachedTemplateListPrefKey)!;
+    cachedTemplatesList =
+        prefs.get<List<String>>(apiCachedTemplateListPrefKey)!;
 
-    _selectedStyleIndexNotifiers = List.generate(cachedTemplatesList.length, (_) => EditorItemModel());
-    _selectedColorIndexNotifiers = List.generate(cachedTemplatesList.length, (_) => EditorItemModel());
+    _selectedStyleIndexNotifiers =
+        List.generate(cachedTemplatesList.length, (_) => EditorItemModel());
+    _selectedColorIndexNotifiers =
+        List.generate(cachedTemplatesList.length, (_) => EditorItemModel());
   }
 
   @override
@@ -127,7 +126,6 @@ class _MyEditorPageState extends State<MyEditorPage> {
     final prefs = Provider.of<PreferencesProvider>(context, listen: false);
 
     // TODO ensure prefkey is set
-
 
     final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
 
@@ -176,25 +174,21 @@ class _MyEditorPageState extends State<MyEditorPage> {
                 child: Image.file(
                   File(_currentImagePath),
                   cacheWidth: (200 * devicePixelRatio).round(),
-                  errorBuilder:(context, error, stackTrace) {
+                  errorBuilder: (context, error, stackTrace) {
                     return const Icon(Icons.person);
                   },
                 ),
               ),
             ),
           ),
-
           const SizedBox(height: 20),
-          Text(
+          const Text(
             "Select Your Hairstyle:",
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 18.0,
             ),
           ),
-
-
-
           Container(
             height: 260,
             decoration: BoxDecoration(
@@ -220,39 +214,39 @@ class _MyEditorPageState extends State<MyEditorPage> {
                       _styleSelector(index);
                     },
                     child: ListenableBuilder(
-                      listenable: _selectedStyleIndexNotifiers[index], // _selectedStyleIndex,
-                      builder: (context, child) {
-                        return Container(
-                          decoration: _selectedStyleIndex == index ?
-                            BoxDecoration(
-                              border: Border.all(
-                                color: Colors.deepOrangeAccent,
-                                width: 4,
+                        listenable: _selectedStyleIndexNotifiers[
+                            index], // _selectedStyleIndex,
+                        builder: (context, child) {
+                          return Container(
+                            decoration: _selectedStyleIndex == index
+                                ? BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.deepOrangeAccent,
+                                      width: 4,
+                                    ),
+                                  )
+                                : null,
+                            child: CachedNetworkImage(
+                              imageUrl: bapiTemplatesUrl(
+                                prefs.get<String>(apiHostPrefKey)!,
+                                cachedTemplatesList[index],
                               ),
-                            ) : null,
-                          child: CachedNetworkImage(
-                            imageUrl: bapiTemplatesUrl(
-                              prefs.get<String>(apiHostPrefKey)!,
-                              cachedTemplatesList[index],
+                              memCacheWidth: (100 * devicePixelRatio).round(),
+                              progressIndicatorBuilder:
+                                  (context, url, progress) =>
+                                      CircularProgressIndicator(
+                                value: progress.progress,
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
                             ),
-                            memCacheWidth: (100 * devicePixelRatio).round(),
-                            progressIndicatorBuilder: (context, url,
-                                progress) =>
-                                CircularProgressIndicator(
-                                  value: progress.progress,
-                                ),
-                            errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
-                          ),
-                        );
-                      }
-                    ),
+                          );
+                        },),
                   );
                 },
               ),
             ),
           ),
-
           const SizedBox(
             height: 20,
           ),
@@ -263,7 +257,6 @@ class _MyEditorPageState extends State<MyEditorPage> {
               fontSize: 18.0,
             ),
           ),
-
           Container(
             height: 260,
             decoration: BoxDecoration(
@@ -289,41 +282,40 @@ class _MyEditorPageState extends State<MyEditorPage> {
                       _colorSelector(index);
                     },
                     child: ListenableBuilder(
-                        listenable: _selectedColorIndexNotifiers[index], // _selectedStyleIndex,
+                        listenable: _selectedColorIndexNotifiers[
+                            index], // _selectedStyleIndex,
                         builder: (context, child) {
                           return Container(
-                            decoration: _selectedColorIndex == index ?
-                              BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.deepOrangeAccent,
-                                  width: 4,
-                                ),
-                              ) : null,
+                            decoration: _selectedColorIndex == index
+                                ? BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.deepOrangeAccent,
+                                      width: 4,
+                                    ),
+                                  )
+                                : null,
                             child: CachedNetworkImage(
                               imageUrl: bapiTemplatesUrl(
                                 prefs.get<String>(apiHostPrefKey)!,
                                 cachedTemplatesList[index],
                               ),
                               memCacheWidth: (100 * devicePixelRatio).round(),
-                              progressIndicatorBuilder: (context, url,
-                                  progress) =>
-                                  CircularProgressIndicator(
-                                    value: progress.progress,
-                                  ),
+                              progressIndicatorBuilder:
+                                  (context, url, progress) =>
+                                      CircularProgressIndicator(
+                                value: progress.progress,
+                              ),
                               errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
+                                  const Icon(Icons.error),
                             ),
                           );
-                        }
-                    ),
+                        },),
                   );
                 },
               ),
             ),
           ),
-
           const SizedBox(height: 20),
-
           const Text(
             "Determine the quality (the higher the quality the longer the compute time):",
             style: TextStyle(
@@ -331,25 +323,21 @@ class _MyEditorPageState extends State<MyEditorPage> {
               fontSize: 18.0,
             ),
           ),
-
-
           ValueListenableBuilder(
-              valueListenable: _qualityValueNotifier,
-              builder: (context, value, child) => Slider(
-                min: 0.0,
-                max: 100,
-                divisions: 100,
-                value: _qualityValueNotifier.value,
-                label: '${_qualityValueNotifier.value.toStringAsFixed(1)}%', // '${_qualityValue.toInt()}%',
-                onChanged: (value) {
-                  _qualityValueNotifier.value = value;
-                },
-              ),
+            valueListenable: _qualityValueNotifier,
+            builder: (context, value, child) => Slider(
+              max: 100,
+              divisions: 100,
+              value: _qualityValueNotifier.value,
+              label:
+                  '${_qualityValueNotifier.value.toStringAsFixed(1)}%', // '${_qualityValue.toInt()}%',
+              onChanged: (value) {
+                _qualityValueNotifier.value = value;
+              },
+            ),
           ),
-
           const SizedBox(height: 20),
-
-           ElevatedButton(
+          ElevatedButton(
             onPressed: () {
               final prefs = Provider.of<PreferencesProvider>(
                 context,
@@ -366,23 +354,24 @@ class _MyEditorPageState extends State<MyEditorPage> {
               )!)[_selectedColorIndex];
 
               bapiApiBarberPost(
-                host: host,
-                // TODO ensure that pref defaults are loaded prior to this
-                //  SettingsPage is responsible for defaults,
-                //  why duplicate this?
-                accessToken: prefs.get<String>(apiTokenPrefKey)!,
-                // TODO determine what to do with this
-                imagePath: _currentImagePath, // require that image actually exists
-                //imageBytes: ,
-                hairStyle: styleTemplateFileName, // 'bob', // style
-                hairColor: colorTemplateFileName, // 'dark-blonde' // color
-                demo: prefs.get(apiDemoPrefKey)!,
-                quality: _qualityValueNotifier.value / 100.0
-              ).then((response) {
+                      host: host,
+                      // TODO ensure that pref defaults are loaded prior to this
+                      //  SettingsPage is responsible for defaults,
+                      //  why duplicate this?
+                      accessToken: prefs.get<String>(apiTokenPrefKey)!,
+                      // TODO determine what to do with this
+                      imagePath:
+                          _currentImagePath, // require that image actually exists
+                      //imageBytes: ,
+                      hairStyle: styleTemplateFileName, // 'bob', // style
+                      hairColor:
+                          colorTemplateFileName, // 'dark-blonde' // color
+                      demo: prefs.get(apiDemoPrefKey)!,
+                      quality: _qualityValueNotifier.value / 100.0,)
+                  .then((response) {
                 if (response.statusCode == 200) {
                   // TODO submit to job queue
-                  final map =
-                      jsonDecode(response.body) as Map<String, dynamic>;
+                  final map = jsonDecode(response.body) as Map<String, dynamic>;
 
                   // submit to work queue
                   final workID = map['work-id'] as String;

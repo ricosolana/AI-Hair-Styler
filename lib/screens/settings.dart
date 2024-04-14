@@ -54,59 +54,64 @@ class _MySettingsPageState extends State<MySettingsPage> {
                   if (str == null || str.isEmpty) {
                     return 'Must not be empty';
                   } else {
-                    return (Uri.tryParse(str.endsWith('/') ? str : '$str/')?.hasAbsolutePath ?? false)
+                    return (Uri.tryParse(str.endsWith('/') ? str : '$str/')
+                                ?.hasAbsolutePath ??
+                            false)
                         ? null
                         : 'Enter a valid URL; ie: https://10.0.2.2/';
                   }
                 },
                 onSave: (str) {
-                  bapiApiTemplatesList(str!)
-                    .then((response) {
-                      if (response.statusCode == 200) {
-                        final list = List<String>.from(
-                          jsonDecode(response.body) as List<dynamic>,
-                        );
-                        prefs.set(apiCachedTemplateListPrefKey, list);
-                        Fluttertoast.showToast(
-                          msg: 'Templates successfully cached',
-                        );
-                      } else {
-                        Fluttertoast.showToast(
-                          msg: 'Failed to cache templates',
-                        );
-                      }
-                    }).onError((error, stackTrace) {
-                      Fluttertoast.showToast(msg: 'Failed to reach server');
-                      log('Error while contacting server', error: error);
-                    });
+                  bapiApiTemplatesList(str!).then((response) {
+                    if (response.statusCode == 200) {
+                      final list = List<String>.from(
+                        jsonDecode(response.body) as List<dynamic>,
+                      );
+                      prefs.set(apiCachedTemplateListPrefKey, list);
+                      Fluttertoast.showToast(
+                        msg: 'Templates successfully cached',
+                      );
+                    } else {
+                      Fluttertoast.showToast(
+                        msg: 'Failed to cache templates',
+                      );
+                    }
+                  }).onError((error, stackTrace) {
+                    Fluttertoast.showToast(msg: 'Failed to reach server');
+                    log('Error while contacting server', error: error);
+                  });
 
                   return true;
                 },
               ),
               createTextSettingsTile(
-                title: const Text('API Token'),
-                leading: const Icon(Icons.token),
-                prefKey: apiTokenPrefKey,
-                context: context,
-                valueAsDescription: true,
-                validator: (str) => (str ?? '').isEmpty ? 'Must not be empty' : null,
-                onSave: (str) {
-                  checkAccessToken(prefs.get(apiHostPrefKey)!, str!)
-                    .then((value) => null)
-                    .onError((error, stackTrace) {
-                      Fluttertoast.showToast(msg: 'Error connecting: $error', toastLength: Toast.LENGTH_LONG);
+                  title: const Text('API Token'),
+                  leading: const Icon(Icons.token),
+                  prefKey: apiTokenPrefKey,
+                  context: context,
+                  valueAsDescription: true,
+                  validator: (str) =>
+                      (str ?? '').isEmpty ? 'Must not be empty' : null,
+                  onSave: (str) {
+                    checkAccessToken(prefs.get(apiHostPrefKey)!, str!)
+                        .then((value) => null)
+                        .onError((error, stackTrace) {
+                      Fluttertoast.showToast(
+                          msg: 'Error connecting: $error',
+                          toastLength: Toast.LENGTH_LONG,);
                     });
-                  return true;
-                }
-                //extraActions: TextButton(
-                //  automatically retrieve from localhost
-                //  child: const Text('Auto'),
-                //  onPressed: onPressed,
-                //)
-              ),
+                    return true;
+                  },
+                  //extraActions: TextButton(
+                  //  automatically retrieve from localhost
+                  //  child: const Text('Auto'),
+                  //  onPressed: onPressed,
+                  //)
+                  ),
               SettingsTile.switchTile(
                 title: const Text('Demo'),
-                description: const Text('Request that the API immediately completes a fake sample'),
+                description: const Text(
+                    'Request that the API immediately completes a fake sample',),
                 leading: const Icon(Icons.dark_mode),
                 initialValue: Provider.of<PreferencesProvider>(context)
                     .get(apiDemoPrefKey),

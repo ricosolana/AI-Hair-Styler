@@ -8,19 +8,17 @@ import 'package:http/http.dart' as http;
 const int timeout = 5;
 
 Future<http.Response> bapiApiBarberPost(
-  {
-    required String host,
+    {required String host,
     required String accessToken,
-    @Deprecated('specify the imageBytes instead') String ?imagePath, 
-    Uint8List ?imageBytes, 
+    @Deprecated('specify the imageBytes instead') String? imagePath,
+    Uint8List? imageBytes,
     required String hairStyle,
     required String hairColor,
     bool demo = false,
-    double quality = 1.0
-}) async {
+    double quality = 1.0,}) async {
   if (imagePath != null) {
     imageBytes = await File(imagePath).readAsBytes();
-  }  
+  }
 
   final rootUri = Uri.parse(host);
 
@@ -40,7 +38,8 @@ Future<http.Response> bapiApiBarberPost(
   final request = http.MultipartRequest('POST', uri)
     ..headers['Authorization'] = 'Bearer $accessToken'
     ..files.add(
-      http.MultipartFile.fromBytes('image', imageBytes!, filename: 'image.jpeg'),
+      http.MultipartFile.fromBytes('image', imageBytes!,
+          filename: 'image.jpeg',),
     );
 
   final responseStream =
@@ -66,8 +65,9 @@ Future<http.Response> bapiAuthCheck(String host, String accessToken) async {
   return http.Response.fromStream(responseStream);
 }
 
-Future<bool> checkAccessToken(String host, String accessToken, {bool quietSuccess=false}) async {  
-  if (accessToken.isEmpty) {  
+Future<bool> checkAccessToken(String host, String accessToken,
+    {bool quietSuccess = false,}) async {
+  if (accessToken.isEmpty) {
     Fluttertoast.showToast(msg: 'Set an access token first');
     return false;
   }
@@ -84,7 +84,8 @@ Future<bool> checkAccessToken(String host, String accessToken, {bool quietSucces
     } else if (code >= 500) {
       Fluttertoast.showToast(msg: 'Server error or backend unavailable($code)');
     } else {
-      Fluttertoast.showToast(msg: 'Unknown error (${response.reasonPhrase}, $code)');
+      Fluttertoast.showToast(
+          msg: 'Unknown error (${response.reasonPhrase}, $code)',);
     }
     return false;
   }).onError((error, stackTrace) {

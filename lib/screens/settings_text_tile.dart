@@ -13,7 +13,9 @@ class MyTextDialog extends StatefulWidget {
   final bool? Function(String?)? onSave;
   final bool saveButton;
   final bool cancelButton;
-  @Deprecated('Unable to specify button order, especially when using save/cancel') final List<Widget> extraActions;
+  @Deprecated(
+      'Unable to specify button order, especially when using save/cancel',)
+  final List<Widget> extraActions;
 
   const MyTextDialog({
     required this.title,
@@ -101,7 +103,8 @@ class _MyTextDialogState extends State<MyTextDialog> {
             onPressed: () {
               //if (_textEditingController.text.isNotEmpty) {
               if (_formKey.currentState!.validate()) {
-                if (!(widget.onSave?.call(_textEditingController.text) == false)) {
+                if (!(widget.onSave?.call(_textEditingController.text) ==
+                    false)) {
                   Navigator.of(context).pop();
                 }
 
@@ -131,8 +134,10 @@ SettingsTile createTextSettingsTile({
   bool valueAsDescription = false,
   String? Function(String?)? validator,
   // return false to keep the menu open
-  bool? Function(String?)? onSave,  
-  @Deprecated('Unable to specify button order, especially when using save/cancel') List<Widget> extraActions = const <Widget>[],
+  bool? Function(String?)? onSave,
+  @Deprecated(
+      'Unable to specify button order, especially when using save/cancel',)
+  List<Widget> extraActions = const <Widget>[],
   bool saveButton = true,
   bool cancelButton = true,
 }) {

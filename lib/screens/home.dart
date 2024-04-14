@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:app_tutorial/app_tutorial.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -56,7 +55,8 @@ class _MyHomePageState extends State<MyHomePage> {
   //}
 
   Future<void> uploadImage() async {
-    final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final returnedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     //final returnedImage = await FilePicker.platform.pickFiles(
     //  type: FileType.custom,
     //  allowedExtensions: ['jpg', 'jpeg', 'png'],
@@ -68,10 +68,10 @@ class _MyHomePageState extends State<MyHomePage> {
     //Provider.of<PreferencesProvider>(context).createListOrAdd(recentsListPrefKey, [returnedImage.path]);
     setState(() {
       //Provider.of<PreferencesProvider>(context, listen: false)
-          //.createListOrAdd(recentsListPrefKey, [result.paths.first!]);
+      //.createListOrAdd(recentsListPrefKey, [result.paths.first!]);
 
       Provider.of<PreferencesProvider>(context, listen: false)
-        .createListOrAdd(recentsListPrefKey, [returnedImage.path]);
+          .createListOrAdd(recentsListPrefKey, [returnedImage.path]);
     });
   }
 
@@ -187,7 +187,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                           child: Image.file(
                                             File(path),
                                             width: 150,
-                                            cacheWidth: (150 * devicePixelRatio).round(),
+                                            cacheWidth: (150 * devicePixelRatio)
+                                                .round(),
                                           ),
                                         ),
                                       ),
@@ -206,7 +207,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                       const Spacer(),
                                     ],
                                   ),
-                                  onTap: () => navigateToEditor(context, imagePath: path, quietSuccess: true),
+                                  onTap: () => navigateToEditor(context,
+                                      imagePath: path, quietSuccess: true,),
                                 );
                               })
                               .toList(),
@@ -260,7 +262,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           const SizedBox(width: 50.0),
-          // Prepare a capture to upload 
+          // Prepare a capture to upload
           SizedBox(
             width: 100.0,
             height: 100.0,

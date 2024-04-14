@@ -7,13 +7,11 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/api_access.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
-import 'package:senior_project_hair_ai/string_ext.dart';
 
 // TODO
 //  this class will render the queued work and awaiting tasks being processed on the server
@@ -84,7 +82,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
   @override
   Widget build(BuildContext context) {
     final prefs = Provider.of<PreferencesProvider>(context, listen: false);
-    final cachedWorkIDList = prefs.get<List<String>>(apiCachedWorkIDListPrefKey)!;
+    final cachedWorkIDList =
+        prefs.get<List<String>>(apiCachedWorkIDListPrefKey)!;
 
     final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
 
@@ -112,8 +111,10 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                             child: CachedNetworkImage(
                               imageUrl: bapiGeneratedUrl(host, workID),
                               memCacheWidth: (100 * devicePixelRatio).round(),
-                              progressIndicatorBuilder: (context, url, progress) =>
-                                  CircularProgressIndicator(value: progress.progress),
+                              progressIndicatorBuilder:
+                                  (context, url, progress) =>
+                                      CircularProgressIndicator(
+                                          value: progress.progress,),
                               errorWidget: (context, url, error) {
                                 // TODO on-click, refresh to re-query server
                                 return const Icon(Icons.error);
@@ -143,7 +144,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                               case WorkPopupItems.save:
                                 // trigger save?
                                 final cache = DefaultCacheManager();
-                                final file = await cache.getFileFromCache(bapiGeneratedUrl(host, workID));
+                                final file = await cache.getFileFromCache(
+                                    bapiGeneratedUrl(host, workID),);
 
                                 //var filePath = file. path.join(documentDirectory.path, 'image.jpg');
                                 //File file = File(filePath);
@@ -152,11 +154,15 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                 if (file != null) {
                                   final params = SaveFileDialogParams(
                                       sourceFilePath: file.file.path,
-                                  fileName: workID + path.extension(file.file.basename));
-                                  final filePath = await FlutterFileDialog.saveFile(params: params);
+                                      fileName: workID +
+                                          path.extension(file.file.basename),);
+                                  final filePath =
+                                      await FlutterFileDialog.saveFile(
+                                          params: params,);
 
-
-                                  Fluttertoast.showToast(msg: 'Saved in directory $filePath', toastLength: Toast.LENGTH_LONG);
+                                  Fluttertoast.showToast(
+                                      msg: 'Saved in directory $filePath',
+                                      toastLength: Toast.LENGTH_LONG,);
 
                                   //final documentDirectory = await getApplicationDocumentsDirectory();
                                   //final documentPath = documentDirectory.path;
@@ -169,11 +175,12 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                   //.onError((error, stackTrace) => Fluttertoast.showToast(msg: 'Error saving file $error', toastLength: Toast.LENGTH_LONG));
                                 }
 
-                                // for now user can just copy url regardless
+                              // for now user can just copy url regardless
                               case WorkPopupItems.copyFileName:
                                 await Clipboard.setData(
                                   ClipboardData(
-                                    text: workID, // bapiGeneratedUrl(host, cachedImageWorkName),
+                                    text:
+                                        workID, // bapiGeneratedUrl(host, cachedImageWorkName),
                                   ),
                                 );
                                 Fluttertoast.showToast(msg: 'Copied filename');
@@ -184,14 +191,16 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                     text: bapiGeneratedUrl(host, workID),
                                   ),
                                 );
-                                Fluttertoast.showToast(msg: 'Copied generated url');
+                                Fluttertoast.showToast(
+                                    msg: 'Copied generated url',);
                                 log('clicked on queued work');
                             }
                             setState(() {
                               selectedItem = item;
                             });
                           },
-                          itemBuilder: (BuildContext context) => <PopupMenuEntry<WorkPopupItems>>[
+                          itemBuilder: (BuildContext context) =>
+                              <PopupMenuEntry<WorkPopupItems>>[
                             const PopupMenuItem<WorkPopupItems>(
                               value: WorkPopupItems.save,
                               child: Text('Save'),
@@ -231,11 +240,10 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                       //  button to copy work file name
                       //  button to copy /generated url for work file
                       // a GestureDetector to the side that refreshes
-    
+
                       // some kind of pop-up
-                      // 
-                      
-    
+                      //
+
                       //if (workIDStatuses.containsKey(workID) &&
                       //    workIDStatuses[workID] == 'Finished') {
                       //  // Show cached result
@@ -252,14 +260,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                       //}
                     },
                   );
-
-
                 }).toList(),
               ),
-
-
-
-
 
               // garbo...
               /*
