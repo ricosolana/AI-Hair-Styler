@@ -133,61 +133,35 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                         //const Spacer(),
                         Expanded(
                           flex: 2,
-                          child: FutureBuilder<TaskStatus>(
-                            future: _checkBarberStatus(workID),
-                            builder: (BuildContext context, AsyncSnapshot snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                // somewhat unexpected for the API to not respond
-                                return Icon(MdiIcons.serverOff);
-                              } else {
-                                final dat = snapshot.data as TaskStatus;
-                                if (dat == TaskStatus.complete) {
-                                  //switch (dat) {
-                                  //  case TaskStatus.queued:
-                                  //  case TaskStatus.faceAlign:
-                                  //  case TaskStatus.embedding:
-                                  //  case TaskStatus.maskStep:
-                                  //  case TaskStatus.alignStep:
-                                  //  case TaskStatus.blend:
-                                  //  case TaskStatus.complete:
-                                  //  case TaskStatus.errorFaceAlign: // image is too squished or no face detected (file never saved)
-                                  //  case TaskStatus.errorUnknown:
-                                  //  case TaskStatus.processing: // being crunched by barber (when we cannot track stdout)
-                                  //  case TaskStatus.cancelled:
-                                  //}
-
-                                  return Center(
-                                    child: CachedNetworkImage(
-                                      imageUrl: bapiGeneratedUrl(host, workID),
-                                      memCacheWidth: (100 * devicePixelRatio)
-                                          .round(),
-                                      progressIndicatorBuilder:
-                                          (context, url, progress) =>
-                                          CircularProgressIndicator(
-                                            value: progress.progress,),
-                                      errorWidget: (context, url, error) {
-                                        // TODO on-click, refresh to re-query server
-
-
-                                        return const Icon(Icons.error);
-                                      },
-                                    ),
-                                    //child: Image.file(
-                                    //  File(path),
-                                    //  width: 100,
-                                    //),
-                                  );
-                                } else {
-
-                                  return Center(
-                                    child: Text(dat.name),
-                                  );
-
-                                }
-                              }
-                            },
+                          child: Center(
+                            child: CachedNetworkImage(
+                              imageUrl: bapiGeneratedUrl(host, workID),
+                              memCacheWidth: (100 * devicePixelRatio)
+                                  .round(),
+                              progressIndicatorBuilder:
+                                  (context, url, progress) =>
+                                  CircularProgressIndicator(
+                                    value: progress.progress,),
+                              errorWidget: (context, url, error) {
+                                // TODO show status/progress
+                                return FutureBuilder<TaskStatus>(
+                                  future: _checkBarberStatus(workID),
+                                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                    if (snapshot.connectionState == ConnectionState.waiting) {
+                                      return const CircularProgressIndicator();
+                                    } else if (snapshot.hasError) {
+                                      // somewhat unexpected for the API to not respond
+                                      return Icon(MdiIcons.serverOff);
+                                    } else {
+                                      final status = snapshot.data as TaskStatus;
+                                      return Center(
+                                        child: Text(status.name),
+                                      );
+                                    }
+                                  },
+                                );
+                              },
+                            ),
                           ),
                         ),
                         Expanded(
