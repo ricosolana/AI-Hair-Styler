@@ -143,6 +143,33 @@ Future<http.Response> bapiApiTemplatesList(
   return bapiGet(host, path: '/api/templates/list');
 }
 
+Future<http.Response> bapiApiBarberStatus(
+  {
+    required String host,
+    required String accessToken,
+    required String workID,
+  }
+) async {
+  final rootUri = Uri.parse(host);
+
+  final uri = Uri(
+    scheme: rootUri.scheme, //'http',
+    host: rootUri.host, // host,
+    port: rootUri.port,
+    path: '/api/status',
+    queryParameters: {
+      'work-id': workID,
+    },
+  );
+
+  final request = http.Request('GET', uri)
+    ..headers['Authorization'] = 'Bearer $accessToken';
+
+  final responseStream =
+      await request.send().timeout(const Duration(seconds: timeout));
+  return http.Response.fromStream(responseStream);
+}
+
 String bapiUrl(
   String host,
   String path,

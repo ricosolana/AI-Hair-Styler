@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -34,6 +35,20 @@ const String apiCachedWorkIDListPrefKey = 'api-cached-work-list';
 class MyQueuedWorkPage extends StatefulWidget {
   @override
   _MyQueuedWorkPageState createState() => _MyQueuedWorkPageState();
+}
+
+enum TaskStatus {
+  queued,
+  faceAlign,
+  embedding,
+  maskStep,
+  alignStep,
+  blend,
+  complete,
+  errorFaceAlign, // image is too squished or no face detected (file never saved)
+  errorUnknown,
+  processing, // being crunched by barber (when we cannot track stdout)
+  cancelled,
 }
 
 class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
@@ -79,6 +94,17 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
     }
   }*/
 
+  Future<TaskStatus> _checkBarberStatus(String workID) async {
+    final prefs = Provider.of<PreferencesProvider>(context, listen: false);
+    final host = prefs.get<String>(apiHostPrefKey)!;
+    final accessToken = prefs.get<String>(apiTokenPrefKey)!;
+    final response = await bapiApiBarberStatus(host: host, accessToken: accessToken, workID: workID);
+
+    final obj = jsonDecode(response.body);
+    final statusValue = obj['status-value'] as int;
+    return TaskStatus.values[statusValue];
+  }
+
   @override
   Widget build(BuildContext context) {
     final prefs = Provider.of<PreferencesProvider>(context, listen: false);
@@ -107,23 +133,61 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                         //const Spacer(),
                         Expanded(
                           flex: 2,
-                          child: Center(
-                            child: CachedNetworkImage(
-                              imageUrl: bapiGeneratedUrl(host, workID),
-                              memCacheWidth: (100 * devicePixelRatio).round(),
-                              progressIndicatorBuilder:
-                                  (context, url, progress) =>
-                                      CircularProgressIndicator(
-                                          value: progress.progress,),
-                              errorWidget: (context, url, error) {
-                                // TODO on-click, refresh to re-query server
-                                return const Icon(Icons.error);
-                              },
-                            ),
-                            //child: Image.file(
-                            //  File(path),
-                            //  width: 100,
-                            //),
+                          child: FutureBuilder<TaskStatus>(
+                            future: _checkBarberStatus(workID),
+                            builder: (BuildContext context, AsyncSnapshot snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                // somewhat unexpected for the API to not respond
+                                return Icon(MdiIcons.serverOff);
+                              } else {
+                                final dat = snapshot.data as TaskStatus;
+                                if (dat == TaskStatus.complete) {
+                                  //switch (dat) {
+                                  //  case TaskStatus.queued:
+                                  //  case TaskStatus.faceAlign:
+                                  //  case TaskStatus.embedding:
+                                  //  case TaskStatus.maskStep:
+                                  //  case TaskStatus.alignStep:
+                                  //  case TaskStatus.blend:
+                                  //  case TaskStatus.complete:
+                                  //  case TaskStatus.errorFaceAlign: // image is too squished or no face detected (file never saved)
+                                  //  case TaskStatus.errorUnknown:
+                                  //  case TaskStatus.processing: // being crunched by barber (when we cannot track stdout)
+                                  //  case TaskStatus.cancelled:
+                                  //}
+
+                                  return Center(
+                                    child: CachedNetworkImage(
+                                      imageUrl: bapiGeneratedUrl(host, workID),
+                                      memCacheWidth: (100 * devicePixelRatio)
+                                          .round(),
+                                      progressIndicatorBuilder:
+                                          (context, url, progress) =>
+                                          CircularProgressIndicator(
+                                            value: progress.progress,),
+                                      errorWidget: (context, url, error) {
+                                        // TODO on-click, refresh to re-query server
+
+
+                                        return const Icon(Icons.error);
+                                      },
+                                    ),
+                                    //child: Image.file(
+                                    //  File(path),
+                                    //  width: 100,
+                                    //),
+                                  );
+                                } else {
+
+                                  return Center(
+                                    child: Text(dat.name),
+                                  );
+
+                                }
+                              }
+                            },
                           ),
                         ),
                         Expanded(
@@ -147,10 +211,6 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                 final file = await cache.getFileFromCache(
                                     bapiGeneratedUrl(host, workID),);
 
-                                //var filePath = file. path.join(documentDirectory.path, 'image.jpg');
-                                //File file = File(filePath);
-                                //file.writeAsBytesSync(response.bodyBytes);
-
                                 if (file != null) {
                                   final params = SaveFileDialogParams(
                                       sourceFilePath: file.file.path,
@@ -161,30 +221,17 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                           params: params,);
 
                                   Fluttertoast.showToast(
-                                      msg: 'Saved in directory $filePath',
+                                      msg: 'Saved to directory $filePath',
                                       toastLength: Toast.LENGTH_LONG,);
-
-                                  //final documentDirectory = await getApplicationDocumentsDirectory();
-                                  //final documentPath = documentDirectory.path;
-                                  //file.file.copy(
-                                  //  path.join(
-                                  //      documentPath,
-                                  //    workID + path.extension(file.file.basename)
-                                  //  )
-                                  //).then((value) => Fluttertoast.showToast(msg: 'Saved to $documentDirectory'))
-                                  //.onError((error, stackTrace) => Fluttertoast.showToast(msg: 'Error saving file $error', toastLength: Toast.LENGTH_LONG));
                                 }
 
-                              // for now user can just copy url regardless
                               case WorkPopupItems.copyFileName:
                                 await Clipboard.setData(
                                   ClipboardData(
-                                    text:
-                                        workID, // bapiGeneratedUrl(host, cachedImageWorkName),
+                                    text: workID,
                                   ),
                                 );
                                 Fluttertoast.showToast(msg: 'Copied filename');
-                                log('clicked on queued work');
                               case WorkPopupItems.copyUrl:
                                 await Clipboard.setData(
                                   ClipboardData(
@@ -193,7 +240,6 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                 );
                                 Fluttertoast.showToast(
                                     msg: 'Copied generated url',);
-                                log('clicked on queued work');
                             }
                             setState(() {
                               selectedItem = item;
