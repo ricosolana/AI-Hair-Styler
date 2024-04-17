@@ -201,10 +201,24 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                         alignment: Alignment.center,
                                         children: <Widget>[
                                           if (progress.currentTransformerPercentage != null)
-                                            CircularProgressIndicator(
-                                              value: progress.currentTransformerPercentage!.toDouble() / 100.0,
-                                              strokeWidth: 10,
+                                            TweenAnimationBuilder<double>(
+                                              // TODO check if tween bounds require [0,1]
+                                              //tween: Tween<double>(begin: 0, end: progress.),
+                                              tween: Tween<double>(begin: 0, end: progress.currentTransformerPercentage!.toDouble() / 100.0),
+                                              // TODO test
+                                              duration: const Duration(seconds: 1),
+                                              builder: (BuildContext context, double tweenValue, Widget? child) {
+                                                return CircularProgressIndicator(
+                                                  value: tweenValue,
+                                                  strokeWidth: 10,
+                                                );
+                                              },
+                                              child: const Icon(Icons.aspect_ratio),
                                             ),
+                                            //CircularProgressIndicator(
+                                            //  value: progress.currentTransformerPercentage!.toDouble() / 100.0,
+                                            //  strokeWidth: 10,
+                                            //),
                                           Center(
                                             child: Text(progress.status),
                                           ),
