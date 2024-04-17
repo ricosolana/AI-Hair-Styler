@@ -136,6 +136,17 @@ class _MyEditorPageState extends State<MyEditorPage> {
       ),
       body: ListView(
         children: <Widget>[
+
+          const SizedBox(height: 20),
+          const Text(
+            "Select an Image:",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 18.0,
+            ),
+          ),
+
           GestureDetector(
             onTap: () {
               showDialog(
@@ -184,11 +195,16 @@ class _MyEditorPageState extends State<MyEditorPage> {
           const SizedBox(height: 20),
           const Text(
             "Select Your Hairstyle:",
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 18.0,
             ),
           ),
+
+
+
+          /*
           Container(
             height: 260,
             decoration: BoxDecoration(
@@ -247,93 +263,189 @@ class _MyEditorPageState extends State<MyEditorPage> {
               ),
             ),
           ),
+           */
+
+
+
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              height: 260,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.deepPurple, // Border color
+                  width: 3, // Border width
+                ),
+                borderRadius: BorderRadius.circular(7), // Border radius
+              ),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: cachedTemplatesList.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          _styleSelector(index);
+                        },
+                        child: ListenableBuilder(
+                          listenable: _selectedStyleIndexNotifiers[index],
+                          builder: (context, child) {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                decoration: _selectedStyleIndex == index
+                                    ? BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.deepOrangeAccent,
+                                    width: 4,
+                                  ),
+                                )
+                                    : null,
+                                child: CachedNetworkImage(
+                                  imageUrl: bapiTemplatesUrl(
+                                    prefs.get<String>(apiHostPrefKey)!,
+                                    cachedTemplatesList[index],
+                                  ),
+                                  memCacheWidth: (100 * devicePixelRatio).round(),
+                                  progressIndicatorBuilder:
+                                      (context, url, progress) =>
+                                      CircularProgressIndicator(
+                                        value: progress.progress,
+                                      ),
+                                  errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
+                                ),
+                              ),
+                            );
+                          },),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+
+
           const SizedBox(
             height: 20,
           ),
           const Text(
             "Select Your Hair Color:",
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 18.0,
             ),
           ),
-          Container(
-            height: 260,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.deepPurple, // Border color
-                width: 3, // Border width
-              ),
-              borderRadius: BorderRadius.circular(7), // Border radius
-            ),
-            child: SingleChildScrollView(
-              child: GridView.builder(
-                shrinkWrap: true,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              height: 260,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.deepPurple, // Border color
+                  width: 3, // Border width
                 ),
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: cachedTemplatesList.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      _colorSelector(index);
-                    },
-                    child: ListenableBuilder(
-                        listenable: _selectedColorIndexNotifiers[
-                            index], // _selectedStyleIndex,
-                        builder: (context, child) {
-                          return Container(
-                            decoration: _selectedColorIndex == index
-                                ? BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.deepOrangeAccent,
-                                      width: 4,
+                borderRadius: BorderRadius.circular(7), // Border radius
+              ),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: cachedTemplatesList.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          _colorSelector(index);
+                        },
+                        child: ListenableBuilder(
+                            listenable: _selectedColorIndexNotifiers[
+                                index], // _selectedStyleIndex,
+                            builder: (context, child) {
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Container(
+                                  decoration: _selectedColorIndex == index
+                                      ? BoxDecoration(
+                                          border: Border.all(
+                                            color: Colors.deepOrangeAccent,
+                                            width: 4,
+                                          ),
+                                        )
+                                      : null,
+                                  child: CachedNetworkImage(
+                                    imageUrl: bapiTemplatesUrl(
+                                      prefs.get<String>(apiHostPrefKey)!,
+                                      cachedTemplatesList[index],
                                     ),
-                                  )
-                                : null,
-                            child: CachedNetworkImage(
-                              imageUrl: bapiTemplatesUrl(
-                                prefs.get<String>(apiHostPrefKey)!,
-                                cachedTemplatesList[index],
-                              ),
-                              memCacheWidth: (100 * devicePixelRatio).round(),
-                              progressIndicatorBuilder:
-                                  (context, url, progress) =>
-                                      CircularProgressIndicator(
-                                value: progress.progress,
-                              ),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error),
-                            ),
-                          );
-                        },),
-                  );
-                },
+                                    memCacheWidth: (100 * devicePixelRatio).round(),
+                                    progressIndicatorBuilder:
+                                        (context, url, progress) =>
+                                            CircularProgressIndicator(
+                                      value: progress.progress,
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  ),
+                                ),
+                              );
+                            },),
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            "Determine the quality (the higher the quality the longer the compute time):",
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 18.0,
+          const Align(
+            alignment: Alignment.center,
+            child: Text(
+              textAlign: TextAlign.center,
+              "Determine the quality (the higher the quality the longer the compute time):",
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 18.0,
+              ),
             ),
           ),
           ValueListenableBuilder(
             valueListenable: _qualityValueNotifier,
-            builder: (context, value, child) => Slider(
-              max: 100,
-              divisions: 100,
-              value: _qualityValueNotifier.value,
-              label:
-                  '${_qualityValueNotifier.value.toStringAsFixed(1)}%', // '${_qualityValue.toInt()}%',
-              onChanged: (value) {
-                _qualityValueNotifier.value = value;
-              },
+            // TODO (actually for everything)
+            //  make everything dynamically positioned for different devices
+            //  since this apparently is statically positioned, might be cut
+            //  off or weirdly sized depending on the device
+            builder: (context, value, child) => Center(
+              child: SizedBox(
+                width: 350,
+                child: Slider(
+                  max: 100,
+                  divisions: 100,
+                  value: _qualityValueNotifier.value,
+                  label:
+                      '${_qualityValueNotifier.value.toStringAsFixed(1)}%', // '${_qualityValue.toInt()}%',
+                  onChanged: (value) {
+                    _qualityValueNotifier.value = value;
+                  },
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 20),
