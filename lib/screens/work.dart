@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:path/path.dart' as path;
@@ -58,6 +59,7 @@ class TaskProgress {
   //late TaskStatus status; //': task.status.name,
   late String status;
   //'status-value': task.status.value,
+  int? currentTransformerPercentage;
   late double timeQueued;
   late double timeAlignStarted;
   late double timeBarberStarted;
@@ -71,6 +73,7 @@ class TaskProgress {
     //status = TaskStatus.values.byName((json['status'] as String).toLowerCase().);
     //status = TaskStatus.values[json['status-value'] as int];
     status = json['status-label'] as String;
+    currentTransformerPercentage = json['current-transformer-percentage'];
     timeQueued = json['time-queued'].toDouble();
     timeAlignStarted = json['time-align-started'].toDouble();
     timeBarberStarted = json['time-barber-started'].toDouble();
@@ -192,8 +195,20 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                       return Icon(MdiIcons.serverOff);
                                     } else {
                                       final progress = snapshot.data as TaskProgress;
-                                      return Center(
-                                        child: Text(progress.status),
+                                      // TODO include predictive / reconciliation loading...
+
+                                      return Stack(
+                                        alignment: Alignment.center,
+                                        children: <Widget>[
+                                          if (progress.currentTransformerPercentage != null)
+                                            CircularProgressIndicator(
+                                              value: progress.currentTransformerPercentage!.toDouble() / 100.0,
+                                              strokeWidth: 10,
+                                            ),
+                                          Center(
+                                            child: Text(progress.status),
+                                          ),
+                                        ],
                                       );
                                     }
                                   },
