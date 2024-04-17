@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -6,6 +7,41 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 const int timeout = 5;
+
+class TaskProgress {
+  //late TaskStatus status; //': task.status.name,
+  late String status;
+  //'status-value': task.status.value,
+  int? currentTransformerPercentage;
+  late double timeQueued;
+  late double timeAlignStarted;
+  late double timeBarberStarted;
+  //#'time-barber-started': task.time_barber_started(),
+  late double timeBarberEnded;
+  late double initialBarberDurationEstimate;
+  //#'initial-barber-duration-estimate': task.initial_barber_duration_estimate(),
+  late double durationBarber;
+  //late double estimateTimeBarberEnded;
+
+  TaskProgress.fromJson(Map<String, dynamic> json) {
+    //status = TaskStatus.values.byName((json['status'] as String).toLowerCase().);
+    //status = TaskStatus.values[json['status-value'] as int];
+    status = json['status-label'] as String;
+    currentTransformerPercentage = json['current-transformer-percentage'];
+    timeQueued = json['time-queued'].toDouble();
+    timeAlignStarted = json['time-align-started'].toDouble();
+    timeBarberStarted = json['time-barber-started'].toDouble();
+    timeBarberEnded = json['time-barber-ended'].toDouble();
+    initialBarberDurationEstimate = json['initial-barber-duration-estimate'].toDouble();
+    durationBarber = json['duration-barber'].toDouble();
+  }
+}
+
+Future<TaskProgress> getBarberStatus(String host, String accessToken, String workID) async {
+  final response = await bapiApiBarberStatus(host: host, accessToken: accessToken, workID: workID);
+  final json = jsonDecode(response.body) as Map<String, dynamic>;
+  return TaskProgress.fromJson(json);
+}
 
 Future<http.Response> bapiApiBarberPost(
     {required String host,

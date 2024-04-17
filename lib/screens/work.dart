@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
@@ -15,16 +16,6 @@ import 'package:senior_project_hair_ai/api_access.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 
-// TODO
-//  this class will render the queued work and awaiting tasks being processed on the server
-//
-
-// TODO clicking on any work will bring up a little menu
-//  button to save the completed work to disk
-//  button to copy work file name
-//  button to copy /generated url for work file
-// a GestureDetector to the side that refreshes
-
 enum WorkPopupItems {
   save,
   copyFileName,
@@ -38,48 +29,10 @@ class MyQueuedWorkPage extends StatefulWidget {
   _MyQueuedWorkPageState createState() => _MyQueuedWorkPageState();
 }
 
-/*
-enum TaskStatus {
-  queued,
-  faceAlign,
-  embedding,
-  maskStep,
-  alignStep,
-  blend,
-  complete,
-  errorFaceAlign, // image is too squished or no face detected (file never saved)
-  errorUnknown,
-  errorFatal,
-  processing, // being crunched by barber (when we cannot track stdout)
-  cancelled,
-}
-*/
-
-class TaskProgress {
-  //late TaskStatus status; //': task.status.name,
-  late String status;
-  //'status-value': task.status.value,
-  int? currentTransformerPercentage;
-  late double timeQueued;
-  late double timeAlignStarted;
-  late double timeBarberStarted;
-  //#'time-barber-started': task.time_barber_started(),
-  late double timeBarberEnded;
-  late double initialBarberDurationEstimate;
-  //#'initial-barber-duration-estimate': task.initial_barber_duration_estimate(),
-  late double durationBarber;
-
-  TaskProgress.fromJson(Map<String, dynamic> json) {
-    //status = TaskStatus.values.byName((json['status'] as String).toLowerCase().);
-    //status = TaskStatus.values[json['status-value'] as int];
-    status = json['status-label'] as String;
-    currentTransformerPercentage = json['current-transformer-percentage'];
-    timeQueued = json['time-queued'].toDouble();
-    timeAlignStarted = json['time-align-started'].toDouble();
-    timeBarberStarted = json['time-barber-started'].toDouble();
-    timeBarberEnded = json['time-barber-ended'].toDouble();
-    initialBarberDurationEstimate = json['initial-barber-duration-estimate'].toDouble();
-    durationBarber = json['duration-barber'].toDouble();
+// TODO for dynamic progress bars
+class WorkItemModel with ChangeNotifier {
+  void update() {
+    notifyListeners();
   }
 }
 
@@ -87,61 +40,88 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
   //List<String> workIDs = [];
   //Map<String, String> workIDStatuses = {};
 
+
+
   WorkPopupItems? selectedItem;
+  late List<WorkItemModel> _refreshNotifiers;
+  late StreamController<TaskProgress> _controller;
+  //late Timer _timer;
 
   @override
   void initState() {
     super.initState();
-    //fetchWorkIDs();
-  }
 
-  //Future<void> fetchWorkIDs() async {
-  //  final response = await http.get(Uri.parse('YOUR_SERVER_URL_HERE'));
-  //  if (response.statusCode == 200) {
-  //    setState(() {
-  //      //workIDs = List<String>.from(jsonDecode(response.body));
-  //    });
-  //  } else {
-  //    throw Exception('Failed to load work IDs');
-  //  }
-  //}
-
-  /*
-  Future<void> updateWorkIDStatus(String workID) async {
     final prefs = Provider.of<PreferencesProvider>(context, listen: false);
 
-    bapiGeneratedUrl(prefs.get(apiHostPrefKey)!, workID);
+    // Refresh sub
+    //_timer = Timer.periodic(const Duration(seconds: 3), (Timer t) {});
+    _controller = StreamController<TaskProgress>(
+      onListen: () async {
+        //  TODO eventually read individual hosts based on file
+        final host = prefs.get<String>(apiHostPrefKey)!;
+        final accessToken = prefs.get<String>(apiTokenPrefKey)!;
+        // TODO whether this close gets called on widget dispose
+        while (!_controller.isClosed) {
+          //final prefs = Provider.of<PreferencesProvider>(context, listen: false);
+          // just add the
+          //
+          await Future.delayed(const Duration(seconds: 1));
+          await getBarberStatus(host, accessToken, workID)
+              .then((value) => controller.add(value))
+              .onError((error, stackTrace) => controller.close());
+          //controller.add(await getBarberStatus(host, accessToken, workID));
+        }
+        await controller.close();
+      },
+    );
+  }
 
-    final response = await http.get(Uri.parse('YOUR_SERVER_URL_HERE/$workID'));
+  @override
+  void dispose() {
+    //_timer.cancel(); // Cancel the timer when the widget is disposed to avoid memory leaks
+    super.dispose();
+  }
 
-    if (response.statusCode == 200) {
-      setState(() {
-        //workIDStatuses[workID] = jsonDecode(response.body)['status'];
-        workIDStatuses[workID] = 'Success?';
-      });
-    } else if (response.statusCode == 404) {
-      // likely not ready yet
-    } else {
-      throw Exception('Failed to update work ID status');
-    }
-  }*/
-
-  //Future<Map<String, dynamic>> _checkBarberStatus(String workID) async {
-  //Future<TaskStatus> _checkBarberStatus(String workID) async {
   Future<TaskProgress> _checkBarberStatus(String workID) async {
     final prefs = Provider.of<PreferencesProvider>(context, listen: false);
     final host = prefs.get<String>(apiHostPrefKey)!;
     final accessToken = prefs.get<String>(apiTokenPrefKey)!;
-    final response = await bapiApiBarberStatus(host: host, accessToken: accessToken, workID: workID);
 
-    final json = jsonDecode(response.body) as Map<String, dynamic>;
-
-    return TaskProgress.fromJson(json);
-
-    //final statusValue = obj['status-value'] as int;
-    //return TaskStatus.values[statusValue];
-    //return statusValue;
+    return getBarberStatus(host, accessToken, workID);
   }
+
+
+
+  //  are prefs even passable
+  //  what will stream pass through to streambuilder
+  //    wrap deserialized TaskStatus'
+  final Stream<TaskProgress> _stream = ((PreferencesProvider prefs, String workID) {
+  // TODO the plan here would be to pass required params
+  //final Stream<TaskProgress> _stream = ((String host, String accessToken, String workID) {
+    late final StreamController<TaskProgress> controller;
+    controller = StreamController<TaskProgress>(
+      onListen: () async {
+        //  TODO eventually read individual hosts based on file
+        final host = prefs.get<String>(apiHostPrefKey)!;
+        final accessToken = prefs.get<String>(apiTokenPrefKey)!;
+        // TODO whether this close gets called on widget dispose
+        while (!controller.isClosed) {
+          //final prefs = Provider.of<PreferencesProvider>(context, listen: false);
+          // just add the
+          //
+          await Future.delayed(const Duration(seconds: 1));
+          await getBarberStatus(host, accessToken, workID)
+              .then((value) => controller.add(value))
+              .onError((error, stackTrace) => controller.close());
+          //controller.add(await getBarberStatus(host, accessToken, workID));
+        }
+        await controller.close();
+      },
+    );
+    return controller.stream;
+  })();
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -185,9 +165,9 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                               },
                               errorWidget: (context, url, error) {
                                 // TODO show status/progress
-                                return FutureBuilder<TaskProgress>(
-                                  future: _checkBarberStatus(workID),
-                                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                return StreamBuilder<TaskProgress>(
+                                  stream: _checkBarberStatus(workID),
+                                  builder: (context, snapshot) {
                                     if (snapshot.connectionState == ConnectionState.waiting) {
                                       return const CircularProgressIndicator();
                                     } else if (snapshot.hasError) {
@@ -201,6 +181,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                         alignment: Alignment.center,
                                         children: <Widget>[
                                           if (progress.currentTransformerPercentage != null)
+
                                             TweenAnimationBuilder<double>(
                                               // TODO check if tween bounds require [0,1]
                                               //tween: Tween<double>(begin: 0, end: progress.),
