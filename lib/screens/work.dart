@@ -37,6 +37,7 @@ class MyQueuedWorkPage extends StatefulWidget {
   _MyQueuedWorkPageState createState() => _MyQueuedWorkPageState();
 }
 
+/*
 enum TaskStatus {
   queued,
   faceAlign,
@@ -47,8 +48,36 @@ enum TaskStatus {
   complete,
   errorFaceAlign, // image is too squished or no face detected (file never saved)
   errorUnknown,
+  errorFatal,
   processing, // being crunched by barber (when we cannot track stdout)
   cancelled,
+}
+*/
+
+class TaskProgress {
+  //late TaskStatus status; //': task.status.name,
+  late String status;
+  //'status-value': task.status.value,
+  late double timeQueued;
+  late double timeAlignStarted;
+  late double timeBarberStarted;
+  //#'time-barber-started': task.time_barber_started(),
+  late double timeBarberEnded;
+  late double initialBarberDurationEstimate;
+  //#'initial-barber-duration-estimate': task.initial_barber_duration_estimate(),
+  late double durationBarber;
+
+  TaskProgress.fromJson(Map<String, dynamic> json) {
+    //status = TaskStatus.values.byName((json['status'] as String).toLowerCase().);
+    //status = TaskStatus.values[json['status-value'] as int];
+    status = json['status-label'] as String;
+    timeQueued = json['time-queued'].toDouble();
+    timeAlignStarted = json['time-align-started'].toDouble();
+    timeBarberStarted = json['time-barber-started'].toDouble();
+    timeBarberEnded = json['time-barber-ended'].toDouble();
+    initialBarberDurationEstimate = json['initial-barber-duration-estimate'].toDouble();
+    durationBarber = json['duration-barber'].toDouble();
+  }
 }
 
 class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
@@ -94,15 +123,21 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
     }
   }*/
 
-  Future<TaskStatus> _checkBarberStatus(String workID) async {
+  //Future<Map<String, dynamic>> _checkBarberStatus(String workID) async {
+  //Future<TaskStatus> _checkBarberStatus(String workID) async {
+  Future<TaskProgress> _checkBarberStatus(String workID) async {
     final prefs = Provider.of<PreferencesProvider>(context, listen: false);
     final host = prefs.get<String>(apiHostPrefKey)!;
     final accessToken = prefs.get<String>(apiTokenPrefKey)!;
     final response = await bapiApiBarberStatus(host: host, accessToken: accessToken, workID: workID);
 
-    final obj = jsonDecode(response.body);
-    final statusValue = obj['status-value'] as int;
-    return TaskStatus.values[statusValue];
+    final json = jsonDecode(response.body) as Map<String, dynamic>;
+
+    return TaskProgress.fromJson(json);
+
+    //final statusValue = obj['status-value'] as int;
+    //return TaskStatus.values[statusValue];
+    //return statusValue;
   }
 
   @override
@@ -142,9 +177,12 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                   (context, url, progress) =>
                                   CircularProgressIndicator(
                                     value: progress.progress,),
+                              errorListener: (obj) {
+                                log(obj.toString());
+                              },
                               errorWidget: (context, url, error) {
                                 // TODO show status/progress
-                                return FutureBuilder<TaskStatus>(
+                                return FutureBuilder<TaskProgress>(
                                   future: _checkBarberStatus(workID),
                                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -153,9 +191,9 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                       // somewhat unexpected for the API to not respond
                                       return Icon(MdiIcons.serverOff);
                                     } else {
-                                      final status = snapshot.data as TaskStatus;
+                                      final progress = snapshot.data as TaskProgress;
                                       return Center(
-                                        child: Text(status.name),
+                                        child: Text(progress.status),
                                       );
                                     }
                                   },
