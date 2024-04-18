@@ -327,11 +327,41 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
             FloatingActionButton(
               heroTag: 'work-clear-fab',
               onPressed: () {
-                prefs.set(apiCachedWorkIDListPrefKey, <String>[]);
-                setState(() {
-                  // reset
-                  //this menu page should be stateless?
-                });
+                // first prompt
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Clear queue'),
+                        content: const Text(
+                            'Are you sure you want to clear the work queue? This action is irreversible.'
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              textStyle: Theme.of(context).textTheme.labelLarge,
+                            ),
+                            child: const Text('Clear all'),
+                            onPressed: () {
+                              prefs.set(apiCachedWorkIDListPrefKey, <String>[]);
+                              setState(() {});
+                              Navigator.of(context).pop();
+                              Fluttertoast.showToast(msg: 'Cleared work queue');
+                            },
+                          ),
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              textStyle: Theme.of(context).textTheme.labelLarge,
+                            ),
+                            child: const Text('Cancel'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    }
+                );
               },
               child: Icon(MdiIcons.trashCan),
             ),

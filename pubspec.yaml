@@ -58,6 +58,7 @@ dependencies:
   flutter_cache_manager: ^3.3.1
   flutter_file_dialog: ^3.0.2
   flutter_local_notifications: ^17.0.1
+  rename: ^3.0.2
 
 
 dev_dependencies:

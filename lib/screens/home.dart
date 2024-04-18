@@ -320,7 +320,7 @@ class _MyHomePageState extends State<MyHomePage> {
             const DrawerHeader(
               decoration: BoxDecoration(color: Colors.deepPurple),
               child: Text(
-                'AI Hair Styler',
+                'Hairch',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,

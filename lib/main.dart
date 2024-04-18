@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
       themeMode: prefs.getOr(darkThemePrefKey, false)
           ? ThemeMode.dark
           : ThemeMode.light, // use saved pref, not built-in
-      home: const MyHomePage(title: "Ai Hair Styler"),
+      home: const MyHomePage(title: "Hairch"),
     );
   }
 }
