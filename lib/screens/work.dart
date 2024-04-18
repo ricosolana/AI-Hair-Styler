@@ -43,9 +43,20 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
 
 
   WorkPopupItems? selectedItem;
-  late List<WorkItemModel> _refreshNotifiers;
-  late StreamController<TaskProgress> _controller;
+  //late List<WorkItemModel> _refreshNotifiers;
+  //late StreamController<TaskProgress> _controller;
   //late Timer _timer;
+
+  Stream<TaskProgress> fetchJobStatusPeriodically(String workID) {
+    return Stream.periodic(const Duration(seconds: 1), (count) async {
+      // Simulate fetching data from the server
+      // Replace this with your actual data fetching logic
+      return await _checkBarberStatus(workID);
+    }).asyncMap((event) async {
+      // Assuming _fetchJobStatusFromServer returns a Future<TaskProgress>
+      return await event;
+    });
+  }
 
   @override
   void initState() {
@@ -53,6 +64,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
 
     final prefs = Provider.of<PreferencesProvider>(context, listen: false);
 
+    /*
     // Refresh sub
     //_timer = Timer.periodic(const Duration(seconds: 3), (Timer t) {});
     _controller = StreamController<TaskProgress>(
@@ -73,7 +85,9 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
         }
         await controller.close();
       },
-    );
+    );*/
+
+
   }
 
   @override
@@ -91,7 +105,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
   }
 
 
-
+  /*
   //  are prefs even passable
   //  what will stream pass through to streambuilder
   //    wrap deserialized TaskStatus'
@@ -119,7 +133,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
       },
     );
     return controller.stream;
-  })();
+  })();*/
 
 
 
@@ -166,7 +180,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                               errorWidget: (context, url, error) {
                                 // TODO show status/progress
                                 return StreamBuilder<TaskProgress>(
-                                  stream: _checkBarberStatus(workID),
+                                  stream: fetchJobStatusPeriodically(workID),
                                   builder: (context, snapshot) {
                                     if (snapshot.connectionState == ConnectionState.waiting) {
                                       return const CircularProgressIndicator();
@@ -174,7 +188,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                       // somewhat unexpected for the API to not respond
                                       return Icon(MdiIcons.serverOff);
                                     } else {
-                                      final progress = snapshot.data as TaskProgress;
+                                      final progress = snapshot.data!;
                                       // TODO include predictive / reconciliation loading...
 
                                       return Stack(
