@@ -1,7 +1,9 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/camera_provider.dart';
+import 'package:senior_project_hair_ai/notifications.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
@@ -18,6 +20,12 @@ Future<void> main() async {
 
   final prefs =
       PreferencesProvider(prefs: await SharedPreferences.getInstance());
+
+
+
+  // init notifications plugin
+  await Notifications().init();
+
 
   // init defaults here
   prefs.getOrCreate(apiHostPrefKey, 'http://10.0.2.2/');
