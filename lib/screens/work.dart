@@ -491,36 +491,34 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
           ],
         ),
       ),
-      floatingActionButton: Row(
-        children: [
-          FloatingActionButton(
-            heroTag: 'work-clear-fab',
-            onPressed: () {
-              prefs.set(apiCachedWorkIDListPrefKey, <String>[]);
-              setState(() {
-                // reset
-                //this menu page should be stateless?
-              });
-            },
-            //foregroundColor: customizations[index].$1,
-            //backgroundColor: customizations[index].$2,
-            //shape: customizations[index].$3,
-            child: Icon(MdiIcons.trashCan),
-          ),
-          // Navigator.of(context).popUntil((route) => route.isFirst);
-          FloatingActionButton(
-            heroTag: 'work-refresh-fab',
-            onPressed: () {
-              setState(() {
-                //this menu page should be stateless?
-              });
-            },
-            //foregroundColor: customizations[index].$1,
-            //backgroundColor: customizations[index].$2,
-            //shape: customizations[index].$3,
-            child: const Icon(Icons.refresh),
-          ),
-        ],
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(right: 16.0), // Adjust the padding as needed
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end, // Aligns the FABs to the right
+          children: [
+            FloatingActionButton(
+              heroTag: 'work-clear-fab',
+              onPressed: () {
+                prefs.set(apiCachedWorkIDListPrefKey, <String>[]);
+                setState(() {
+                  // reset
+                  //this menu page should be stateless?
+                });
+              },
+              child: Icon(MdiIcons.trashCan),
+            ),
+            SizedBox(width: 10), // Adds some space between the FABs
+            FloatingActionButton(
+              heroTag: 'work-refresh-fab',
+              onPressed: () {
+                setState(() {
+                  //this menu page should be stateless?
+                });
+              },
+              child: const Icon(Icons.refresh),
+            ),
+          ],
+        ),
       ),
     );
   }
