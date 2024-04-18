@@ -71,14 +71,13 @@ class _MyHomePageState extends State<MyHomePage> {
       //.createListOrAdd(recentsListPrefKey, [result.paths.first!]);
 
       Provider.of<PreferencesProvider>(context, listen: false)
-          .createListOrAdd(recentsListPrefKey, [returnedImage.path]);
+          .appendOrDefault(recentsListPrefKey, [returnedImage.path]);
     });
   }
 
   void _tryStartTutorial() {
-    if (!(Provider.of<PreferencesProvider>(context, listen: false)
-            .get<bool>(tutorialCompletedPrefKey) ??
-        false)) {
+    if (!Provider.of<PreferencesProvider>(context, listen: false)
+        .ensure<bool>(tutorialCompletedPrefKey)) {
       _startTutorial();
     }
   }
@@ -174,7 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         return ListView(
                           padding: const EdgeInsets.only(bottom: 150),
                           children: prefs
-                              .getOrCreate(recentsListPrefKey, <String>[])
+                              .getOrDefault(recentsListPrefKey, <String>[])
                               .reversed
                               .map((path) {
                                 return ListTile(

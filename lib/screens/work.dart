@@ -59,31 +59,6 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
   @override
   void initState() {
     super.initState();
-
-    final prefs = Provider.of<PreferencesProvider>(context, listen: false);
-
-    /*
-    // Refresh sub
-    //_timer = Timer.periodic(const Duration(seconds: 3), (Timer t) {});
-    _controller = StreamController<TaskProgress>(
-      onListen: () async {
-        //  TODO eventually read individual hosts based on file
-        final host = prefs.get<String>(apiHostPrefKey)!;
-        final accessToken = prefs.get<String>(apiTokenPrefKey)!;
-        // TODO whether this close gets called on widget dispose
-        while (!_controller.isClosed) {
-          //final prefs = Provider.of<PreferencesProvider>(context, listen: false);
-          // just add the
-          //
-          await Future.delayed(const Duration(seconds: 1));
-          await getBarberStatus(host, accessToken, workID)
-              .then((value) => controller.add(value))
-              .onError((error, stackTrace) => controller.close());
-          //controller.add(await getBarberStatus(host, accessToken, workID));
-        }
-        await controller.close();
-      },
-    );*/
   }
 
   @override
@@ -94,47 +69,17 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
 
   Future<TaskProgress> _checkBarberStatus(String workID) async {
     final prefs = Provider.of<PreferencesProvider>(context, listen: false);
-    final host = prefs.get<String>(apiHostPrefKey)!;
-    final accessToken = prefs.get<String>(apiTokenPrefKey)!;
+    final host = prefs.ensure<String>(apiHostPrefKey);
+    final accessToken = prefs.ensure<String>(apiTokenPrefKey);
 
     return getBarberStatus(host, accessToken, workID);
   }
-
-  /*
-  //  are prefs even passable
-  //  what will stream pass through to streambuilder
-  //    wrap deserialized TaskStatus'
-  final Stream<TaskProgress> _stream = ((PreferencesProvider prefs, String workID) {
-  // TODO the plan here would be to pass required params
-  //final Stream<TaskProgress> _stream = ((String host, String accessToken, String workID) {
-    late final StreamController<TaskProgress> controller;
-    controller = StreamController<TaskProgress>(
-      onListen: () async {
-        //  TODO eventually read individual hosts based on file
-        final host = prefs.get<String>(apiHostPrefKey)!;
-        final accessToken = prefs.get<String>(apiTokenPrefKey)!;
-        // TODO whether this close gets called on widget dispose
-        while (!controller.isClosed) {
-          //final prefs = Provider.of<PreferencesProvider>(context, listen: false);
-          // just add the
-          //
-          await Future.delayed(const Duration(seconds: 1));
-          await getBarberStatus(host, accessToken, workID)
-              .then((value) => controller.add(value))
-              .onError((error, stackTrace) => controller.close());
-          //controller.add(await getBarberStatus(host, accessToken, workID));
-        }
-        await controller.close();
-      },
-    );
-    return controller.stream;
-  })();*/
 
   @override
   Widget build(BuildContext context) {
     final prefs = Provider.of<PreferencesProvider>(context, listen: false);
     final cachedWorkIDList =
-        prefs.get<List<String>>(apiCachedWorkIDListPrefKey)!;
+        prefs.ensure<List<String>>(apiCachedWorkIDListPrefKey);
 
     final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
 
@@ -174,7 +119,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                 child: ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: cachedWorkIDList.reversed.map((workID) {
-                    final host = prefs.get<String>(apiHostPrefKey)!;
+                    final host = prefs.ensure<String>(apiHostPrefKey);
                     return ListTile(
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.center,

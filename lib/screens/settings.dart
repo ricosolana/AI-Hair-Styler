@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/api_access.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
@@ -17,6 +18,7 @@ const String apiHostPrefKey = 'api-host';
 const String apiTokenPrefKey = 'api-token';
 const String apiDemoPrefKey = 'api-demo';
 const String apiCachedTemplateListPrefKey = 'api-cached-template-list';
+const String apiTimeoutPrefKey = 'api-timeout';
 
 class MySettingsPage extends StatefulWidget {
   const MySettingsPage({super.key});
@@ -93,7 +95,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 validator: (str) =>
                     (str ?? '').isEmpty ? 'Must not be empty' : null,
                 onSave: (str) {
-                  checkAccessToken(prefs.get(apiHostPrefKey)!, str!)
+                  checkAccessToken(prefs.ensure(apiHostPrefKey), str)
                       .then((value) => null)
                       .onError((error, stackTrace) {
                     Fluttertoast.showToast(
@@ -102,6 +104,30 @@ class _MySettingsPageState extends State<MySettingsPage> {
                     );
                   });
                   return true;
+                },
+                //extraActions: TextButton(
+                //  automatically retrieve from localhost
+                //  child: const Text('Auto'),
+                //  onPressed: onPressed,
+                //)
+              ),
+              createTextSettingsTile(
+                title: const Text('Response Timeout'),
+                leading: Icon(MdiIcons.clockRemoveOutline),
+                prefKey: apiTimeoutPrefKey,
+                context: context,
+                valueAsDescription: true,
+                validator: (str) {
+                  final value = int.tryParse(str ?? '');
+                  if (value == null) {
+                    return 'Must enter a number';
+                  }
+
+                  // TODO test whether empty is fine
+                  if (value <= 0 || value > 60) {
+                    return 'Must be between 1 and 60';
+                  }
+                  return null;
                 },
                 //extraActions: TextButton(
                 //  automatically retrieve from localhost

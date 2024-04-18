@@ -10,7 +10,7 @@ class MyTextDialog extends StatefulWidget {
   final String defaultText;
   final String? Function(String?)? validator;
   // return false to keep the menu open
-  final bool? Function(String?)? onSave;
+  final bool? Function(String)? onSave;
   final bool saveButton;
   final bool cancelButton;
   @Deprecated(
@@ -135,7 +135,7 @@ SettingsTile createTextSettingsTile({
   bool valueAsDescription = false,
   String? Function(String?)? validator,
   // return false to keep the menu open
-  bool? Function(String?)? onSave,
+  bool? Function(String)? onSave,
   @Deprecated(
     'Unable to specify button order, especially when using save/cancel',
   )
@@ -151,8 +151,10 @@ SettingsTile createTextSettingsTile({
     //description: description,
     description: valueAsDescription
         ? Text(
-            Provider.of<PreferencesProvider>(context)
-                .getOr(prefKey, defaultText),
+      // TODO For timeout,
+      //    the issue here is that the pref is stored as an int,
+      //    But we are trying to retrieve a stored String type
+            getPreferences().rawOr(prefKey, defaultText).toString(),
           )
         : description,
     //description: valueAsDescription ?

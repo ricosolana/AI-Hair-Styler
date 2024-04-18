@@ -5,8 +5,8 @@ import 'dart:typed_data';
 
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-
-const int timeout = 5;
+import 'package:senior_project_hair_ai/preferences_provider.dart';
+import 'package:senior_project_hair_ai/screens/settings.dart';
 
 class TaskProgress {
   //late TaskStatus status; //': task.status.name,
@@ -85,8 +85,9 @@ Future<http.Response> bapiApiBarberPost({
       ),
     );
 
+  // TODO
   final responseStream =
-      await request.send().timeout(const Duration(seconds: timeout));
+      await request.send().timeout(Duration(seconds: getPreferences().ensure<int>(apiTimeoutPrefKey)));
   return http.Response.fromStream(responseStream);
 }
 
@@ -104,7 +105,7 @@ Future<http.Response> bapiAuthCheck(String host, String accessToken) async {
     ..headers['Authorization'] = 'Bearer $accessToken';
 
   final responseStream =
-      await request.send().timeout(const Duration(seconds: timeout));
+      await request.send().timeout(Duration(seconds: getPreferences().ensure<int>(apiTimeoutPrefKey)));
   return http.Response.fromStream(responseStream);
 }
 
@@ -154,29 +155,9 @@ Future<http.Response> bapiGet(String host, {String path = '/'}) async {
   final request = http.Request('GET', uri);
 
   final responseStream =
-      await request.send().timeout(const Duration(seconds: timeout));
+      await request.send().timeout(Duration(seconds: getPreferences().ensure<int>(apiTimeoutPrefKey)));
   return http.Response.fromStream(responseStream);
 }
-
-/*
-Future<http.Response> bapiRootPath(
-  String host,
-) async {
-  final rootUri = Uri.parse(host);
-
-  final uri = Uri(
-    scheme: rootUri.scheme, //'http',
-    host: rootUri.host, // host,
-    port: rootUri.port,
-    path: '/',
-  );
-
-  final request = http.Request('GET', uri);
-
-  final responseStream =
-      await request.send().timeout(const Duration(seconds: 5));
-  return http.Response.fromStream(responseStream);
-}*/
 
 Future<http.Response> bapiApiTemplatesStyles(
   String host,
@@ -211,7 +192,7 @@ Future<http.Response> bapiApiBarberStatus({
     ..headers['Authorization'] = 'Bearer $accessToken';
 
   final responseStream =
-      await request.send().timeout(const Duration(seconds: timeout));
+      await request.send().timeout(Duration(seconds: getPreferences().ensure<int>(apiTimeoutPrefKey)));
   return http.Response.fromStream(responseStream);
 }
 

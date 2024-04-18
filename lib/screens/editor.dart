@@ -21,9 +21,9 @@ Future<void> navigateToEditor(
   bool quietSuccess = false,
 }) async {
   final host = Provider.of<PreferencesProvider>(context, listen: false)
-      .get<String>(apiHostPrefKey)!;
+      .ensure<String>(apiHostPrefKey);
   final accessToken = Provider.of<PreferencesProvider>(context, listen: false)
-      .get<String>(apiTokenPrefKey)!;
+      .ensure<String>(apiTokenPrefKey);
 
   // add this to the screen momentarily
   //SpinKitFadingCircle
@@ -105,7 +105,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
       //Provider.of<RecentsProvider>(context, listen: false).addFile(returnedImage.path);
       //Provider.of<PreferencesProvider>(context, listen: false).
       Provider.of<PreferencesProvider>(context, listen: false)
-          .createListOrAdd(recentsListPrefKey, <String>[returnedImage.path]);
+          .appendOrDefault(recentsListPrefKey, <String>[returnedImage.path]);
     });
   }
 
@@ -116,7 +116,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
     final prefs = Provider.of<PreferencesProvider>(context, listen: false);
     cachedTemplatesList =
-        prefs.get<List<String>>(apiCachedTemplateListPrefKey)!;
+        prefs.ensure<List<String>>(apiCachedTemplateListPrefKey);
 
     _selectedStyleIndexNotifiers =
         List.generate(cachedTemplatesList.length, (_) => EditorItemModel());
@@ -203,66 +203,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
             ),
           ),
 
-          /*
-          Container(
-            height: 260,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.deepPurple, // Border color
-                width: 3, // Border width
-              ),
-              borderRadius: BorderRadius.circular(7), // Border radius
-            ),
-            child: SingleChildScrollView(
-              child: GridView.builder(
-                shrinkWrap: true,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                ),
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: cachedTemplatesList.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      _styleSelector(index);
-                    },
-                    child: ListenableBuilder(
-                        listenable: _selectedStyleIndexNotifiers[
-                            index], // _selectedStyleIndex,
-                        builder: (context, child) {
-                          return Container(
-                            decoration: _selectedStyleIndex == index
-                                ? BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.deepOrangeAccent,
-                                      width: 4,
-                                    ),
-                                  )
-                                : null,
-                            child: CachedNetworkImage(
-                              imageUrl: bapiTemplatesUrl(
-                                prefs.get<String>(apiHostPrefKey)!,
-                                cachedTemplatesList[index],
-                              ),
-                              memCacheWidth: (100 * devicePixelRatio).round(),
-                              progressIndicatorBuilder:
-                                  (context, url, progress) =>
-                                      CircularProgressIndicator(
-                                value: progress.progress,
-                              ),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error),
-                            ),
-                          );
-                        },),
-                  );
-                },
-              ),
-            ),
-          ),
-           */
+
 
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -309,7 +250,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
                                     : null,
                                 child: CachedNetworkImage(
                                   imageUrl: bapiTemplatesUrl(
-                                    prefs.get<String>(apiHostPrefKey)!,
+                                    prefs.ensure<String>(apiHostPrefKey),
                                     cachedTemplatesList[index],
                                   ).toString(),
                                   memCacheWidth:
@@ -390,7 +331,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
                                     : null,
                                 child: CachedNetworkImage(
                                   imageUrl: bapiTemplatesUrl(
-                                    prefs.get<String>(apiHostPrefKey)!,
+                                    prefs.ensure<String>(apiHostPrefKey),
                                     cachedTemplatesList[index],
                                   ).toString(),
                                   memCacheWidth:
@@ -455,21 +396,21 @@ class _MyEditorPageState extends State<MyEditorPage> {
                 listen: false,
               );
 
-              final host = prefs.get<String>(apiHostPrefKey)!;
+              final host = prefs.ensure<String>(apiHostPrefKey);
 
-              final styleTemplateFileName = (prefs.get<List<String>>(
+              final styleTemplateFileName = prefs.ensure<List<String>>(
                 apiCachedTemplateListPrefKey,
-              )!)[_selectedStyleIndex];
-              final colorTemplateFileName = (prefs.get<List<String>>(
+              )[_selectedStyleIndex];
+              final colorTemplateFileName = prefs.ensure<List<String>>(
                 apiCachedTemplateListPrefKey,
-              )!)[_selectedColorIndex];
+              )[_selectedColorIndex];
 
               bapiApiBarberPost(
                 host: host,
                 // TODO ensure that pref defaults are loaded prior to this
                 //  SettingsPage is responsible for defaults,
                 //  why duplicate this?
-                accessToken: prefs.get<String>(apiTokenPrefKey)!,
+                accessToken: prefs.ensure<String>(apiTokenPrefKey),
                 // TODO determine what to do with this
                 imagePath:
                     _currentImagePath, // require that image actually exists
@@ -486,7 +427,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
                   // submit to work queue
                   final workID = map['work-id'] as String;
 
-                  prefs.createListOrAdd(
+                  prefs.appendOrDefault(
                     apiCachedWorkIDListPrefKey,
                     [workID],
                   );
