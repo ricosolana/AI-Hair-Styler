@@ -215,7 +215,7 @@ Future<http.Response> bapiApiBarberStatus({
   return http.Response.fromStream(responseStream);
 }
 
-String bapiUrl(
+Uri bapiUrl(
   String host,
   String path,
 ) {
@@ -228,17 +228,17 @@ String bapiUrl(
     path: path,
   );
 
-  return uri.toString();
+  return uri;
 }
 
-String bapiGeneratedUrl(
+Uri bapiGeneratedUrl(
   String host,
   String workID,
 ) {
   return bapiUrl(host, '/generated/$workID');
 }
 
-String bapiTemplatesUrl(
+Uri bapiTemplatesUrl(
   String host,
   String imageName,
 ) {

@@ -311,7 +311,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
                                   imageUrl: bapiTemplatesUrl(
                                     prefs.get<String>(apiHostPrefKey)!,
                                     cachedTemplatesList[index],
-                                  ),
+                                  ).toString(),
                                   memCacheWidth:
                                       (100 * devicePixelRatio).round(),
                                   progressIndicatorBuilder:
@@ -392,7 +392,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
                                   imageUrl: bapiTemplatesUrl(
                                     prefs.get<String>(apiHostPrefKey)!,
                                     cachedTemplatesList[index],
-                                  ),
+                                  ).toString(),
                                   memCacheWidth:
                                       (100 * devicePixelRatio).round(),
                                   progressIndicatorBuilder:

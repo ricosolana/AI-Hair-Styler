@@ -13,11 +13,13 @@ import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/api_access.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 enum WorkPopupItems {
   save,
   copyFileName,
   copyUrl,
+  openUrl
 }
 
 const String apiCachedWorkIDListPrefKey = 'api-cached-work-list';
@@ -158,7 +160,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                           flex: 2,
                           child: Center(
                             child: CachedNetworkImage(
-                              imageUrl: bapiGeneratedUrl(host, workID),
+                              imageUrl: bapiGeneratedUrl(host, workID).toString(),
                               memCacheWidth: (100 * devicePixelRatio).round(),
                               progressIndicatorBuilder:
                                   (context, url, progress) =>
@@ -181,8 +183,6 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                       return Icon(MdiIcons.serverOff);
                                     } else {
                                       final progress = snapshot.data!;
-                                      // TODO include predictive / reconciliation loading...
-
                                       return Stack(
                                         alignment: Alignment.center,
                                         children: <Widget>[
@@ -247,7 +247,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                 // trigger save?
                                 final cache = DefaultCacheManager();
                                 final file = await cache.getFileFromCache(
-                                  bapiGeneratedUrl(host, workID),
+                                  bapiGeneratedUrl(host, workID).toString(),
                                 );
 
                                 if (file != null) {
@@ -279,12 +279,19 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                               case WorkPopupItems.copyUrl:
                                 await Clipboard.setData(
                                   ClipboardData(
-                                    text: bapiGeneratedUrl(host, workID),
+                                    text: bapiGeneratedUrl(host, workID).toString(),
                                   ),
                                 );
                                 Fluttertoast.showToast(
                                   msg: 'Copied generated url',
                                 );
+                              case WorkPopupItems.openUrl:
+                                if (!await launchUrl(bapiGeneratedUrl(host, workID))) {
+                                  Fluttertoast.showToast(
+                                    msg: 'Unable to open URL',
+                                  );
+                                }
+
                             }
                             setState(() {
                               selectedItem = item;
@@ -303,6 +310,10 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                             const PopupMenuItem<WorkPopupItems>(
                               value: WorkPopupItems.copyUrl,
                               child: Text('Copy generated URL'),
+                            ),
+                            const PopupMenuItem<WorkPopupItems>(
+                              value: WorkPopupItems.openUrl,
+                              child: Text('Open in browser'),
                             ),
                           ],
                         ),
