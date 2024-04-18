@@ -15,8 +15,11 @@ import 'package:senior_project_hair_ai/screens/capture.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/work.dart';
 
-Future<void> navigateToEditor(BuildContext context,
-    {String imagePath = '', bool quietSuccess = false,}) async {
+Future<void> navigateToEditor(
+  BuildContext context, {
+  String imagePath = '',
+  bool quietSuccess = false,
+}) async {
   final host = Provider.of<PreferencesProvider>(context, listen: false)
       .get<String>(apiHostPrefKey)!;
   final accessToken = Provider.of<PreferencesProvider>(context, listen: false)
@@ -136,7 +139,6 @@ class _MyEditorPageState extends State<MyEditorPage> {
       ),
       body: ListView(
         children: <Widget>[
-
           const SizedBox(height: 20),
           const Text(
             "Select an Image:",
@@ -146,7 +148,6 @@ class _MyEditorPageState extends State<MyEditorPage> {
               fontSize: 18.0,
             ),
           ),
-
           GestureDetector(
             onTap: () {
               showDialog(
@@ -201,8 +202,6 @@ class _MyEditorPageState extends State<MyEditorPage> {
               fontSize: 18.0,
             ),
           ),
-
-
 
           /*
           Container(
@@ -265,8 +264,6 @@ class _MyEditorPageState extends State<MyEditorPage> {
           ),
            */
 
-
-
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
@@ -283,7 +280,8 @@ class _MyEditorPageState extends State<MyEditorPage> {
                   padding: const EdgeInsets.all(4.0),
                   child: GridView.builder(
                     shrinkWrap: true,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 4,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
@@ -303,29 +301,31 @@ class _MyEditorPageState extends State<MyEditorPage> {
                               child: Container(
                                 decoration: _selectedStyleIndex == index
                                     ? BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.deepOrangeAccent,
-                                    width: 4,
-                                  ),
-                                )
+                                        border: Border.all(
+                                          color: Colors.deepOrangeAccent,
+                                          width: 4,
+                                        ),
+                                      )
                                     : null,
                                 child: CachedNetworkImage(
                                   imageUrl: bapiTemplatesUrl(
                                     prefs.get<String>(apiHostPrefKey)!,
                                     cachedTemplatesList[index],
                                   ),
-                                  memCacheWidth: (100 * devicePixelRatio).round(),
+                                  memCacheWidth:
+                                      (100 * devicePixelRatio).round(),
                                   progressIndicatorBuilder:
                                       (context, url, progress) =>
-                                      CircularProgressIndicator(
-                                        value: progress.progress,
-                                      ),
+                                          CircularProgressIndicator(
+                                    value: progress.progress,
+                                  ),
                                   errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error),
+                                      const Icon(Icons.error),
                                 ),
                               ),
                             );
-                          },),
+                          },
+                        ),
                       );
                     },
                   ),
@@ -333,9 +333,6 @@ class _MyEditorPageState extends State<MyEditorPage> {
               ),
             ),
           ),
-
-
-
           const SizedBox(
             height: 20,
           ),
@@ -363,7 +360,8 @@ class _MyEditorPageState extends State<MyEditorPage> {
                   padding: const EdgeInsets.all(4.0),
                   child: GridView.builder(
                     shrinkWrap: true,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 4,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
@@ -376,37 +374,39 @@ class _MyEditorPageState extends State<MyEditorPage> {
                           _colorSelector(index);
                         },
                         child: ListenableBuilder(
-                            listenable: _selectedColorIndexNotifiers[
-                                index], // _selectedStyleIndex,
-                            builder: (context, child) {
-                              return ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Container(
-                                  decoration: _selectedColorIndex == index
-                                      ? BoxDecoration(
-                                          border: Border.all(
-                                            color: Colors.deepOrangeAccent,
-                                            width: 4,
-                                          ),
-                                        )
-                                      : null,
-                                  child: CachedNetworkImage(
-                                    imageUrl: bapiTemplatesUrl(
-                                      prefs.get<String>(apiHostPrefKey)!,
-                                      cachedTemplatesList[index],
-                                    ),
-                                    memCacheWidth: (100 * devicePixelRatio).round(),
-                                    progressIndicatorBuilder:
-                                        (context, url, progress) =>
-                                            CircularProgressIndicator(
-                                      value: progress.progress,
-                                    ),
-                                    errorWidget: (context, url, error) =>
-                                        const Icon(Icons.error),
+                          listenable: _selectedColorIndexNotifiers[
+                              index], // _selectedStyleIndex,
+                          builder: (context, child) {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                decoration: _selectedColorIndex == index
+                                    ? BoxDecoration(
+                                        border: Border.all(
+                                          color: Colors.deepOrangeAccent,
+                                          width: 4,
+                                        ),
+                                      )
+                                    : null,
+                                child: CachedNetworkImage(
+                                  imageUrl: bapiTemplatesUrl(
+                                    prefs.get<String>(apiHostPrefKey)!,
+                                    cachedTemplatesList[index],
                                   ),
+                                  memCacheWidth:
+                                      (100 * devicePixelRatio).round(),
+                                  progressIndicatorBuilder:
+                                      (context, url, progress) =>
+                                          CircularProgressIndicator(
+                                    value: progress.progress,
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
                                 ),
-                              );
-                            },),
+                              ),
+                            );
+                          },
+                        ),
                       );
                     },
                   ),
@@ -416,7 +416,6 @@ class _MyEditorPageState extends State<MyEditorPage> {
           ),
           const SizedBox(height: 20),
           const Align(
-            alignment: Alignment.center,
             child: Text(
               textAlign: TextAlign.center,
               "Determine the quality (the higher the quality the longer the compute time):",
@@ -466,21 +465,20 @@ class _MyEditorPageState extends State<MyEditorPage> {
               )!)[_selectedColorIndex];
 
               bapiApiBarberPost(
-                      host: host,
-                      // TODO ensure that pref defaults are loaded prior to this
-                      //  SettingsPage is responsible for defaults,
-                      //  why duplicate this?
-                      accessToken: prefs.get<String>(apiTokenPrefKey)!,
-                      // TODO determine what to do with this
-                      imagePath:
-                          _currentImagePath, // require that image actually exists
-                      //imageBytes: ,
-                      hairStyle: styleTemplateFileName, // 'bob', // style
-                      hairColor:
-                          colorTemplateFileName, // 'dark-blonde' // color
-                      demo: prefs.get(apiDemoPrefKey)!,
-                      quality: _qualityValueNotifier.value / 100.0,)
-                  .then((response) {
+                host: host,
+                // TODO ensure that pref defaults are loaded prior to this
+                //  SettingsPage is responsible for defaults,
+                //  why duplicate this?
+                accessToken: prefs.get<String>(apiTokenPrefKey)!,
+                // TODO determine what to do with this
+                imagePath:
+                    _currentImagePath, // require that image actually exists
+                //imageBytes: ,
+                hairStyle: styleTemplateFileName, // 'bob', // style
+                hairColor: colorTemplateFileName, // 'dark-blonde' // color
+                demo: prefs.get(apiDemoPrefKey)!,
+                quality: _qualityValueNotifier.value / 100.0,
+              ).then((response) {
                 if (response.statusCode == 200) {
                   // TODO submit to job queue
                   final map = jsonDecode(response.body) as Map<String, dynamic>;

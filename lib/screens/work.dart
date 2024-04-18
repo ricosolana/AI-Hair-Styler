@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -7,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:path/path.dart' as path;
@@ -39,8 +37,6 @@ class WorkItemModel with ChangeNotifier {
 class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
   //List<String> workIDs = [];
   //Map<String, String> workIDStatuses = {};
-
-
 
   WorkPopupItems? selectedItem;
   //late List<WorkItemModel> _refreshNotifiers;
@@ -86,8 +82,6 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
         await controller.close();
       },
     );*/
-
-
   }
 
   @override
@@ -103,7 +97,6 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
 
     return getBarberStatus(host, accessToken, workID);
   }
-
 
   /*
   //  are prefs even passable
@@ -134,8 +127,6 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
     );
     return controller.stream;
   })();*/
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -168,12 +159,12 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                           child: Center(
                             child: CachedNetworkImage(
                               imageUrl: bapiGeneratedUrl(host, workID),
-                              memCacheWidth: (100 * devicePixelRatio)
-                                  .round(),
+                              memCacheWidth: (100 * devicePixelRatio).round(),
                               progressIndicatorBuilder:
                                   (context, url, progress) =>
-                                  CircularProgressIndicator(
-                                    value: progress.progress,),
+                                      CircularProgressIndicator(
+                                value: progress.progress,
+                              ),
                               errorListener: (obj) {
                                 log(obj.toString());
                               },
@@ -182,7 +173,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                 return StreamBuilder<TaskProgress>(
                                   stream: fetchJobStatusPeriodically(workID),
                                   builder: (context, snapshot) {
-                                    if (snapshot.connectionState == ConnectionState.waiting) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
                                       return const CircularProgressIndicator();
                                     } else if (snapshot.hasError) {
                                       // somewhat unexpected for the API to not respond
@@ -194,26 +186,36 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                       return Stack(
                                         alignment: Alignment.center,
                                         children: <Widget>[
-                                          if (progress.currentTransformerPercentage != null)
-
+                                          if (progress
+                                                  .currentTransformerPercentage !=
+                                              null)
                                             TweenAnimationBuilder<double>(
                                               // TODO check if tween bounds require [0,1]
                                               //tween: Tween<double>(begin: 0, end: progress.),
-                                              tween: Tween<double>(begin: 0, end: progress.currentTransformerPercentage!.toDouble() / 100.0),
+                                              tween: Tween<double>(
+                                                  begin: 0,
+                                                  end: progress
+                                                          .currentTransformerPercentage!
+                                                          .toDouble() /
+                                                      100.0,),
                                               // TODO test
-                                              duration: const Duration(seconds: 1),
-                                              builder: (BuildContext context, double tweenValue, Widget? child) {
+                                              duration:
+                                                  const Duration(seconds: 1),
+                                              builder: (BuildContext context,
+                                                  double tweenValue,
+                                                  Widget? child,) {
                                                 return CircularProgressIndicator(
                                                   value: tweenValue,
                                                   strokeWidth: 10,
                                                 );
                                               },
-                                              child: const Icon(Icons.aspect_ratio),
+                                              child: const Icon(
+                                                  Icons.aspect_ratio,),
                                             ),
-                                            //CircularProgressIndicator(
-                                            //  value: progress.currentTransformerPercentage!.toDouble() / 100.0,
-                                            //  strokeWidth: 10,
-                                            //),
+                                          //CircularProgressIndicator(
+                                          //  value: progress.currentTransformerPercentage!.toDouble() / 100.0,
+                                          //  strokeWidth: 10,
+                                          //),
                                           Center(
                                             child: Text(progress.status),
                                           ),
@@ -245,20 +247,24 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                 // trigger save?
                                 final cache = DefaultCacheManager();
                                 final file = await cache.getFileFromCache(
-                                    bapiGeneratedUrl(host, workID),);
+                                  bapiGeneratedUrl(host, workID),
+                                );
 
                                 if (file != null) {
                                   final params = SaveFileDialogParams(
-                                      sourceFilePath: file.file.path,
-                                      fileName: workID +
-                                          path.extension(file.file.basename),);
+                                    sourceFilePath: file.file.path,
+                                    fileName: workID +
+                                        path.extension(file.file.basename),
+                                  );
                                   final filePath =
                                       await FlutterFileDialog.saveFile(
-                                          params: params,);
+                                    params: params,
+                                  );
 
                                   Fluttertoast.showToast(
-                                      msg: 'Saved to directory $filePath',
-                                      toastLength: Toast.LENGTH_LONG,);
+                                    msg: 'Saved to directory $filePath',
+                                    toastLength: Toast.LENGTH_LONG,
+                                  );
                                 }
 
                               case WorkPopupItems.copyFileName:
@@ -275,7 +281,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                   ),
                                 );
                                 Fluttertoast.showToast(
-                                    msg: 'Copied generated url',);
+                                  msg: 'Copied generated url',
+                                );
                             }
                             setState(() {
                               selectedItem = item;

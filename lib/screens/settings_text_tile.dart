@@ -14,7 +14,8 @@ class MyTextDialog extends StatefulWidget {
   final bool saveButton;
   final bool cancelButton;
   @Deprecated(
-      'Unable to specify button order, especially when using save/cancel',)
+    'Unable to specify button order, especially when using save/cancel',
+  )
   final List<Widget> extraActions;
 
   const MyTextDialog({
@@ -136,7 +137,8 @@ SettingsTile createTextSettingsTile({
   // return false to keep the menu open
   bool? Function(String?)? onSave,
   @Deprecated(
-      'Unable to specify button order, especially when using save/cancel',)
+    'Unable to specify button order, especially when using save/cancel',
+  )
   List<Widget> extraActions = const <Widget>[],
   bool saveButton = true,
   bool cancelButton = true,

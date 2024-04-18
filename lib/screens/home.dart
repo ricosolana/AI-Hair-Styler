@@ -207,8 +207,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                       const Spacer(),
                                     ],
                                   ),
-                                  onTap: () => navigateToEditor(context,
-                                      imagePath: path, quietSuccess: true,),
+                                  onTap: () => navigateToEditor(
+                                    context,
+                                    imagePath: path,
+                                    quietSuccess: true,
+                                  ),
                                 );
                               })
                               .toList(),

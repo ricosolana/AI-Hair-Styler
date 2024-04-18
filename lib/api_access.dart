@@ -32,26 +32,30 @@ class TaskProgress {
     timeAlignStarted = json['time-align-started'].toDouble();
     timeBarberStarted = json['time-barber-started'].toDouble();
     timeBarberEnded = json['time-barber-ended'].toDouble();
-    initialBarberDurationEstimate = json['initial-barber-duration-estimate'].toDouble();
+    initialBarberDurationEstimate =
+        json['initial-barber-duration-estimate'].toDouble();
     durationBarber = json['duration-barber'].toDouble();
   }
 }
 
-Future<TaskProgress> getBarberStatus(String host, String accessToken, String workID) async {
-  final response = await bapiApiBarberStatus(host: host, accessToken: accessToken, workID: workID);
+Future<TaskProgress> getBarberStatus(
+    String host, String accessToken, String workID,) async {
+  final response = await bapiApiBarberStatus(
+      host: host, accessToken: accessToken, workID: workID,);
   final json = jsonDecode(response.body) as Map<String, dynamic>;
   return TaskProgress.fromJson(json);
 }
 
-Future<http.Response> bapiApiBarberPost(
-    {required String host,
-    required String accessToken,
-    @Deprecated('specify the imageBytes instead') String? imagePath,
-    Uint8List? imageBytes,
-    required String hairStyle,
-    required String hairColor,
-    bool demo = false,
-    double quality = 1.0,}) async {
+Future<http.Response> bapiApiBarberPost({
+  required String host,
+  required String accessToken,
+  @Deprecated('specify the imageBytes instead') String? imagePath,
+  Uint8List? imageBytes,
+  required String hairStyle,
+  required String hairColor,
+  bool demo = false,
+  double quality = 1.0,
+}) async {
   if (imagePath != null) {
     imageBytes = await File(imagePath).readAsBytes();
   }
@@ -74,8 +78,11 @@ Future<http.Response> bapiApiBarberPost(
   final request = http.MultipartRequest('POST', uri)
     ..headers['Authorization'] = 'Bearer $accessToken'
     ..files.add(
-      http.MultipartFile.fromBytes('image', imageBytes!,
-          filename: 'image.jpeg',),
+      http.MultipartFile.fromBytes(
+        'image',
+        imageBytes!,
+        filename: 'image.jpeg',
+      ),
     );
 
   final responseStream =
@@ -101,8 +108,11 @@ Future<http.Response> bapiAuthCheck(String host, String accessToken) async {
   return http.Response.fromStream(responseStream);
 }
 
-Future<bool> checkAccessToken(String host, String accessToken,
-    {bool quietSuccess = false,}) async {
+Future<bool> checkAccessToken(
+  String host,
+  String accessToken, {
+  bool quietSuccess = false,
+}) async {
   if (accessToken.isEmpty) {
     Fluttertoast.showToast(msg: 'Set an access token first');
     return false;
@@ -121,7 +131,8 @@ Future<bool> checkAccessToken(String host, String accessToken,
       Fluttertoast.showToast(msg: 'Server error or backend unavailable($code)');
     } else {
       Fluttertoast.showToast(
-          msg: 'Unknown error (${response.reasonPhrase}, $code)',);
+        msg: 'Unknown error (${response.reasonPhrase}, $code)',
+      );
     }
     return false;
   }).onError((error, stackTrace) {
@@ -179,13 +190,11 @@ Future<http.Response> bapiApiTemplatesList(
   return bapiGet(host, path: '/api/templates/list');
 }
 
-Future<http.Response> bapiApiBarberStatus(
-  {
-    required String host,
-    required String accessToken,
-    required String workID,
-  }
-) async {
+Future<http.Response> bapiApiBarberStatus({
+  required String host,
+  required String accessToken,
+  required String workID,
+}) async {
   final rootUri = Uri.parse(host);
 
   final uri = Uri(

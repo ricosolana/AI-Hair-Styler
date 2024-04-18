@@ -85,33 +85,35 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 },
               ),
               createTextSettingsTile(
-                  title: const Text('API Token'),
-                  leading: const Icon(Icons.token),
-                  prefKey: apiTokenPrefKey,
-                  context: context,
-                  valueAsDescription: true,
-                  validator: (str) =>
-                      (str ?? '').isEmpty ? 'Must not be empty' : null,
-                  onSave: (str) {
-                    checkAccessToken(prefs.get(apiHostPrefKey)!, str!)
-                        .then((value) => null)
-                        .onError((error, stackTrace) {
-                      Fluttertoast.showToast(
-                          msg: 'Error connecting: $error',
-                          toastLength: Toast.LENGTH_LONG,);
-                    });
-                    return true;
-                  },
-                  //extraActions: TextButton(
-                  //  automatically retrieve from localhost
-                  //  child: const Text('Auto'),
-                  //  onPressed: onPressed,
-                  //)
-                  ),
+                title: const Text('API Token'),
+                leading: const Icon(Icons.token),
+                prefKey: apiTokenPrefKey,
+                context: context,
+                valueAsDescription: true,
+                validator: (str) =>
+                    (str ?? '').isEmpty ? 'Must not be empty' : null,
+                onSave: (str) {
+                  checkAccessToken(prefs.get(apiHostPrefKey)!, str!)
+                      .then((value) => null)
+                      .onError((error, stackTrace) {
+                    Fluttertoast.showToast(
+                      msg: 'Error connecting: $error',
+                      toastLength: Toast.LENGTH_LONG,
+                    );
+                  });
+                  return true;
+                },
+                //extraActions: TextButton(
+                //  automatically retrieve from localhost
+                //  child: const Text('Auto'),
+                //  onPressed: onPressed,
+                //)
+              ),
               SettingsTile.switchTile(
                 title: const Text('Demo'),
                 description: const Text(
-                    'Request that the API immediately completes a fake sample',),
+                  'Request that the API immediately completes a fake sample',
+                ),
                 leading: const Icon(Icons.dark_mode),
                 initialValue: Provider.of<PreferencesProvider>(context)
                     .get(apiDemoPrefKey),

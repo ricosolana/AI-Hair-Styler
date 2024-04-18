@@ -31,7 +31,8 @@ class _MyResultsPageState extends State<MyResultsPage> {
               child: imageCachedFile.path.isEmpty
                   // TODO test this icon
                   ? const Icon(
-                      Icons.person,) // Image.asset('assets/images/default.png')
+                      Icons.person,
+                    ) // Image.asset('assets/images/default.png')
                   : Image.file(
                       File(imageCachedFile.path),
                       fit: BoxFit.cover,
@@ -62,8 +63,12 @@ class _MyResultsPageState extends State<MyResultsPage> {
                       //TODO Download Photo
                       final Directory documentDirectory =
                           await getApplicationDocumentsDirectory(); //just added
-                      final File file = File(path.join(
-                          documentDirectory.path, 'filename.jpg',),); //just added
+                      final File file = File(
+                        path.join(
+                          documentDirectory.path,
+                          'filename.jpg',
+                        ),
+                      ); //just added
                       await file
                           .writeAsBytes(await imageCachedFile.readAsBytes());
                     },

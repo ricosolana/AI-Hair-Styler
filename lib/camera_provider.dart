@@ -8,11 +8,13 @@ class CameraProvider {
 
   CameraDescription getFrontCamera() {
     return _cameras.firstWhere(
-        (camera) => camera.lensDirection == CameraLensDirection.front,);
+      (camera) => camera.lensDirection == CameraLensDirection.front,
+    );
   }
 
   CameraDescription getBackCamera() {
     return _cameras.firstWhere(
-        (camera) => camera.lensDirection == CameraLensDirection.back,);
+      (camera) => camera.lensDirection == CameraLensDirection.back,
+    );
   }
 }
