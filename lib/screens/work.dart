@@ -261,10 +261,12 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                     params: params,
                                   );
 
-                                  Fluttertoast.showToast(
-                                    msg: 'Saved to directory $filePath',
-                                    toastLength: Toast.LENGTH_LONG,
-                                  );
+                                  if (filePath != null) {
+                                    Fluttertoast.showToast(
+                                      msg: 'Saved to directory $filePath',
+                                      toastLength: Toast.LENGTH_LONG,
+                                    );
+                                  }
                                 }
 
                               case WorkPopupItems.copyFileName:
