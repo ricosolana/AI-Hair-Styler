@@ -19,7 +19,7 @@ class TakePictureScreen extends StatefulWidget {
 }
 
 class _TakePictureScreenState extends State<TakePictureScreen> {
-  late CameraController _controller;
+  CameraController ?_controller;
   late Future<void> _initializeControllerFuture;
   bool _useFrontCamera = false;
 
@@ -30,7 +30,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
@@ -39,7 +39,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
 
     try {
       await _initializeControllerFuture;
-      final image = await _controller.takePicture();
+      final image = await _controller!.takePicture();
 
       if (!mounted) return;
 
@@ -53,9 +53,10 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Future<void> initCamera() async {
     final cameras = Provider.of<CameraProvider>(context, listen: false);
+
+    await _controller?.dispose();
 
     _controller = CameraController(
       _useFrontCamera ? cameras.getFrontCamera() : cameras.getBackCamera(),
@@ -63,20 +64,21 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
       enableAudio: false,
     );
 
-    _initializeControllerFuture = _controller.initialize();
+    _initializeControllerFuture = _controller!.initialize();
+    await _initializeControllerFuture;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    //initCamera();
 
     return Scaffold(
       appBar: AppBar(title: const Text("Take a Photo")),
       body: FutureBuilder<void>(
-        future: _initializeControllerFuture,
+        future: initCamera(), //_initializeControllerFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return Center(
-              child: AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: CameraPreview(_controller),
-              ),
-            );
+            return CameraPreview(_controller!);
           } else {
             return const Center(child: CircularProgressIndicator());
           }
