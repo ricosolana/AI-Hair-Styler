@@ -19,27 +19,16 @@ class TakePictureScreen extends StatefulWidget {
 }
 
 class _TakePictureScreenState extends State<TakePictureScreen> {
-  late CameraController _controller;
-  late Future<void> _initializeControllerFuture;
   bool _useFrontCamera = false;
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  GlobalKey<_PreviewLiveCameraScreenState> _previewKey = GlobalKey();
 
   Future<void> _takePictureAndPrompt() async {
     if (!mounted) return;
 
     try {
-      await _initializeControllerFuture;
-      final image = await _controller.takePicture();
+      await _previewKey.currentState!._initializeControllerFuture;
+      final image = await _previewKey.currentState!._controller.takePicture();
 
       if (!mounted) return;
 
@@ -55,16 +44,61 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cameras = Provider.of<CameraProvider>(context, listen: false);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Take a picture'),
+      ),
+      // You must wait until the controller is initialized before displaying the
+      // camera preview. Use a FutureBuilder to display a loading spinner until the
+      // controller has finished initializing.
+      body: PreviewLiveCameraScreen(
+          key: _previewKey,
+          useFrontCamera: _useFrontCamera,
+      ),
+      floatingActionButton: Row(
+        children: [
+          SizedBox(
+            width: 80.0,
+            height: 80.0,
+            child: FloatingActionButton(
+              heroTag: "capture-take-fab",
+              onPressed: _takePictureAndPrompt,
+              shape: const CircleBorder(),
+              child: const Icon(Icons.camera_alt, size: 45.0),
+            ),
+          ),
+          SizedBox(
+            width: 80.0,
+            height: 80.0,
+            child: FloatingActionButton(
+              heroTag: "capture-flip-fab",
+              onPressed: () {
+                setState(() {
+                  _useFrontCamera = !_useFrontCamera;
+                });
+              },
+              shape: const CircleBorder(),
+              child: const Icon(Icons.flip_camera_android, size: 45.0),
+            ),
+          ),
+        ],
+      ),
 
-    _controller = CameraController(
-      _useFrontCamera ? cameras.getFrontCamera() : cameras.getBackCamera(),
-      ResolutionPreset.veryHigh,
-      enableAudio: false,
+
+      /*
+      FloatingActionButton(
+        heroTag: "capture-flip-fab",
+        onPressed: () {
+          setState(() {
+            _useFrontCamera = !_useFrontCamera;
+          });
+        },
+        shape: const CircleBorder(),
+        child: const Icon(Icons.flip_camera_android, size: 45.0),
+      ),*/
     );
 
-    _initializeControllerFuture = _controller.initialize();
-
+    /*
     return Scaffold(
       appBar: AppBar(title: const Text("Take a Photo")),
       body: FutureBuilder<void>(
@@ -111,9 +145,64 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );*/
+  }
+}
+
+
+
+class PreviewLiveCameraScreen extends StatefulWidget {
+  final bool useFrontCamera;
+
+  const PreviewLiveCameraScreen({super.key, required this.useFrontCamera});
+
+  @override
+  _PreviewLiveCameraScreenState createState() => _PreviewLiveCameraScreenState();
+}
+
+class _PreviewLiveCameraScreenState extends State<PreviewLiveCameraScreen> {
+  late CameraController _controller;
+  late Future<void> _initializeControllerFuture;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final cameras = Provider.of<CameraProvider>(context, listen: false);
+
+    _controller = CameraController(
+      widget.useFrontCamera ? cameras.getFrontCamera() : cameras.getBackCamera(),
+      ResolutionPreset.veryHigh,
+      enableAudio: false,
+    );
+
+    _initializeControllerFuture = _controller.initialize();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initializeControllerFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          // If the Future is complete, display the preview.
+          return CameraPreview(_controller);
+        } else {
+          // Otherwise, display a loading indicator.
+          return const Center(child: CircularProgressIndicator());
+        }
+      },
     );
   }
 }
+
+
 
 class DisplayPictureScreen extends StatelessWidget {
   final XFile imageCachedFile;
