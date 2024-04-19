@@ -136,6 +136,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
     final cachedWorkIDList =
         prefs.get<List<String>>(apiCachedWorkIDListPrefKey)!;
 
+    final host = prefs.get<String>(apiHostPrefKey)!;
+
     final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
 
     return Scaffold(
@@ -145,7 +147,9 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
         title: const Text("Work Queue"),
       ),
       body: Center(
-        child: Column(
+        child: cachedWorkIDList.isEmpty
+            ? const Text('Hmm, no work.') :
+        Column(
           children: [
             Expanded(
               child: RefreshIndicator(
@@ -170,12 +174,16 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                   return notification.depth == 0;
                 },
                 // TODO use ListView.builder
-                child: ListView(
+                child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  children: cachedWorkIDList.reversed.map((workID) {
-                    final host = prefs.get<String>(apiHostPrefKey)!;
+                  itemCount: cachedWorkIDList.length,
+                  itemBuilder: (context, index) {
+                    index = cachedWorkIDList.length - index - 1;
+                    //final workID = cachedWorkIDList[cachedWorkIDList.length - index - 1];
+                    final workID = cachedWorkIDList[index];
                     return Dismissible(
-                      key: Key(workID),
+                      //key: Key(workID),
+                      key: UniqueKey(),
                       // Accept
                       background: const ColoredBox(
                         color: Colors.green,
@@ -199,22 +207,34 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                       ),
                       confirmDismiss: (direction) async {
                         // In this case, swiping any direction will dismiss element
-                        bool delete = true;
+                        //bool delete = true;
                         if (direction == DismissDirection.startToEnd) {
                           // TODO send image to gallery
                         } else {
-                          await ScaffoldMessenger.of(context).showSnackBar(
+                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('Deleted $workID'),
-                              action: SnackBarAction(label: 'Undo', onPressed: () => delete = false),
+                              action: SnackBarAction(
+                                label: 'Undo',
+                                onPressed: () {
+                                  setState(() {
+                                    cachedWorkIDList.insert(index, workID);
+                                    prefs.set(apiCachedWorkIDListPrefKey, cachedWorkIDList);
+                                    //cachedWorkIDList.insert(cachedWorkIDList.length - index, workID);
+                                  });
+                                }
+                              ),
                             ),
-                          ).closed;
+                          );
                         }
-                        return delete;
+                        //return delete;
+                        return true;
                       },
                       onDismissed: (_) {
                         setState(() {
-                          cachedWorkIDList.remove(workID);
+                          cachedWorkIDList.removeAt(index);
+                          //cachedWorkIDList.remove(workID);
                           prefs.set(apiCachedWorkIDListPrefKey, cachedWorkIDList);
                         });
                       },
@@ -392,8 +412,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                         },
                       ),
                     );
-                  }).toList(),
-                ),
+                  })
               ),
             ),
           ],
