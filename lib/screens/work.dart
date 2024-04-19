@@ -69,7 +69,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
     super.initState();
 
     prefs = Provider.of<PreferencesProvider>(context, listen: false);
-    cachedWorkIDList = prefs.get<List<String>>(apiCachedWorkIDListPrefKey)!;
+    cachedWorkIDList = prefs.get<List<String>>(apiCachedWorkIDListPrefKey)!.reversed.toList();
 
     /*
     // Refresh sub
@@ -186,10 +186,10 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                   itemBuilder: (context, index, animation) {
                     // We want to render the list backwards,
                     //  so the new items appear first
-                    final reverseIndex = cachedWorkIDList.length - index - 1;
+                    //final reverseIndex = cachedWorkIDList.length - index - 1;
                     //index = cachedWorkIDList.length - index;
                     //final workID = cachedWorkIDList[cachedWorkIDList.length - index - 1];
-                    final workID = cachedWorkIDList[reverseIndex];
+                    final workID = cachedWorkIDList[index];
                     return SlideTransition(
                       position: _tween.animate(animation),
                       child: Dismissible(
@@ -233,8 +233,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                     setState(() {
                                       _tween.begin = Offset(direction == DismissDirection.startToEnd ? 1 : -1, 0);
 
-                                      cachedWorkIDList.insert(reverseIndex, workID);
-                                      prefs.set(apiCachedWorkIDListPrefKey, cachedWorkIDList);
+                                      cachedWorkIDList.insert(index, workID);
+                                      prefs.set(apiCachedWorkIDListPrefKey, cachedWorkIDList.reversed.toList());
                                       _listKey.currentState?.insertItem(index);
                                       //cachedWorkIDList.insert(cachedWorkIDList.length - index, workID);
                                     });
@@ -248,9 +248,9 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                         },
                         onDismissed: (_) {
                           setState(() {
-                            cachedWorkIDList.removeAt(reverseIndex);
+                            cachedWorkIDList.removeAt(index);
                             //cachedWorkIDList.remove(workID);
-                            prefs.set(apiCachedWorkIDListPrefKey, cachedWorkIDList);
+                            prefs.set(apiCachedWorkIDListPrefKey, cachedWorkIDList.reversed.toList());
                             _listKey.currentState?.removeItem(index, (context, animation) => Container());
                           });
                         },
