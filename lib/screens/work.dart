@@ -209,8 +209,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                               return Icon(MdiIcons.serverOff);
                                             } else {
                                               final progress = snapshot.data!;
-                                              return Stack(
-                                                alignment: Alignment.center,
+                                              return Column(
+                                                //alignment: Alignment.center,
                                                 children: <Widget>[
                                                   if (progress
                                                           .currentTransformerPercentage !=
@@ -242,9 +242,15 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                                   //  value: progress.currentTransformerPercentage!.toDouble() / 100.0,
                                                   //  strokeWidth: 10,
                                                   //),
-                                                  Center(
-                                                    child: Text(progress.statusLabel),
-                                                  ),
+                                                  if (progress
+                                                      .currentTransformerPercentage !=
+                                                      null)
+                                                    const Padding(padding: EdgeInsets.symmetric(vertical: 5)),
+                                                  Text(progress.statusLabel),
+                                                  // Additional text underneath the indicator
+                                                  if (progress.currentTransformerPercentage != null)
+                                                    //Text('Additional Text Here'),
+                                                    Text(progress.getEstimatedRemainingTimeString())
                                                 ],
                                               );
                                             }
@@ -383,7 +389,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                             ),
                             child: const Text('Clear all'),
                             onPressed: () {
-                              prefs.set(apiCachedWorkIDListPrefKey, <String>[]);
+                              cachedWorkIDList.clear();
+                              prefs.set(apiCachedWorkIDListPrefKey, cachedWorkIDList);
                               setState(() {});
                               Navigator.of(context).pop();
                               Fluttertoast.showToast(msg: 'Cleared work queue');

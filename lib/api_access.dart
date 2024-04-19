@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 const int timeout = 5;
 
@@ -15,7 +16,7 @@ class TaskProgress {
   late int utcAlignStarted;
   late int utcBarberStarted;
   late int utcBarberEnded;
-  late int initialBarberDurationEstimate;
+  int? initialBarberDurationEstimate;
 
   TaskProgress.fromJson(Map<String, dynamic> json) {
     statusLabel = json['status-label'] as String;
@@ -24,7 +25,45 @@ class TaskProgress {
     utcAlignStarted = json['utc-align-started'] as int;
     utcBarberStarted = json['utc-barber-started'] as int;
     utcBarberEnded = json['utc-barber-ended'] as int;
-    initialBarberDurationEstimate = json['initial-barber-duration-estimate'] as int;
+    initialBarberDurationEstimate = json['initial-barber-duration-estimate'];
+  }
+
+  String getEstimatedRemainingTimeString() {
+    if (initialBarberDurationEstimate != null) {
+      final utcEstEndBarber = utcBarberStarted + initialBarberDurationEstimate!;
+      final utcNow = (DateTime.now().toUtc().millisecondsSinceEpoch) ~/ 1000.0;
+
+      final diffSeconds = utcEstEndBarber - utcNow;
+
+      if (diffSeconds.isNegative) {
+        return '...';
+      }
+
+      final rSeconds = diffSeconds % 60;
+
+      final diffMinutes = (diffSeconds - rSeconds) ~/ 60;
+      final rMinutes = diffMinutes % 60;
+
+      final diffHours = (diffMinutes - rMinutes) ~/ 60;
+      final rHours = diffHours % 60;
+
+      final diffDays = (diffHours - rHours) ~/ 24;
+      final rDays = diffHours % 24;
+
+      final diffWeeks = (diffDays - rDays) ~/ 7;
+      final rWeeks = diffWeeks % 7;
+
+      //
+      return '${rWeeks > 0 ? '${rWeeks}w' : ''}'
+          '${rDays > 0 ? '${rDays}d' : ''}'
+          '${rHours > 0 ? '${rHours}h' : ''}'
+          '${rMinutes > 0 ? '${rMinutes}m' : ''}'
+          '${rSeconds > 0 ? '${rSeconds}s' : ''}';
+
+      //final fmt = DateFormat('D:H:mm').format(DateTime.fromMillisecondsSinceEpoch(diffSeconds * 1000, isUtc: true));
+      //return fmt;
+    }
+    return '...';
   }
 }
 
