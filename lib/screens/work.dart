@@ -250,7 +250,9 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                                   // Additional text underneath the indicator
                                                   if (progress.currentTransformerPercentage != null)
                                                     //Text('Additional Text Here'),
-                                                    Text(progress.getEstimatedRemainingTimeString())
+                                                    Text(progress.getEstimatedRemainingTimeString()),
+                                                  //Text('Additional Text Here'),
+                                                  Text(progress.getElapsedTimeString()),
                                                 ],
                                               );
                                             }

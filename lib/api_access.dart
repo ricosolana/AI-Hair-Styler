@@ -54,7 +54,7 @@ class TaskProgress {
       final rWeeks = diffWeeks % 7;
 
       //
-      return '${rWeeks > 0 ? '${rWeeks}w' : ''}'
+      return '~${rWeeks > 0 ? '${rWeeks}w' : ''}'
           '${rDays > 0 ? '${rDays}d' : ''}'
           '${rHours > 0 ? '${rHours}h' : ''}'
           '${rMinutes > 0 ? '${rMinutes}m' : ''}'
@@ -64,6 +64,36 @@ class TaskProgress {
       //return fmt;
     }
     return '...';
+  }
+
+  String getElapsedTimeString() {
+    final utcNow = (DateTime.now().toUtc().millisecondsSinceEpoch) ~/ 1000.0;
+    final diffSeconds = utcNow - utcBarberStarted;
+
+    final rSeconds = diffSeconds % 60;
+
+    final diffMinutes = (diffSeconds - rSeconds) ~/ 60;
+    final rMinutes = diffMinutes % 60;
+
+    final diffHours = (diffMinutes - rMinutes) ~/ 60;
+    final rHours = diffHours % 60;
+
+    final diffDays = (diffHours - rHours) ~/ 24;
+    final rDays = diffHours % 24;
+
+    final diffWeeks = (diffDays - rDays) ~/ 7;
+    final rWeeks = diffWeeks % 7;
+
+    //
+    return '${rWeeks > 0 ? '${rWeeks}w' : ''}'
+        '${rDays > 0 ? '${rDays}d' : ''}'
+        '${rHours > 0 ? '${rHours}h' : ''}'
+        '${rMinutes > 0 ? '${rMinutes}m' : ''}'
+        '${rSeconds > 0 ? '${rSeconds}s' : ''}';
+
+    if (diffSeconds.isNegative) {
+      return '...';
+    }
   }
 }
 
