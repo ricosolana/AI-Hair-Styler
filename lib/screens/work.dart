@@ -37,29 +37,20 @@ class WorkItemModel with ChangeNotifier {
 }
 
 class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
-  //List<String> workIDs = [];
-  //Map<String, String> workIDStatuses = {};
-
   WorkPopupItems? selectedItem;
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
   final Tween<Offset> _tween = Tween(
       begin: const Offset(1, 0),
       end: Offset.zero
   );
-  //late List<WorkItemModel> _refreshNotifiers;
-  //late StreamController<TaskProgress> _controller;
-  //late Timer _timer;
 
   late PreferencesProvider prefs;
   late List<String> cachedWorkIDList;
 
   Stream<TaskProgress> fetchJobStatusPeriodically(String workID) {
     return Stream.periodic(const Duration(seconds: 1), (count) async {
-      // Simulate fetching data from the server
-      // Replace this with your actual data fetching logic
       return await _checkBarberStatus(workID);
     }).asyncMap((event) async {
-      // Assuming _fetchJobStatusFromServer returns a Future<TaskProgress>
       return await event;
     });
   }
@@ -70,29 +61,6 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
 
     prefs = Provider.of<PreferencesProvider>(context, listen: false);
     cachedWorkIDList = prefs.get<List<String>>(apiCachedWorkIDListPrefKey)!.reversed.toList();
-
-    /*
-    // Refresh sub
-    //_timer = Timer.periodic(const Duration(seconds: 3), (Timer t) {});
-    _controller = StreamController<TaskProgress>(
-      onListen: () async {
-        //  TODO eventually read individual hosts based on file
-        final host = prefs.get<String>(apiHostPrefKey)!;
-        final accessToken = prefs.get<String>(apiTokenPrefKey)!;
-        // TODO whether this close gets called on widget dispose
-        while (!_controller.isClosed) {
-          //final prefs = Provider.of<PreferencesProvider>(context, listen: false);
-          // just add the
-          //
-          await Future.delayed(const Duration(seconds: 1));
-          await getBarberStatus(host, accessToken, workID)
-              .then((value) => controller.add(value))
-              .onError((error, stackTrace) => controller.close());
-          //controller.add(await getBarberStatus(host, accessToken, workID));
-        }
-        await controller.close();
-      },
-    );*/
   }
 
   @override
@@ -108,36 +76,6 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
 
     return getBarberStatus(host, accessToken, workID);
   }
-
-  /*
-  //  are prefs even passable
-  //  what will stream pass through to streambuilder
-  //    wrap deserialized TaskStatus'
-  final Stream<TaskProgress> _stream = ((PreferencesProvider prefs, String workID) {
-  // TODO the plan here would be to pass required params
-  //final Stream<TaskProgress> _stream = ((String host, String accessToken, String workID) {
-    late final StreamController<TaskProgress> controller;
-    controller = StreamController<TaskProgress>(
-      onListen: () async {
-        //  TODO eventually read individual hosts based on file
-        final host = prefs.get<String>(apiHostPrefKey)!;
-        final accessToken = prefs.get<String>(apiTokenPrefKey)!;
-        // TODO whether this close gets called on widget dispose
-        while (!controller.isClosed) {
-          //final prefs = Provider.of<PreferencesProvider>(context, listen: false);
-          // just add the
-          //
-          await Future.delayed(const Duration(seconds: 1));
-          await getBarberStatus(host, accessToken, workID)
-              .then((value) => controller.add(value))
-              .onError((error, stackTrace) => controller.close());
-          //controller.add(await getBarberStatus(host, accessToken, workID));
-        }
-        await controller.close();
-      },
-    );
-    return controller.stream;
-  })();*/
 
   @override
   Widget build(BuildContext context) {
@@ -161,20 +99,9 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                 color: Colors.white,
                 backgroundColor: Colors.blue,
                 onRefresh: () async {
-                  // Replace this delay with the code to be executed during refresh
-                  // and return asynchronous code
-                  //return Future<void>.delayed(const Duration(seconds: 3));
-                  // TODO refresh, l
+                  // TODO refresh
                   setState(() {});
                 },
-                // This check is used to customize listening to scroll notifications
-                // from the widget's children.
-                //
-                // By default this is set to `notification.depth == 0`, which ensures
-                // the only the scroll notifications from the first scroll view are listened to.
-                //
-                // Here setting `notification.depth == 1` triggers the refresh indicator
-                // when overscrolling the nested scroll view.
                 notificationPredicate: (ScrollNotification notification) {
                   return notification.depth == 0;
                 },
@@ -184,11 +111,6 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                   physics: const AlwaysScrollableScrollPhysics(),
                   initialItemCount: cachedWorkIDList.length,
                   itemBuilder: (context, index, animation) {
-                    // We want to render the list backwards,
-                    //  so the new items appear first
-                    //final reverseIndex = cachedWorkIDList.length - index - 1;
-                    //index = cachedWorkIDList.length - index;
-                    //final workID = cachedWorkIDList[cachedWorkIDList.length - index - 1];
                     final workID = cachedWorkIDList[index];
                     return SlideTransition(
                       position: _tween.animate(animation),
@@ -260,7 +182,6 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                             title: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                //const Spacer(),
                                 Expanded(
                                   flex: 2,
                                   child: Center(
@@ -322,7 +243,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                                   //  strokeWidth: 10,
                                                   //),
                                                   Center(
-                                                    child: Text(progress.status),
+                                                    child: Text(progress.statusLabel),
                                                   ),
                                                 ],
                                               );

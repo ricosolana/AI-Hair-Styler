@@ -9,32 +9,22 @@ import 'package:http/http.dart' as http;
 const int timeout = 5;
 
 class TaskProgress {
-  //late TaskStatus status; //': task.status.name,
-  late String status;
-  //'status-value': task.status.value,
+  late String statusLabel;
   int? currentTransformerPercentage;
-  late double timeQueued;
-  late double timeAlignStarted;
-  late double timeBarberStarted;
-  //#'time-barber-started': task.time_barber_started(),
-  late double timeBarberEnded;
-  late double initialBarberDurationEstimate;
-  //#'initial-barber-duration-estimate': task.initial_barber_duration_estimate(),
-  late double durationBarber;
-  //late double estimateTimeBarberEnded;
+  late int utcQueued;
+  late int utcAlignStarted;
+  late int utcBarberStarted;
+  late int utcBarberEnded;
+  late int initialBarberDurationEstimate;
 
   TaskProgress.fromJson(Map<String, dynamic> json) {
-    //status = TaskStatus.values.byName((json['status'] as String).toLowerCase().);
-    //status = TaskStatus.values[json['status-value'] as int];
-    status = json['status-label'] as String;
+    statusLabel = json['status-label'] as String;
     currentTransformerPercentage = json['current-transformer-percentage'];
-    timeQueued = json['time-queued'].toDouble();
-    timeAlignStarted = json['time-align-started'].toDouble();
-    timeBarberStarted = json['time-barber-started'].toDouble();
-    timeBarberEnded = json['time-barber-ended'].toDouble();
-    initialBarberDurationEstimate =
-        json['initial-barber-duration-estimate'].toDouble();
-    durationBarber = json['duration-barber'].toDouble();
+    utcQueued = json['utc-queued'] as int;
+    utcAlignStarted = json['utc-align-started'] as int;
+    utcBarberStarted = json['utc-barber-started'] as int;
+    utcBarberEnded = json['utc-barber-ended'] as int;
+    initialBarberDurationEstimate = json['initial-barber-duration-estimate'] as int;
   }
 }
 
