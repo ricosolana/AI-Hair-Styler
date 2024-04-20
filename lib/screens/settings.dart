@@ -73,7 +73,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
                       );
                     } else {
                       Fluttertoast.showToast(
-                        msg: 'Failed to cache templates',
+                        msg: 'Failed to cache templates (${response.statusCode})',
                       );
                     }
                   }).onError((error, stackTrace) {

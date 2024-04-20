@@ -184,10 +184,10 @@ Future<bool> checkAccessToken(
         Fluttertoast.showToast(msg: 'Verified');
       }
       return true;
+    } else if (code == 404 || code >= 500) {
+      Fluttertoast.showToast(msg: 'Server error or backend unavailable ($code)');
     } else if (code >= 400 && code < 500) {
       Fluttertoast.showToast(msg: 'Expired or invalid access token ($code)');
-    } else if (code >= 500) {
-      Fluttertoast.showToast(msg: 'Server error or backend unavailable($code)');
     } else {
       Fluttertoast.showToast(
         msg: 'Unknown error (${response.reasonPhrase}, $code)',
