@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 const int timeout = 5;
 
 class TaskProgress {
+  late String status;
   late String statusLabel;
   int? currentTransformerPercentage;
   late int utcQueued;
@@ -19,6 +20,7 @@ class TaskProgress {
   int? initialBarberDurationEstimate;
 
   TaskProgress.fromJson(Map<String, dynamic> json) {
+    status = json['status'] as String;
     statusLabel = json['status-label'] as String;
     currentTransformerPercentage = json['current-transformer-percentage'];
     utcQueued = json['utc-queued'] as int;
