@@ -13,64 +13,62 @@ class TaskProgress {
   late String status;
   late String statusLabel;
   int? currentTransformerPercentage;
-  late int utcQueued;
-  late int utcAlignStarted;
-  late int utcBarberStarted;
-  late int utcBarberEnded;
+  int? utcQueued;
+  int? utcAlignStarted;
+  int? utcBarberStarted;
+  int? utcBarberEnded;
   int? initialBarberDurationEstimate;
 
   TaskProgress.fromJson(Map<String, dynamic> json) {
     status = json['status'] as String;
     statusLabel = json['status-label'] as String;
     currentTransformerPercentage = json['current-transformer-percentage'];
-    utcQueued = json['utc-queued'] as int;
-    utcAlignStarted = json['utc-align-started'] as int;
-    utcBarberStarted = json['utc-barber-started'] as int;
-    utcBarberEnded = json['utc-barber-ended'] as int;
+    utcQueued = json['utc-queued'];
+    utcAlignStarted = json['utc-align-started'];
+    utcBarberStarted = json['utc-barber-started'];
+    utcBarberEnded = json['utc-barber-ended'];
     initialBarberDurationEstimate = json['initial-barber-duration-estimate'];
   }
 
   String getEstimatedRemainingTimeString() {
-    if (initialBarberDurationEstimate != null) {
-      final utcEstEndBarber = utcBarberStarted + initialBarberDurationEstimate!;
+    if (utcBarberStarted != null && initialBarberDurationEstimate != null) {
+      final utcEstEndBarber = utcBarberStarted! + initialBarberDurationEstimate!;
       final utcNow = (DateTime.now().toUtc().millisecondsSinceEpoch) ~/ 1000.0;
 
       final diffSeconds = utcEstEndBarber - utcNow;
 
-      if (diffSeconds.isNegative) {
-        return '...';
+      if (diffSeconds >= 0) {
+        final rSeconds = diffSeconds % 60;
+
+        final diffMinutes = (diffSeconds - rSeconds) ~/ 60;
+        final rMinutes = diffMinutes % 60;
+
+        final diffHours = (diffMinutes - rMinutes) ~/ 60;
+        final rHours = diffHours % 60;
+
+        final diffDays = (diffHours - rHours) ~/ 24;
+        final rDays = diffHours % 24;
+
+        final diffWeeks = (diffDays - rDays) ~/ 7;
+        final rWeeks = diffWeeks % 7;
+
+        //
+        return '~${rWeeks > 0 ? '${rWeeks}w' : ''}'
+            '${rDays > 0 ? '${rDays}d' : ''}'
+            '${rHours > 0 ? '${rHours}h' : ''}'
+            '${rMinutes > 0 ? '${rMinutes}m' : ''}'
+            '${rSeconds > 0 ? '${rSeconds}s' : ''}';
       }
-
-      final rSeconds = diffSeconds % 60;
-
-      final diffMinutes = (diffSeconds - rSeconds) ~/ 60;
-      final rMinutes = diffMinutes % 60;
-
-      final diffHours = (diffMinutes - rMinutes) ~/ 60;
-      final rHours = diffHours % 60;
-
-      final diffDays = (diffHours - rHours) ~/ 24;
-      final rDays = diffHours % 24;
-
-      final diffWeeks = (diffDays - rDays) ~/ 7;
-      final rWeeks = diffWeeks % 7;
-
-      //
-      return '~${rWeeks > 0 ? '${rWeeks}w' : ''}'
-          '${rDays > 0 ? '${rDays}d' : ''}'
-          '${rHours > 0 ? '${rHours}h' : ''}'
-          '${rMinutes > 0 ? '${rMinutes}m' : ''}'
-          '${rSeconds > 0 ? '${rSeconds}s' : ''}';
-
-      //final fmt = DateFormat('D:H:mm').format(DateTime.fromMillisecondsSinceEpoch(diffSeconds * 1000, isUtc: true));
-      //return fmt;
     }
-    return '...';
+    return 'TBD';
   }
 
   String getElapsedTimeString() {
-    final utcNow = (DateTime.now().toUtc().millisecondsSinceEpoch) ~/ 1000.0;
-    final diffSeconds = utcNow - utcBarberStarted;
+    final utcNow = (DateTime
+        .now()
+        .toUtc()
+        .millisecondsSinceEpoch) ~/ 1000.0;
+    final diffSeconds = utcNow - utcQueued!;
 
     final rSeconds = diffSeconds % 60;
 
@@ -92,10 +90,6 @@ class TaskProgress {
         '${rHours > 0 ? '${rHours}h' : ''}'
         '${rMinutes > 0 ? '${rMinutes}m' : ''}'
         '${rSeconds > 0 ? '${rSeconds}s' : ''}';
-
-    if (diffSeconds.isNegative) {
-      return '...';
-    }
   }
 }
 
