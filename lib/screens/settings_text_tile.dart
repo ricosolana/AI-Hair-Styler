@@ -34,23 +34,21 @@ class MyTextDialog extends StatefulWidget {
 }
 
 class _MyTextDialogState extends State<MyTextDialog> {
-  late String textString;
-  late TextEditingController _textEditingController;
+  final _textEditingController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   final _formKey = GlobalKey<FormState>();
 
   void _loadText() {
     setState(() {
-      textString = Provider.of<PreferencesProvider>(context, listen: false)
-          .getOr<String>(widget.prefKey, widget.defaultText);
+      _textEditingController.text = Provider.of<PreferencesProvider>(context, listen: false)
+          .rawOr(widget.prefKey, widget.defaultText).toString();
     });
   }
 
   void _saveText(String text) {
     setState(() {
-      textString = text;
       Provider.of<PreferencesProvider>(context, listen: false)
-          .set(widget.prefKey, textString);
+          .set(widget.prefKey, _textEditingController.text);
     });
   }
 
@@ -58,7 +56,6 @@ class _MyTextDialogState extends State<MyTextDialog> {
   void initState() {
     super.initState();
     _loadText();
-    _textEditingController = TextEditingController(text: textString);
   }
 
   @override
