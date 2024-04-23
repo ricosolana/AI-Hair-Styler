@@ -7,34 +7,89 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
+import 'package:intl/intl.dart';
 
 class TaskProgress {
-  //late TaskStatus status; //': task.status.name,
   late String status;
-  //'status-value': task.status.value,
+  late String statusLabel;
   int? currentTransformerPercentage;
-  late double timeQueued;
-  late double timeAlignStarted;
-  late double timeBarberStarted;
-  //#'time-barber-started': task.time_barber_started(),
-  late double timeBarberEnded;
-  late double initialBarberDurationEstimate;
-  //#'initial-barber-duration-estimate': task.initial_barber_duration_estimate(),
-  late double durationBarber;
-  //late double estimateTimeBarberEnded;
+  int? utcQueued;
+  int? utcAlignStarted;
+  int? utcBarberStarted;
+  int? utcBarberEnded;
+  int? initialBarberDurationEstimate;
 
   TaskProgress.fromJson(Map<String, dynamic> json) {
-    //status = TaskStatus.values.byName((json['status'] as String).toLowerCase().);
-    //status = TaskStatus.values[json['status-value'] as int];
-    status = json['status-label'] as String;
+    status = json['status'] as String;
+    statusLabel = json['status-label'] as String;
     currentTransformerPercentage = json['current-transformer-percentage'];
-    timeQueued = json['time-queued'].toDouble();
-    timeAlignStarted = json['time-align-started'].toDouble();
-    timeBarberStarted = json['time-barber-started'].toDouble();
-    timeBarberEnded = json['time-barber-ended'].toDouble();
-    initialBarberDurationEstimate =
-        json['initial-barber-duration-estimate'].toDouble();
-    durationBarber = json['duration-barber'].toDouble();
+    utcQueued = json['utc-queued'];
+    utcAlignStarted = json['utc-align-started'];
+    utcBarberStarted = json['utc-barber-started'];
+    utcBarberEnded = json['utc-barber-ended'];
+    initialBarberDurationEstimate = json['initial-barber-duration-estimate'];
+  }
+
+  String getEstimatedRemainingTimeString() {
+    if (utcBarberStarted != null && initialBarberDurationEstimate != null) {
+      final utcEstEndBarber = utcBarberStarted! + initialBarberDurationEstimate!;
+      final utcNow = (DateTime.now().toUtc().millisecondsSinceEpoch) ~/ 1000.0;
+
+      final diffSeconds = utcEstEndBarber - utcNow;
+
+      if (diffSeconds >= 0) {
+        final rSeconds = diffSeconds % 60;
+
+        final diffMinutes = (diffSeconds - rSeconds) ~/ 60;
+        final rMinutes = diffMinutes % 60;
+
+        final diffHours = (diffMinutes - rMinutes) ~/ 60;
+        final rHours = diffHours % 60;
+
+        final diffDays = (diffHours - rHours) ~/ 24;
+        final rDays = diffHours % 24;
+
+        final diffWeeks = (diffDays - rDays) ~/ 7;
+        final rWeeks = diffWeeks % 7;
+
+        //
+        return '~${rWeeks > 0 ? '${rWeeks}w' : ''}'
+            '${rDays > 0 ? '${rDays}d' : ''}'
+            '${rHours > 0 ? '${rHours}h' : ''}'
+            '${rMinutes > 0 ? '${rMinutes}m' : ''}'
+            '${rSeconds > 0 ? '${rSeconds}s' : ''}';
+      }
+    }
+    return 'TBD';
+  }
+
+  String getElapsedTimeString() {
+    final utcNow = (DateTime
+        .now()
+        .toUtc()
+        .millisecondsSinceEpoch) ~/ 1000.0;
+    final diffSeconds = utcNow - utcQueued!;
+
+    final rSeconds = diffSeconds % 60;
+
+    final diffMinutes = (diffSeconds - rSeconds) ~/ 60;
+    final rMinutes = diffMinutes % 60;
+
+    final diffHours = (diffMinutes - rMinutes) ~/ 60;
+    final rHours = diffHours % 60;
+
+    final diffDays = (diffHours - rHours) ~/ 24;
+    final rDays = diffHours % 24;
+
+    final diffWeeks = (diffDays - rDays) ~/ 7;
+    final rWeeks = diffWeeks % 7;
+
+    //
+    return '${rWeeks > 0 ? '${rWeeks}w' : ''}'
+        '${rDays > 0 ? '${rDays}d' : ''}'
+        '${rHours > 0 ? '${rHours}h' : ''}'
+        '${rMinutes > 0 ? '${rMinutes}m' : ''}'
+        '${rSeconds > 0 ? '${rSeconds}s' : ''}';
   }
 }
 
@@ -126,10 +181,10 @@ Future<bool> checkAccessToken(
         Fluttertoast.showToast(msg: 'Verified');
       }
       return true;
+    } else if (code == 404 || code >= 500) {
+      Fluttertoast.showToast(msg: 'Server error or backend unavailable ($code)');
     } else if (code >= 400 && code < 500) {
       Fluttertoast.showToast(msg: 'Expired or invalid access token ($code)');
-    } else if (code >= 500) {
-      Fluttertoast.showToast(msg: 'Server error or backend unavailable($code)');
     } else {
       Fluttertoast.showToast(
         msg: 'Unknown error (${response.reasonPhrase}, $code)',

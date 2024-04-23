@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -37,49 +38,90 @@ class WorkItemModel with ChangeNotifier {
 }
 
 class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
-  //List<String> workIDs = [];
-  //Map<String, String> workIDStatuses = {};
-
   WorkPopupItems? selectedItem;
-  //late List<WorkItemModel> _refreshNotifiers;
-  //late StreamController<TaskProgress> _controller;
-  //late Timer _timer;
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey();
+  final Tween<Offset> _tween = Tween(
+      begin: const Offset(1, 0),
+      end: Offset.zero
+  );
 
-  Stream<TaskProgress> fetchJobStatusPeriodically(String workID) {
-    return Stream.periodic(const Duration(seconds: 1), (count) async {
-      // Simulate fetching data from the server
-      // Replace this with your actual data fetching logic
-      return await _checkBarberStatus(workID);
-    }).asyncMap((event) async {
-      // Assuming _fetchJobStatusFromServer returns a Future<TaskProgress>
-      return await event;
-    });
+  late PreferencesProvider prefs;
+  late List<String> cachedWorkIDList;
+  late List<WorkItemModel> workQueueIndexNotifiers;
+
+  Stream<TaskProgress> fetchJobStatusPeriodically({
+      required String workID,
+      required int index,
+    }) {
+    // Create a StreamController to manually control the stream
+    final controller = StreamController<TaskProgress>();
+
+    // Start the periodic stream
+    final subscription = Stream.periodic(const Duration(seconds: 1), (count) async {
+      final host = prefs.get<String>(apiHostPrefKey)!;
+      final accessToken = prefs.get<String>(apiTokenPrefKey)!;
+
+      return await bapiApiBarberStatus(
+        host: host,
+        accessToken: accessToken,
+        workID: workID,
+      );
+      //    .then((response) {
+      //  if (response.statusCode == 200) {
+      //    final json = jsonDecode(response.body) as Map<String, dynamic>;
+      //    return TaskProgress.fromJson(json);
+      //  } else {
+      //    //controller.addError(error as Object, stackTrace as StackTrace);
+      //    controller.close();
+      //  }
+      //}).onError((error, stackTrace) {
+      //  controller.addError(error!, stackTrace);
+      //  controller.close();
+      //});
+    }).listen(
+      (future) async {
+        final response = await future;
+        if (response.statusCode == 200) {
+          final json = jsonDecode(response.body) as Map<String, dynamic>;
+
+          final progress = TaskProgress.fromJson(json);
+
+          if (progress.status == 'COMPLETE') {
+            workQueueIndexNotifiers[index].update();
+          } else {
+            controller.add(progress);
+          }
+        } else {
+          controller.close();
+        }
+      },
+      onError: (error, stackTrace) {
+        controller.addError(error as Object, stackTrace as StackTrace);
+        controller.close();
+      },
+      cancelOnError: true,
+    );
+
+    // When the controller is cancelled, cancel the subscription
+    controller.onCancel = () {
+      subscription.cancel();
+    };
+
+    return controller.stream;
   }
 
   @override
   void initState() {
     super.initState();
-  }
 
-  @override
-  void dispose() {
-    //_timer.cancel(); // Cancel the timer when the widget is disposed to avoid memory leaks
-    super.dispose();
-  }
-
-  Future<TaskProgress> _checkBarberStatus(String workID) async {
-    final prefs = Provider.of<PreferencesProvider>(context, listen: false);
-    final host = prefs.ensure<String>(apiHostPrefKey);
-    final accessToken = prefs.ensure<String>(apiTokenPrefKey);
-
-    return getBarberStatus(host, accessToken, workID);
+    prefs = Provider.of<PreferencesProvider>(context, listen: false);
+    cachedWorkIDList = prefs.ensure<List<String>>(apiCachedWorkIDListPrefKey).reversed.toList();
+    workQueueIndexNotifiers = List.generate(cachedWorkIDList.length, (_) => WorkItemModel());
   }
 
   @override
   Widget build(BuildContext context) {
-    final prefs = Provider.of<PreferencesProvider>(context, listen: false);
-    final cachedWorkIDList =
-        prefs.ensure<List<String>>(apiCachedWorkIDListPrefKey);
+    final host = prefs.ensure<String>(apiHostPrefKey);
 
     final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
 
@@ -90,211 +132,291 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
         title: const Text("Work Queue"),
       ),
       body: Center(
-        child: Column(
+        child: cachedWorkIDList.isEmpty
+            ? const Text('Hmm, no work.') :
+        Column(
           children: [
             Expanded(
               child: RefreshIndicator(
                 color: Colors.white,
                 backgroundColor: Colors.blue,
                 onRefresh: () async {
-                  // Replace this delay with the code to be executed during refresh
-                  // and return asynchronous code
-                  //return Future<void>.delayed(const Duration(seconds: 3));
-                  // TODO refresh, l
+                  // TODO refresh
                   setState(() {});
                 },
-                // This check is used to customize listening to scroll notifications
-                // from the widget's children.
-                //
-                // By default this is set to `notification.depth == 0`, which ensures
-                // the only the scroll notifications from the first scroll view are listened to.
-                //
-                // Here setting `notification.depth == 1` triggers the refresh indicator
-                // when overscrolling the nested scroll view.
                 notificationPredicate: (ScrollNotification notification) {
                   return notification.depth == 0;
                 },
-                // TODO do not use reversed,
-                //  use list.builder; its optimized
-                child: ListView(
+                // TODO use ListView.builder
+                child: AnimatedList(
+                  key: _listKey,
                   physics: const AlwaysScrollableScrollPhysics(),
-                  children: cachedWorkIDList.reversed.map((workID) {
-                    final host = prefs.ensure<String>(apiHostPrefKey);
-                    return ListTile(
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          //const Spacer(),
-                          Expanded(
-                            flex: 2,
-                            child: Center(
-                              child: CachedNetworkImage(
-                                imageUrl: bapiGeneratedUrl(host, workID).toString(),
-                                memCacheWidth: (100 * devicePixelRatio).round(),
-                                progressIndicatorBuilder:
-                                    (context, url, progress) =>
-                                        CircularProgressIndicator(
-                                  value: progress.progress,
+                  initialItemCount: cachedWorkIDList.length,
+                  itemBuilder: (context, index, animation) {
+                    final workID = cachedWorkIDList[index];
+                    return SlideTransition(
+                      position: _tween.animate(animation),
+                      child: Dismissible(
+                        //key: Key(workID),
+                        key: UniqueKey(),
+                        // Accept
+                        background: const ColoredBox(
+                          color: Colors.green,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 16),
+                              child: Icon(Icons.save),
+                            ),
+                          ),
+                        ),
+                        secondaryBackground: const ColoredBox(
+                          color: Colors.red,
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Padding(
+                              padding: EdgeInsets.only(right: 16),
+                              child: Icon(Icons.delete),
+                            ),
+                          ),
+                        ),
+                        confirmDismiss: (direction) async {
+                          // In this case, swiping any direction will dismiss element
+                          //bool delete = true;
+
+                          if (direction == DismissDirection.startToEnd) {
+                            // TODO send image to gallery
+                          } else {
+                            ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Deleted $workID'),
+                                action: SnackBarAction(
+                                  label: 'Undo',
+                                  onPressed: () {
+                                    setState(() {
+                                      _tween.begin = Offset(direction == DismissDirection.startToEnd ? 1 : -1, 0);
+
+                                      cachedWorkIDList.insert(index, workID);
+                                      prefs.set(apiCachedWorkIDListPrefKey, cachedWorkIDList.reversed.toList());
+                                      _listKey.currentState?.insertItem(index);
+                                      //cachedWorkIDList.insert(cachedWorkIDList.length - index, workID);
+                                    });
+                                  }
                                 ),
-                                errorListener: (obj) {
-                                  log(obj.toString());
-                                },
-                                errorWidget: (context, url, error) {
-                                  // TODO show status/progress
-                                  return StreamBuilder<TaskProgress>(
-                                    stream: fetchJobStatusPeriodically(workID),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return const CircularProgressIndicator();
-                                      } else if (snapshot.hasError) {
-                                        // somewhat unexpected for the API to not respond
-                                        return Icon(MdiIcons.serverOff);
-                                      } else {
-                                        final progress = snapshot.data!;
-                                        return Stack(
-                                          alignment: Alignment.center,
-                                          children: <Widget>[
-                                            if (progress
-                                                    .currentTransformerPercentage !=
-                                                null)
-                                              TweenAnimationBuilder<double>(
-                                                // TODO check if tween bounds require [0,1]
-                                                //tween: Tween<double>(begin: 0, end: progress.),
-                                                tween: Tween<double>(
-                                                    begin: 0,
-                                                    end: progress
-                                                            .currentTransformerPercentage!
-                                                            .toDouble() /
-                                                        100.0,),
-                                                // TODO test
-                                                duration:
-                                                    const Duration(seconds: 1),
-                                                builder: (BuildContext context,
-                                                    double tweenValue,
-                                                    Widget? child,) {
-                                                  return CircularProgressIndicator(
-                                                    value: tweenValue,
-                                                    strokeWidth: 10,
-                                                  );
-                                                },
-                                                child: const Icon(
-                                                    Icons.aspect_ratio,),
-                                              ),
-                                            //CircularProgressIndicator(
-                                            //  value: progress.currentTransformerPercentage!.toDouble() / 100.0,
-                                            //  strokeWidth: 10,
-                                            //),
-                                            Center(
-                                              child: Text(progress.status),
+                              ),
+                            );
+                          }
+                          //return delete;
+                          return true;
+                        },
+                        onDismissed: (_) {
+                          setState(() {
+                            cachedWorkIDList.removeAt(index);
+                            //cachedWorkIDList.remove(workID);
+                            prefs.set(apiCachedWorkIDListPrefKey, cachedWorkIDList.reversed.toList());
+                            _listKey.currentState?.removeItem(index, (context, animation) => Container());
+                          });
+                        },
+                        child: SizeTransition(
+                          sizeFactor: animation,
+                          child: ListenableBuilder(
+                            listenable: workQueueIndexNotifiers[index],
+                            builder: (context, child) => ListTile(
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    flex: 2,
+                                    child: Center(
+                                      child: CachedNetworkImage(
+                                        imageUrl: bapiGeneratedUrl(host, workID).toString(),
+                                        memCacheWidth: (100 * devicePixelRatio).round(),
+                                        progressIndicatorBuilder:
+                                            (context, url, progress) =>
+                                                CircularProgressIndicator(
+                                          value: progress.progress,
+                                        ),
+                                        errorListener: (obj) {
+                                          log(obj.toString());
+                                        },
+                                        errorWidget: (context, url, error) {
+                                          // TODO show status/progress
+                                          return StreamBuilder<TaskProgress>(
+                                            stream: fetchJobStatusPeriodically(
+                                              workID: workID,
+                                              index: index,
                                             ),
-                                          ],
-                                        );
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const CircularProgressIndicator();
+                                              } else if (snapshot.hasError) {
+                                                // somewhat unexpected for the API to not respond
+                                                return Icon(MdiIcons.serverOff);
+                                              } else { //if (snapshot.connectionState != ConnectionState.done) {
+                                                if (snapshot.data == null) {
+                                                  return const Text(
+                                                    'Unable to query status',
+                                                    textAlign: TextAlign.center,
+                                                  );
+                                                }
+                                                final progress = snapshot.data!;
+
+                                                return Column(
+                                                  //alignment: Alignment.center,
+                                                  children: <Widget>[
+                                                    if (progress
+                                                            .currentTransformerPercentage !=
+                                                        null)
+                                                      TweenAnimationBuilder<double>(
+                                                        // TODO check if tween bounds require [0,1]
+                                                        //tween: Tween<double>(begin: 0, end: progress.),
+                                                        tween: Tween<double>(
+                                                            begin: 0,
+                                                            end: progress
+                                                                    .currentTransformerPercentage!
+                                                                    .toDouble() /
+                                                                100.0,),
+                                                        // TODO test
+                                                        duration:
+                                                            const Duration(seconds: 1),
+                                                        builder: (BuildContext context,
+                                                            double tweenValue,
+                                                            Widget? child,) {
+                                                          return CircularProgressIndicator(
+                                                            value: tweenValue,
+                                                            strokeWidth: 10,
+                                                          );
+                                                        },
+                                                        child: const Icon(
+                                                            Icons.aspect_ratio,),
+                                                      ),
+                                                    //CircularProgressIndicator(
+                                                    //  value: progress.currentTransformerPercentage!.toDouble() / 100.0,
+                                                    //  strokeWidth: 10,
+                                                    //),
+                                                    if (progress
+                                                        .currentTransformerPercentage !=
+                                                        null)
+                                                      const Padding(padding: EdgeInsets.symmetric(vertical: 5)),
+                                                    Text(progress.statusLabel),
+                                                    // Additional text underneath the indicator
+                                                    if (progress.currentTransformerPercentage != null)
+                                                      //Text('Additional Text Here'),
+                                                      Text(progress.getEstimatedRemainingTimeString()),
+                                                    //Text('Additional Text Here'),
+                                                    Text(progress.getElapsedTimeString()),
+                                                  ],
+                                                );
+                                              }
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      workID, //cachedImageWorkName.limit(40),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16.0,
+                                      ),
+                                    ),
+                                  ),
+                                  PopupMenuButton<WorkPopupItems>(
+                                    initialValue: selectedItem,
+                                    onSelected: (WorkPopupItems item) async {
+                                      switch (item) {
+                                        // TODO grey-out menu item if work is not completed
+                                        case WorkPopupItems.save:
+                                          // trigger save?
+                                          final cache = DefaultCacheManager();
+                                          final file = await cache.getFileFromCache(
+                                            bapiGeneratedUrl(host, workID).toString(),
+                                          );
+
+                                          if (file != null) {
+                                            final params = SaveFileDialogParams(
+                                              sourceFilePath: file.file.path,
+                                              fileName: workID +
+                                                  path.extension(file.file.basename),
+                                            );
+                                            final filePath =
+                                                await FlutterFileDialog.saveFile(
+                                              params: params,
+                                            );
+
+                                            if (filePath != null) {
+                                              Fluttertoast.showToast(
+                                                msg: 'Saved to directory $filePath',
+                                                toastLength: Toast.LENGTH_LONG,
+                                              );
+                                            }
+                                          }
+
+                                        case WorkPopupItems.copyFileName:
+                                          await Clipboard.setData(
+                                            ClipboardData(
+                                              text: workID,
+                                            ),
+                                          );
+                                          Fluttertoast.showToast(msg: 'Copied filename');
+                                        case WorkPopupItems.copyUrl:
+                                          await Clipboard.setData(
+                                            ClipboardData(
+                                              text: bapiGeneratedUrl(host, workID).toString(),
+                                            ),
+                                          );
+                                          Fluttertoast.showToast(
+                                            msg: 'Copied generated url',
+                                          );
+                                        case WorkPopupItems.openUrl:
+                                          if (!await launchUrl(bapiGeneratedUrl(host, workID))) {
+                                            Fluttertoast.showToast(
+                                              msg: 'Unable to open URL',
+                                            );
+                                          }
+
                                       }
+                                      setState(() {
+                                        selectedItem = item;
+                                      });
                                     },
-                                  );
-                                },
+                                    itemBuilder: (BuildContext context) =>
+                                        <PopupMenuEntry<WorkPopupItems>>[
+                                      const PopupMenuItem<WorkPopupItems>(
+                                        value: WorkPopupItems.save,
+                                        child: Text('Save'),
+                                      ),
+                                      const PopupMenuItem<WorkPopupItems>(
+                                        value: WorkPopupItems.copyFileName,
+                                        child: Text('Copy file name'),
+                                      ),
+                                      const PopupMenuItem<WorkPopupItems>(
+                                        value: WorkPopupItems.copyUrl,
+                                        child: Text('Copy generated URL'),
+                                      ),
+                                      const PopupMenuItem<WorkPopupItems>(
+                                        value: WorkPopupItems.openUrl,
+                                        child: Text('Open in browser'),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
+                              onTap: () async {
+                                // TODO what should be do on click?
+                                //    show a larger image?
+                              },
                             ),
                           ),
-                          Expanded(
-                            flex: 2,
-                            child: Text(
-                              workID, //cachedImageWorkName.limit(40),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16.0,
-                              ),
-                            ),
-                          ),
-                          PopupMenuButton<WorkPopupItems>(
-                            initialValue: selectedItem,
-                            onSelected: (WorkPopupItems item) async {
-                              switch (item) {
-                                // TODO grey-out menu item if work is not completed
-                                case WorkPopupItems.save:
-                                  // trigger save?
-                                  final cache = DefaultCacheManager();
-                                  final file = await cache.getFileFromCache(
-                                    bapiGeneratedUrl(host, workID).toString(),
-                                  );
-
-                                  if (file != null) {
-                                    final params = SaveFileDialogParams(
-                                      sourceFilePath: file.file.path,
-                                      fileName: workID +
-                                          path.extension(file.file.basename),
-                                    );
-                                    final filePath =
-                                        await FlutterFileDialog.saveFile(
-                                      params: params,
-                                    );
-
-                                    if (filePath != null) {
-                                      Fluttertoast.showToast(
-                                        msg: 'Saved to directory $filePath',
-                                        toastLength: Toast.LENGTH_LONG,
-                                      );
-                                    }
-                                  }
-
-                                case WorkPopupItems.copyFileName:
-                                  await Clipboard.setData(
-                                    ClipboardData(
-                                      text: workID,
-                                    ),
-                                  );
-                                  Fluttertoast.showToast(msg: 'Copied filename');
-                                case WorkPopupItems.copyUrl:
-                                  await Clipboard.setData(
-                                    ClipboardData(
-                                      text: bapiGeneratedUrl(host, workID).toString(),
-                                    ),
-                                  );
-                                  Fluttertoast.showToast(
-                                    msg: 'Copied generated url',
-                                  );
-                                case WorkPopupItems.openUrl:
-                                  if (!await launchUrl(bapiGeneratedUrl(host, workID))) {
-                                    Fluttertoast.showToast(
-                                      msg: 'Unable to open URL',
-                                    );
-                                  }
-
-                              }
-                              setState(() {
-                                selectedItem = item;
-                              });
-                            },
-                            itemBuilder: (BuildContext context) =>
-                                <PopupMenuEntry<WorkPopupItems>>[
-                              const PopupMenuItem<WorkPopupItems>(
-                                value: WorkPopupItems.save,
-                                child: Text('Save'),
-                              ),
-                              const PopupMenuItem<WorkPopupItems>(
-                                value: WorkPopupItems.copyFileName,
-                                child: Text('Copy file name'),
-                              ),
-                              const PopupMenuItem<WorkPopupItems>(
-                                value: WorkPopupItems.copyUrl,
-                                child: Text('Copy generated URL'),
-                              ),
-                              const PopupMenuItem<WorkPopupItems>(
-                                value: WorkPopupItems.openUrl,
-                                child: Text('Open in browser'),
-                              ),
-                            ],
-                          ),
-                        ],
+                        ),
                       ),
-                      onTap: () async {
-                        // TODO what should be do on click?
-                        //    show a larger image?
-                      },
                     );
-                  }).toList(),
-                ),
+                  })
               ),
             ),
           ],
@@ -324,7 +446,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                             ),
                             child: const Text('Clear all'),
                             onPressed: () {
-                              prefs.set(apiCachedWorkIDListPrefKey, <String>[]);
+                              cachedWorkIDList.clear();
+                              prefs.set(apiCachedWorkIDListPrefKey, cachedWorkIDList);
                               setState(() {});
                               Navigator.of(context).pop();
                               Fluttertoast.showToast(msg: 'Cleared work queue');

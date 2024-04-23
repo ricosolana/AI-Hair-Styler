@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
     final prefs = Provider.of<PreferencesProvider>(context);
 
     return MaterialApp(
-      title: 'Hair Styler',
+      title: 'B3S',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
         useMaterial3: true,
@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
       themeMode: prefs.getOr(darkThemePrefKey, false)
           ? ThemeMode.dark
           : ThemeMode.light, // use saved pref, not built-in
-      home: const MyHomePage(title: "Hairch"),
+      home: const MyHomePage(title: "B3S"),
     );
   }
 }
