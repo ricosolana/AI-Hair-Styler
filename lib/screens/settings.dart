@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/api_access.dart';
+import 'package:senior_project_hair_ai/notifications.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/settings_text_tile.dart';
@@ -145,7 +146,12 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 leading: const Icon(Icons.dark_mode),
                 initialValue: Provider.of<PreferencesProvider>(context)
                     .get(darkThemePrefKey),
-                onToggle: (isDarkTheme) {
+                onToggle: (isDarkTheme) async {
+                  await MyNotifications().show(title: 'Theme Change', body: 'The theme was toggled!');
+                  if (!context.mounted) {
+                    return;
+                  }
+
                   Provider.of<PreferencesProvider>(context, listen: false)
                       .set(darkThemePrefKey, isDarkTheme);
                 },
