@@ -24,7 +24,7 @@ Future<void> main() async {
 
 
   // init notifications plugin
-  await Notifications().init();
+  await MyNotifications().init();
 
 
   // init defaults here

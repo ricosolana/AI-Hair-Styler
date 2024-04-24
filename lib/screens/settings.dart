@@ -147,7 +147,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 initialValue: Provider.of<PreferencesProvider>(context)
                     .get(darkThemePrefKey),
                 onToggle: (isDarkTheme) async {
-                  await Notifications().show(title: 'Theme Change', body: 'The theme was toggled!');
+                  await MyNotifications().show(title: 'Theme Change', body: 'The theme was toggled!');
                   if (!context.mounted) {
                     return;
                   }

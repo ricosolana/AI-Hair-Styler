@@ -5,33 +5,49 @@ void notificationTapBackground(NotificationResponse notificationResponse) {
   // handle action
 }
 
-class Notifications {
-  static final notificationsPlugin = FlutterLocalNotificationsPlugin();
+class MyNotifications {
+  static final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   Future<void> init() async {
-    const androidInitSettings = AndroidInitializationSettings('main_icon');
-    final iOSInitSettings = DarwinInitializationSettings(
-        onDidReceiveLocalNotification: (id, title, body, payload) async {},
+    const initializationSettingsAndroid = AndroidInitializationSettings(
+        'app_icon'
     );
-
-    final initSettings = InitializationSettings(
-        android: androidInitSettings,
-        iOS: iOSInitSettings,
+    // iOS
+    //final initializationSettingsDarwin = DarwinInitializationSettings(
+    //    onDidReceiveLocalNotification: onDidReceiveLocalNotification
+    //);
+    const initializationSettingsLinux = LinuxInitializationSettings(
+      defaultActionName: 'Open notification',
     );
-
-    await notificationsPlugin.initialize(
-        initSettings,
-        onDidReceiveBackgroundNotificationResponse: notificationTapBackground, //(response) async {}
+    const initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid,
+        //iOS: initializationSettingsDarwin,
+        //macOS: initializationSettingsDarwin,
+        linux: initializationSettingsLinux
+    );
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse notificationResponse) {
+        //switch (notificationResponse.notificationResponseType) {
+        //  case NotificationResponseType.selectedNotification:
+        //    selectNotificationStream.add(notificationResponse.payload);
+        //    break;
+        //  case NotificationResponseType.selectedNotificationAction:
+        //    if (notificationResponse.actionId == navigationActionId) {
+        //      selectNotificationStream.add(notificationResponse.payload);
+        //    }
+        //    break;
+        //}
+      },
+      onDidReceiveBackgroundNotificationResponse: notificationTapBackground
     );
   }
 
-  NotificationDetails notificationDetails() {
+  NotificationDetails createNotificationDetails() {
     return const NotificationDetails(
       android: AndroidNotificationDetails(
           'channelId',
           'channelName',
-          //icon: 'flutter_logo',
-          //icon: 'ic_notification',
           icon: 'main_icon',
           importance: Importance.max
       ),
@@ -39,13 +55,12 @@ class Notifications {
     );
   }
 
-  Future show({
-    int id = 0,
-    String? title,
-    String? body,
-    String? payload,
+  Future<void> show({
+    required String title,
+    required String body,
+    String? payload, // what is this? in terms of Android
   }) async {
-    return notificationsPlugin.show(id, title, body, const NotificationDetails());
+    await flutterLocalNotificationsPlugin.show(1, title, body, createNotificationDetails(), payload: payload);
   }
 
 }
