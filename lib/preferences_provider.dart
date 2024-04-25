@@ -2,12 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferencesProvider with ChangeNotifier {
+  static late PreferencesProvider instance;
+
   final SharedPreferences _prefs;
 
   // TODO cache set() values in memory until disk persist
   //  will help avoid disk write slows
 
-  PreferencesProvider({required SharedPreferences prefs}) : _prefs = prefs;
+  PreferencesProvider({required SharedPreferences prefs}) : _prefs = prefs {
+    instance = this;
+  }
 
   T getOr<T>(String prefKey, T def) {
     final Object? value = _prefs.get(prefKey);

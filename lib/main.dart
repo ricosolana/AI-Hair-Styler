@@ -1,7 +1,9 @@
+import 'dart:developer';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
+import 'package:senior_project_hair_ai/api_access.dart';
 import 'package:senior_project_hair_ai/camera_provider.dart';
 import 'package:senior_project_hair_ai/notifications.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
@@ -10,6 +12,37 @@ import 'package:senior_project_hair_ai/screens/home.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/work.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:workmanager/workmanager.dart';
+
+
+
+@pragma('vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
+void workBackgroundCallback() {
+  Workmanager().executeTask((task, _) async {
+    int? totalExecutions;
+
+    // TODO really dont wanna reinvent everything
+    //  preferences provider wraps preferences in a both listenable unit and extra functions for preferences
+
+    // TODO implementing user-profiles will complicate this system a lot
+    //  maybe prefs will store the current user
+
+    //
+
+    //final workIDs = PreferencesProvider.instance.get(prefKey)[apiCachedWorkIDListPrefKey] as List<String>;
+
+    try { //add code execution
+      //bapiApiBarberStatus(host: host, accessToken: accessToken, workID: workID)
+      //totalExecutions = _sharedPreference.getInt("totalExecutions");
+      //_sharedPreference.setInt("totalExecutions", totalExecutions == null ? 1 : totalExecutions+1);
+    } catch(err) {
+      //Logger().e(err.toString()); // Logger flutter package, prints error on the debug console
+      throw Exception(err);
+    }
+
+    return Future.value(true);
+  });
+}
 
 Future<void> main() async {
   // init camera library
@@ -33,6 +66,28 @@ Future<void> main() async {
   prefs.getOrCreate(apiTokenPrefKey, '');
   prefs.getOrCreate(apiDemoPrefKey, false);
   prefs.getOrCreate(apiCachedWorkIDListPrefKey, <String>[]);
+
+
+
+  // TODO disable debug mode
+  /*
+  Workmanager().initialize(
+    workBackgroundCallback, // The top level function, aka callbackDispatcher
+    isInDebugMode: true, // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+  );
+  Workmanager().registerOneOffTask(
+    "task-identifier",
+    "simpleTask",
+    constraints: Constraints(
+      networkType: NetworkType.connected,
+      requiresBatteryNotLow: false,
+      requiresCharging: false,
+      requiresDeviceIdle: false,
+      requiresStorageNotLow: false
+    )
+  );*/
+
+
 
   runApp(
     MultiProvider(
