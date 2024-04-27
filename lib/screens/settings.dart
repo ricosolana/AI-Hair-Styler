@@ -129,7 +129,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
               SettingsTile.switchTile(
                 title: const Text('Use Dark Theme'),
                 leading: const Icon(Icons.dark_mode),
-                initialValue: prefs.get(themeModePrefKey) == 'dark', // TODO impl system
+                initialValue: prefs.ensure<String>(themeModePrefKey) == 'dark', // TODO impl system
                 onToggle: (isDarkTheme) {
                   Provider.of<ThemeNotifier>(context, listen: false).theme = isDarkTheme ? ThemeMode.dark : ThemeMode.light;
                   //prefs.set(oldDarkThemePrefKey, isDarkTheme);

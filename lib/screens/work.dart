@@ -120,7 +120,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
   void initState() {
     super.initState();
 
-    workItems = UserProfile.activeUserProfile().workItems.reversed.toList();
+    workItems = UserProfile.activeUserProfile().getWorkItems().reversed.toList();
     workItemNotifiers = List.generate(workItems.length, (_) => UpdateNotifier());
   }
 
@@ -204,7 +204,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
 
                                       workItems.insert(index, workID);
                                       // TODO save immediately
-                                      UserProfile.activeUserProfile().workItems = workItems.reversed.toList();
+                                      UserProfile.activeUserProfile().setWorkItems((list) => list.replaceRange(0, list.length + 1, workItems.reversed.toList()));
                                       _listKey.currentState?.insertItem(index);
                                     });
                                   }
@@ -218,7 +218,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                         onDismissed: (_) {
                           setState(() {
                             workItems.removeAt(index);
-                            UserProfile.activeUserProfile().workItems = workItems.reversed.toList();
+                            // TODO too complicated
+                            UserProfile.activeUserProfile().setWorkItems((list) => list.replaceRange(0, list.length + 1, workItems.reversed.toList()));
                             _listKey.currentState?.removeItem(index, (context, animation) => Container());
                           });
                         },
@@ -452,7 +453,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                             onPressed: () {
                               workItems.clear();
                               //prefs.set(apiCachedWorkIDListPrefKey, workItems);
-                              UserProfile.activeUserProfile().workItems = workItems.toList();
+                              UserProfile.activeUserProfile().setWorkItems((list) => list.replaceRange(0, list.length + 1, workItems.toList()));
                               setState(() {});
                               Navigator.of(context).pop();
                               Fluttertoast.showToast(msg: 'Cleared work queue');

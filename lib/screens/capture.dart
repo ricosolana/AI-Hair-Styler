@@ -187,7 +187,7 @@ class DisplayPictureScreen extends StatelessWidget {
             Navigator.of(context).popUntil((route) => route.isFirst);
 
             Fluttertoast.showToast(msg: 'Image saved as $path');
-            UserProfile.activeUserProfile().recentItems.add(path);
+            UserProfile.activeUserProfile().setRecentItems((list) => list.add(path));
           },
           shape: const CircleBorder(),
           child: const Icon(Icons.save_alt, size: 45.0),

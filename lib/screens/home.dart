@@ -86,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     setState(() {
-      activeUserProfile.recentItems.add(returnedImage.path);
+      activeUserProfile.setRecentItems((list) => list.add(returnedImage.path));
     });
   }
 
@@ -188,7 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       // TODO rebuild dynamic notifier
                       children:
                         //prefs.get<List<String>>(recentsListPrefKey)!
-                          activeUserProfile.recentItems
+                          activeUserProfile.getRecentItems()
                           .reversed
                           .map((path) {
                             return ListTile(
@@ -310,7 +310,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 setState(() {
                   // TODO must save profiles after transactions
                   // TODO add a list clear to PreferencesProvider
-                  activeUserProfile.recentItems.clear();
+                  activeUserProfile.setRecentItems((list) => list.clear());
                 });
               },
               shape: const CircleBorder(),

@@ -15,18 +15,36 @@ int randomRange(int minInclusive, int maxExclusive) => minInclusive + _rngRandom
 
 class UserProfile {
   final String userID;
-  String displayName;
-  List<String> workItems;
-  List<String> recentItems;
+  final String displayName;
+  List<String> _workItems;
+  List<String> _recentItems;
+
+  List<String> getWorkItems() => _workItems.toList();
+  void setWorkItems(void Function(List<String>) function) {
+    function(_workItems);
+    save();
+  }
+
+  List<String> getRecentItems() => _recentItems.toList();
+  void setRecentItems(void Function(List<String>) function) {
+    function(_recentItems);
+    save();
+  }
+
+  //List<String> get recentItems => _recentItems.toList();
+  //set recentItems(List<String> values) {
+  //  _recentItems = values.toList();
+  //  save();
+  //}
 
   // each user data is specific to
   UserProfile({String? userID, required this.displayName})
-      : userID = userID ?? getUniqueUserID(displayName), workItems = [], recentItems = [];
+      : userID = userID ?? getUniqueUserID(displayName), _workItems = [], _recentItems = [];
 
   UserProfile.fromJson(this.userID, Map<String, dynamic> json) :
       displayName = json['display-name'] as String,
-      workItems = (json['work-items'] as List<dynamic>).cast<String>(),
-      recentItems = (json['recent-items'] as List<dynamic>).cast<String>();
+      _workItems = (json['work-items'] as List<dynamic>).cast<String>(),
+      _recentItems = (json['recent-items'] as List<dynamic>).cast<String>();
 
   String getAbbreviation() => displayName.split(' ').map((e) => e[0]).join().toUpperCase();
 
@@ -46,7 +64,7 @@ class UserProfile {
   }
 
   static Map<String, dynamic> toJson(UserProfile value) =>
-      {'display-name': value.displayName, 'work-items': value.workItems, 'recent-items': value.recentItems};
+      {'display-name': value.displayName, 'work-items': value._workItems, 'recent-items': value._recentItems};
 
   static String toJsonString(UserProfile value) => jsonEncode(toJson(value));
 
@@ -56,38 +74,38 @@ class UserProfile {
   static void load() {
     // TODO load defaults if failure
     final userProfileDefault = UserProfile(displayName: 'Bob Ross');
-    final userID = userProfileDefault.userID;
+    final defaultUserID = userProfileDefault.userID;
 
     try {
       final json = jsonDecode(
           prefs.ensure<String>(jsonUserProfilesPrefKey)) as Map<String,
           dynamic>;
-      users = json.map((key, value) => MapEntry(key, UserProfile.fromJson(userID, value as Map<String, dynamic>)));
+      users = json.map((key, value) => MapEntry(key, UserProfile.fromJson(key, value as Map<String, dynamic>)));
     } catch (e) {
       // error doesnt really matter, just catch json or missing pref error
 
-      users[userID] = userProfileDefault;
+      users[defaultUserID] = userProfileDefault;
     }
 
     // activeProfileUserIDPrefKey
     final oldWorkItems = prefs.get<List<String>>(apiCachedWorkIDListPrefKey);
     if (oldWorkItems != null) {
       // migrate
-      userProfileDefault.workItems = oldWorkItems;
+      userProfileDefault._workItems = oldWorkItems;
       prefs.sharedPrefs.remove(apiCachedWorkIDListPrefKey); // remove old prefs
     }
 
     final oldRecentItems = prefs.get<List<String>>(recentsListPrefKey);
     if (oldRecentItems != null) {
       // migrate
-      userProfileDefault.recentItems = oldRecentItems;
+      userProfileDefault._recentItems = oldRecentItems;
       prefs.sharedPrefs.remove(recentsListPrefKey); // remove old prefs
     }
 
     // This tests if the stated user id actually maps to an existing profile
-    final statedUserID = prefs.getOrCreate(activeProfileUserIDPrefKey, userID);
+    final statedUserID = prefs.getOrCreate(activeProfileUserIDPrefKey, defaultUserID);
     if (!users.containsKey(statedUserID)) {
-      prefs.set(activeProfileUserIDPrefKey, userID);
+      prefs.set(activeProfileUserIDPrefKey, defaultUserID);
     }
 
     // saving is redundant when above all successful

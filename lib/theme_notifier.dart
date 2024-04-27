@@ -11,7 +11,7 @@ class ThemeNotifier extends ChangeNotifier {
     if (oldThemeDark != null) {
       // create new / reparse
       theme = oldThemeDark ? ThemeMode.dark : ThemeMode.light;
-      //prefs.sharedPrefs.remove(oldDarkThemePrefKey);
+      prefs.sharedPrefs.remove(oldDarkThemePrefKey);
     } else {
       _themeMode = ThemeMode.values.byName(prefs.getOrCreate(themeModePrefKey, 'system'));
     }
