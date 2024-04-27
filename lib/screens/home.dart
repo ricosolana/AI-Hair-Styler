@@ -326,137 +326,158 @@ class _MyHomePageState extends State<MyHomePage> {
       drawer: Drawer(
         child: ListView(
           children: <Widget>[
-            UserAccountsDrawerHeader(
-              accountName: Text(activeUserProfile.displayName),
-              accountEmail: null, //Text('john.doe@example.com'),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Text(
-                  activeUserProfile.getAbbreviation(),
-                  style: TextStyle(fontSize: 40.0),
-                ),
-              ),
-              onDetailsPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    final lvUpdateNotifier = UpdateNotifier();
-                    return AlertDialog(
-                      title: const Text('Switch Profile'),
-                      content: SizedBox(
-                        height: 300.0,
-                        width: 300.0,
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: ListenableBuilder(
-                                listenable: lvUpdateNotifier, // actually do not destroy
-                                builder: (context, child) {
-                                  // will dynamically rebuild?
-                                  final entriesList = UserProfile.users.entries.toList();
-                                  return ListView.builder( // TODO use .builder
-                                    itemCount: entriesList.length,
-                                    itemBuilder: (context, index) {
-                                      // todo build profiles here
-                                      // Row(children: <Widget>[Container()])
-                                      final enumEntry = entriesList[index];
-                                      final enumUserProfile = enumEntry.value;
-                                      final enumUserID = enumEntry.key;
-                                      return ListTile(
-                                        leading: CircleAvatar(
-                                          backgroundColor: Colors.white,
-                                          child: Text(
-                                            enumUserProfile.getAbbreviation()
-                                            //style: TextStyle(fontSize: 40.0),
-                                          ),
-                                        ),
-                                        //leading: const CircleAvatar(), // const Icon(Icons.person),
-                                        title: Text(enumUserProfile.displayName),
-                                        // Display name
-                                        subtitle: Text(enumUserID),
-                                        // id
-                                        onTap: () {
-                                          // TODO switch to profile
-                                          Navigator.pop(context);
-                                          _setCurrentProfile(
-                                              userID: enumUserID);
+
+
+
+
+
+
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Colors.deepPurple),
+              child: Column(
+                children: [
+                  const Text(
+                    'B3S',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+
+
+                  // Current UserProfile
+                  ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      child: Text(
+                        textAlign: TextAlign.center,
+                        activeUserProfile.getAbbreviation(),
+                        style: const TextStyle(fontSize: 25.0),
+                      ),
+                    ),
+                    title: Text(
+                      activeUserProfile.displayName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    subtitle: Text(
+                      activeUserProfile.userID,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                      ),
+                    ),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          final lvUpdateNotifier = UpdateNotifier();
+                          return AlertDialog(
+                            title: const Text('Switch Profile'),
+                            content: SizedBox(
+                              height: 300.0,
+                              width: 300.0,
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: ListenableBuilder(
+                                        listenable: lvUpdateNotifier, // actually do not destroy
+                                        builder: (context, child) {
+                                          // will dynamically rebuild?
+                                          final entriesList = UserProfile.users.entries.toList();
+                                          return ListView.builder( // TODO use .builder
+                                            itemCount: entriesList.length,
+                                            itemBuilder: (context, index) {
+                                              // todo build profiles here
+                                              // Row(children: <Widget>[Container()])
+                                              final enumEntry = entriesList[index];
+                                              final enumUserProfile = enumEntry.value;
+                                              final enumUserID = enumEntry.key;
+                                              return ListTile(
+                                                leading: CircleAvatar(
+                                                  backgroundColor: Colors.white,
+                                                  child: Text(
+                                                      enumUserProfile.getAbbreviation()
+                                                    //style: TextStyle(fontSize: 40.0),
+                                                  ),
+                                                ),
+                                                //leading: const CircleAvatar(), // const Icon(Icons.person),
+                                                title: Text(enumUserProfile.displayName),
+                                                // Display name
+                                                subtitle: Text(enumUserID),
+                                                // id
+                                                onTap: () {
+                                                  // TODO switch to profile
+                                                  Navigator.pop(context);
+                                                  _setCurrentProfile(
+                                                      userID: enumUserID);
+                                                },
+                                              );
+                                            },
+                                          );
+                                        }
+                                    ),
+                                  ),
+                                  // TODO bottom static add profile
+                                  ListTile(
+                                    leading: const Icon(Icons.person_add),
+                                    title: const Text('Add Profile'),
+                                    onTap: () {
+                                      // Add a new profile
+                                      // TODO create a new after prompting
+
+
+                                      final textController = TextEditingController();
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: const Text('Enter Text'),
+                                            content: TextFormField(
+                                              controller: textController,
+                                              decoration: InputDecoration(hintText: "Enter the display name"),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: const Text('Cancel'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  final uniqueUserID = UserProfile.getUniqueUserID(textController.text);
+                                                  if (!UserProfile.createUser(uniqueUserID, textController.text)) {
+                                                    Fluttertoast.showToast(msg: 'unexpected');
+                                                  }
+                                                  Navigator.of(context).pop();
+
+                                                  _setCurrentProfile(userID: uniqueUserID);
+                                                  lvUpdateNotifier.update();
+                                                },
+                                                child: const Text('OK'),
+                                              ),
+                                            ],
+                                          );
                                         },
                                       );
+                                      Navigator.pop(context);
                                     },
-                                  );
-                                }
+                                  ),
+                                ],
                               ),
                             ),
-                            // TODO bottom static add profile
-                            ListTile(
-                              leading: const Icon(Icons.person_add),
-                              title: const Text('Add Profile'),
-                              onTap: () {
-                                // Add a new profile
-                                // TODO create a new after prompting
-
-
-                                final _textController = TextEditingController();
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text('Enter Text'),
-                                      content: TextFormField(
-                                        controller: _textController,
-                                        decoration: InputDecoration(hintText: "Enter the display name"),
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('Cancel'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            final uniqueUserID = UserProfile.getUniqueUserID(_textController.text);
-                                            if (!UserProfile.createUser(uniqueUserID, _textController.text)) {
-                                              Fluttertoast.showToast(msg: 'unexpected');
-                                            }
-                                            Navigator.of(context).pop();
-
-                                            _setCurrentProfile(userID: uniqueUserID);
-                                            lvUpdateNotifier.update();
-                                          },
-                                          child: const Text('OK'),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
+                          );
+                        },
+                      );
+                    },
+                  ),
 
 
 
-
-                                //Navigator.pop(context);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-
-
-
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.deepPurple),
-              child: Text(
-                'B3S',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-                textAlign: TextAlign.center,
+                ],
               ),
             ),
             ListTile(
