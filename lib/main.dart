@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/api_access.dart';
 import 'package:senior_project_hair_ai/camera_provider.dart';
@@ -14,11 +16,12 @@ import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/tutorial.dart';
 import 'package:senior_project_hair_ai/screens/user_profile.dart';
 import 'package:senior_project_hair_ai/screens/work.dart';
+import 'package:senior_project_hair_ai/string_ext.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
 
-
+/*
 @pragma('vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
 void workBackgroundCallback() {
   Workmanager().executeTask((task, _) async {
@@ -32,20 +35,55 @@ void workBackgroundCallback() {
 
     //
 
-    //final workIDs = PreferencesProvider.instance.get(prefKey)[apiCachedWorkIDListPrefKey] as List<String>;
+    final workItems = prefs.ensure<List<String>>(activeProfileUserIDPrefKey);
+    final host = prefs.ensure<String>(apiHostPrefKey);
+    final accessToken = prefs.ensure<String>(apiTokenPrefKey);
 
     try { //add code execution
-      //bapiApiBarberStatus(host: host, accessToken: accessToken, workID: workID)
-      //totalExecutions = _sharedPreference.getInt("totalExecutions");
-      //_sharedPreference.setInt("totalExecutions", totalExecutions == null ? 1 : totalExecutions+1);
-    } catch(err) {
+      final List<Future> futures = [];
+
+      for (final workID in workItems) {
+        final cache = DefaultCacheManager();
+        final file = await cache.getFileFromCache(
+          bapiGeneratedUrl(host, workID).toString(),
+        );
+
+        // Skip already received images
+        if (file != null) {
+          continue;
+        }
+
+        futures.add(bapiApiBarberStatus(host: host, accessToken: accessToken, workID: workID)
+        .then((response) {
+          if (response.statusCode == 200) {
+            final json = jsonDecode(response.body) as Map<String, dynamic>;
+            final progress = TaskProgress.fromJson(json);
+            if (progress.status == 'COMPLETE') {
+              // send notification
+              MyNotifications().show(
+                title: 'Work is complete',
+                body: '${workID.limit(8)} has finished processing',
+              );
+            }
+          } else if (response.statusCode == 401 || response.statusCode == 422) {
+            // invalid token, stop checking server?
+          }
+        }).onError((error, stackTrace) {
+
+        }));
+
+        await Future.wait(futures);
+      }} catch(err) {
       //Logger().e(err.toString()); // Logger flutter package, prints error on the debug console
-      throw Exception(err);
+      //throw Exception(err);
     }
 
     return Future.value(true);
   });
 }
+*/
+
+
 
 Future<void> main() async {
   // init camera library
@@ -53,7 +91,7 @@ Future<void> main() async {
 
   // Obtain a list of the available cameras on the device.
   Wrapmeras(cameras: await availableCameras());
-  final prefs = Wrapreferences(sharedPrefs: await SharedPreferences.getInstance());
+  Wrapreferences(sharedPrefs: await SharedPreferences.getInstance());
 
 
 
@@ -79,13 +117,14 @@ Future<void> main() async {
   UserProfile.load();
 
 
+
   // TODO disable debug mode
   /*
   Workmanager().initialize(
     workBackgroundCallback, // The top level function, aka callbackDispatcher
     isInDebugMode: true, // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
   );
-  Workmanager().registerOneOffTask(
+  Workmanager().registerPeriodicTask(
     "task-identifier",
     "simpleTask",
     constraints: Constraints(
@@ -93,9 +132,10 @@ Future<void> main() async {
       requiresBatteryNotLow: false,
       requiresCharging: false,
       requiresDeviceIdle: false,
-      requiresStorageNotLow: false
-    )
-  );*/
+      requiresStorageNotLow: false,
+    ),
+  );
+   */
 
 
 

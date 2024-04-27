@@ -82,6 +82,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
                     log('Error while contacting server', error: error);
                   });
 
+                  setState(() {});
                   return true;
                 },
               ),
@@ -94,7 +95,6 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 validator: (str) =>
                 (str ?? '').isEmpty ? 'Must not be empty' : null,
                 onSave: (str) {
-                  setState(() {});
                   checkAccessToken(prefs.ensure(apiHostPrefKey), str)
                       .then((value) => null)
                       .onError((error, stackTrace) {
@@ -103,6 +103,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
                       toastLength: Toast.LENGTH_LONG,
                     );
                   });
+                  setState(() {});
                   return true;
                 },
               ),
@@ -115,6 +116,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 initialValue: prefs.get(apiDemoPrefKey),
                 onToggle: (value) {
                   prefs.set(apiDemoPrefKey, value);
+                  setState(() {});
                 },
               ),
             ],
@@ -126,14 +128,10 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 title: const Text('Use Dark Theme'),
                 leading: const Icon(Icons.dark_mode),
                 initialValue: prefs.get(darkThemePrefKey),
-                onToggle: (isDarkTheme) async {
-                  await MyNotifications().show(title: 'Theme Change',
-                      body: 'The theme was toggled!');
-                  if (!context.mounted) {
-                    return;
-                  }
-
+                onToggle: (isDarkTheme) {
                   prefs.set(darkThemePrefKey, isDarkTheme);
+                  // TODO trigger top rebuild
+                  //setState(() {});
                 },
               ),
             ],

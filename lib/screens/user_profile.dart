@@ -14,16 +14,16 @@ final _rngRandom = Random();
 int randomRange(int minInclusive, int maxExclusive) => minInclusive + _rngRandom.nextInt(maxExclusive - minInclusive);
 
 class UserProfile {
-  late String userID;
+  final String userID;
   String displayName;
   List<String> workItems;
   List<String> recentItems;
 
   // each user data is specific to
-  UserProfile({required this.displayName})
-      : workItems = [], recentItems = [];
+  UserProfile({String? userID, required this.displayName})
+      : userID = userID ?? getUniqueUserID(displayName), workItems = [], recentItems = [];
 
-  UserProfile.fromJson(Map<String, dynamic> json) :
+  UserProfile.fromJson(this.userID, Map<String, dynamic> json) :
       displayName = json['display-name'] as String,
       workItems = (json['work-items'] as List<dynamic>).cast<String>(),
       recentItems = (json['recent-items'] as List<dynamic>).cast<String>();
@@ -56,14 +56,13 @@ class UserProfile {
   static void load() {
     // TODO load defaults if failure
     final userProfileDefault = UserProfile(displayName: 'Bob Ross');
-    final userID = getUniqueUserID(userProfileDefault.displayName);
+    final userID = userProfileDefault.userID;
 
     try {
       final json = jsonDecode(
           prefs.ensure<String>(jsonUserProfilesPrefKey)) as Map<String,
           dynamic>;
-      users = json.map((key, value) =>
-          MapEntry(key, UserProfile.fromJson(value as Map<String, dynamic>)..userID = key));
+      users = json.map((key, value) => MapEntry(key, UserProfile.fromJson(userID, value as Map<String, dynamic>)));
     } catch (e) {
       // error doesnt really matter, just catch json or missing pref error
 
@@ -127,7 +126,7 @@ class UserProfile {
     var dup = true;
     users.putIfAbsent(userID, () {
       dup = false;
-      return UserProfile(displayName: displayName);
+      return UserProfile(userID: userID, displayName: displayName);
     });
     if (!dup) {
       save(); // persistence

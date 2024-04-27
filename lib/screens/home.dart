@@ -548,7 +548,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 style: NavigationRouteStyle.material,
               ),
             ),
-            const Divider(),
             ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Settings'),

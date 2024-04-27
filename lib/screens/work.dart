@@ -13,9 +13,11 @@ import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/api_access.dart';
 import 'package:senior_project_hair_ai/listenable.dart';
+import 'package:senior_project_hair_ai/notifications.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/user_profile.dart';
+import 'package:senior_project_hair_ai/string_ext.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 enum WorkPopupItems {
@@ -81,8 +83,17 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
 
           final progress = TaskProgress.fromJson(json);
 
-          if (progress.status == 'COMPLETE') {
+          if (progress.isDone()) {
             workItemNotifiers[index].update();
+            if (progress.isSuccess()) {
+              MyNotifications().show(
+                title: 'Work is complete',
+                body: '${workID.limit(8)} has finished processing',
+              );
+            }
+            // else failure
+            // TODO omitting might be causing the spam notifications
+            controller.close();
           } else {
             controller.add(progress);
           }

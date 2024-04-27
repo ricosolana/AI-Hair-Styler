@@ -30,6 +30,14 @@ class TaskProgress {
     initialBarberDurationEstimate = json['initial-barber-duration-estimate'];
   }
 
+  bool isDone() {
+    return status.contains('DONE');
+  }
+
+  bool isSuccess() {
+    return status.contains('SUCCESS');
+  }
+
   String getEstimatedRemainingTimeString() {
     if (utcBarberStarted != null && initialBarberDurationEstimate != null) {
       final utcEstEndBarber = utcBarberStarted! + initialBarberDurationEstimate!;
