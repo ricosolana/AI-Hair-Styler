@@ -10,6 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/Navigation.dart';
 import 'package:senior_project_hair_ai/api_access.dart';
+import 'package:senior_project_hair_ai/listenable.dart';
+import 'package:senior_project_hair_ai/listenable.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/capture.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
@@ -20,10 +22,8 @@ Future<void> navigateToEditor(
   String imagePath = '',
   bool quietSuccess = false,
 }) async {
-  final host = Provider.of<PreferencesProvider>(context, listen: false)
-      .get<String>(apiHostPrefKey)!;
-  final accessToken = Provider.of<PreferencesProvider>(context, listen: false)
-      .get<String>(apiTokenPrefKey)!;
+  final host = prefs.get<String>(apiHostPrefKey)!;
+  final accessToken = prefs.get<String>(apiTokenPrefKey)!;
 
   // add this to the screen momentarily
   //SpinKitFadingCircle
@@ -53,12 +53,6 @@ Future<void> navigateToEditor(
   }
 }
 
-class EditorItemModel with ChangeNotifier {
-  void update() {
-    notifyListeners();
-  }
-}
-
 class MyEditorPage extends StatefulWidget {
   const MyEditorPage({super.key, required this.initialInputImagePath});
 
@@ -72,8 +66,8 @@ class _MyEditorPageState extends State<MyEditorPage> {
   String _currentImagePath = '';
   int _selectedStyleIndex = 0;
   int _selectedColorIndex = 0;
-  late List<EditorItemModel> _selectedStyleIndexNotifiers;
-  late List<EditorItemModel> _selectedColorIndexNotifiers;
+  late List<UpdateNotifier> _selectedStyleIndexNotifiers;
+  late List<UpdateNotifier> _selectedColorIndexNotifiers;
   final ValueNotifier<double> _qualityValueNotifier = ValueNotifier(1.0);
 
   late List<String> cachedTemplatesList;
@@ -104,8 +98,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
       //imageUploaded = File(returnedImage.path);
       //Provider.of<RecentsProvider>(context, listen: false).addFile(returnedImage.path);
       //Provider.of<PreferencesProvider>(context, listen: false).
-      Provider.of<PreferencesProvider>(context, listen: false)
-          .createListOrAdd(recentsListPrefKey, <String>[returnedImage.path]);
+      prefs.createListOrAdd(recentsListPrefKey, <String>[returnedImage.path]);
     });
   }
 
@@ -114,22 +107,16 @@ class _MyEditorPageState extends State<MyEditorPage> {
     super.initState();
     _currentImagePath = widget.initialInputImagePath;
 
-    final prefs = Provider.of<PreferencesProvider>(context, listen: false);
-    cachedTemplatesList =
-        prefs.get<List<String>>(apiCachedTemplateListPrefKey)!;
+    cachedTemplatesList = prefs.get<List<String>>(apiCachedTemplateListPrefKey)!;
 
     _selectedStyleIndexNotifiers =
-        List.generate(cachedTemplatesList.length, (_) => EditorItemModel());
+        List.generate(cachedTemplatesList.length, (_) => UpdateNotifier());
     _selectedColorIndexNotifiers =
-        List.generate(cachedTemplatesList.length, (_) => EditorItemModel());
+        List.generate(cachedTemplatesList.length, (_) => UpdateNotifier());
   }
 
   @override
   Widget build(BuildContext context) {
-    final prefs = Provider.of<PreferencesProvider>(context, listen: false);
-
-    // TODO ensure prefkey is set
-
     final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
 
     return Scaffold(
@@ -450,11 +437,6 @@ class _MyEditorPageState extends State<MyEditorPage> {
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
-              final prefs = Provider.of<PreferencesProvider>(
-                context,
-                listen: false,
-              );
-
               final host = prefs.get<String>(apiHostPrefKey)!;
 
               final styleTemplateFileName = (prefs.get<List<String>>(

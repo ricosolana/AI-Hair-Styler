@@ -8,8 +8,7 @@ import 'package:senior_project_hair_ai/preferences_provider.dart';
 const String tutorialCompletedPrefKey = 'tutorial-completed';
 
 void setTutorialCompletedPref(BuildContext context, bool isCompleted) {
-  Provider.of<PreferencesProvider>(context, listen: false)
-      .set(tutorialCompletedPrefKey, isCompleted);
+  prefs.set(tutorialCompletedPrefKey, isCompleted);
 }
 
 class TutorialItemContent extends StatelessWidget {

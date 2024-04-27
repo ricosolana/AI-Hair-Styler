@@ -1,9 +1,9 @@
 import 'package:camera/camera.dart';
 
-class CameraProvider {
+class Wrapmeras {
   final List<CameraDescription> _cameras;
 
-  CameraProvider({required List<CameraDescription> cameras})
+  Wrapmeras({required List<CameraDescription> cameras})
       : _cameras = cameras;
 
   CameraDescription getFrontCamera() {

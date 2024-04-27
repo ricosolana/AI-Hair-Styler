@@ -54,7 +54,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
   }
 
   Future<void> initCamera() async {
-    final cameras = Provider.of<CameraProvider>(context, listen: false);
+    final cameras = Provider.of<Wrapmeras>(context, listen: false);
 
     await _controller?.dispose();
 
@@ -185,8 +185,7 @@ class DisplayPictureScreen extends StatelessWidget {
             Navigator.of(context).popUntil((route) => route.isFirst);
 
             Fluttertoast.showToast(msg: 'Image saved as $path');
-            Provider.of<PreferencesProvider>(context, listen: false)
-                .createListOrAdd(recentsListPrefKey, [path]);
+            prefs.createListOrAdd(recentsListPrefKey, [path]);
           },
           shape: const CircleBorder(),
           child: const Icon(Icons.save_alt, size: 45.0),

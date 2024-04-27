@@ -12,6 +12,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/api_access.dart';
+import 'package:senior_project_hair_ai/listenable.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -30,13 +31,6 @@ class MyQueuedWorkPage extends StatefulWidget {
   _MyQueuedWorkPageState createState() => _MyQueuedWorkPageState();
 }
 
-// TODO for dynamic progress bars
-class WorkItemModel with ChangeNotifier {
-  void update() {
-    notifyListeners();
-  }
-}
-
 class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
   WorkPopupItems? selectedItem;
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
@@ -45,9 +39,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
       end: Offset.zero
   );
 
-  late PreferencesProvider prefs;
   late List<String> cachedWorkIDList;
-  late List<WorkItemModel> workQueueIndexNotifiers;
+  late List<UpdateNotifier> workQueueIndexNotifiers;
 
   Stream<TaskProgress> fetchJobStatusPeriodically({
       required String workID,
@@ -114,9 +107,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
   void initState() {
     super.initState();
 
-    prefs = Provider.of<PreferencesProvider>(context, listen: false);
     cachedWorkIDList = prefs.get<List<String>>(apiCachedWorkIDListPrefKey)!.reversed.toList();
-    workQueueIndexNotifiers = List.generate(cachedWorkIDList.length, (_) => WorkItemModel());
+    workQueueIndexNotifiers = List.generate(cachedWorkIDList.length, (_) => UpdateNotifier());
   }
 
   @override

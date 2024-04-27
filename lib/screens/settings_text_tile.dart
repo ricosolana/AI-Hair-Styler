@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:senior_project_hair_ai/listenable.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 class MyTextDialog extends StatefulWidget {
   //final String title;
+  //final Key textKey;
+  //final UpdateNotifier notifier;
   final Text title;
   final String prefKey;
   final String defaultText;
   final String? Function(String?)? validator;
   // return false to keep the menu open
-  final bool? Function(String?)? onSave;
+  final bool? Function(String)? onSave;
   final bool saveButton;
   final bool cancelButton;
   @Deprecated(
@@ -19,6 +22,7 @@ class MyTextDialog extends StatefulWidget {
   final List<Widget> extraActions;
 
   const MyTextDialog({
+    //required this.notifier,
     required this.title,
     required this.prefKey,
     this.defaultText = '',
@@ -34,31 +38,29 @@ class MyTextDialog extends StatefulWidget {
 }
 
 class _MyTextDialogState extends State<MyTextDialog> {
-  late String textString;
-  late TextEditingController _textEditingController;
-  final FocusNode _focusNode = FocusNode();
+  final _textEditingController = TextEditingController();
+  final _focusNode = FocusNode();
   final _formKey = GlobalKey<FormState>();
 
-  void _loadText() {
-    setState(() {
-      textString = Provider.of<PreferencesProvider>(context, listen: false)
-          .getOr<String>(widget.prefKey, widget.defaultText);
-    });
-  }
+  //void _loadText() {
+  //  setState(() {
+  //    _textEditingController.text = prefs.getOr<String>(widget.prefKey, widget.defaultText);
+  //  });
+  //}
 
   void _saveText(String text) {
-    setState(() {
-      textString = text;
-      Provider.of<PreferencesProvider>(context, listen: false)
-          .set(widget.prefKey, textString);
-    });
+    //setState(() {
+      prefs.set(widget.prefKey, _textEditingController.text);
+    //});
+
+    //widget.notifier.update();
   }
 
   @override
   void initState() {
     super.initState();
-    _loadText();
-    _textEditingController = TextEditingController(text: textString);
+
+    _textEditingController.text = prefs.getOr<String>(widget.prefKey, widget.defaultText);
   }
 
   @override
@@ -69,6 +71,8 @@ class _MyTextDialogState extends State<MyTextDialog> {
 
   @override
   Widget build(BuildContext context) {
+    //_loadText();
+
     return AlertDialog(
       title: widget.title, //Text(widget.title),
       // TODO test if form doesnt look tacky
@@ -135,7 +139,7 @@ SettingsTile createTextSettingsTile({
   bool valueAsDescription = false,
   String? Function(String?)? validator,
   // return false to keep the menu open
-  bool? Function(String?)? onSave,
+  bool? Function(String)? onSave,
   @Deprecated(
     'Unable to specify button order, especially when using save/cancel',
   )
@@ -150,10 +154,10 @@ SettingsTile createTextSettingsTile({
     title: title,
     //description: description,
     description: valueAsDescription
-        ? Text(
-            Provider.of<PreferencesProvider>(context)
-                .getOr(prefKey, defaultText),
-          )
+        ?
+    Text(
+      prefs.getOr(prefKey, defaultText),
+    )
         : description,
     //description: valueAsDescription ?
     //  Consumer<PreferencesProvider>(
@@ -168,6 +172,7 @@ SettingsTile createTextSettingsTile({
         context: context,
         builder: (BuildContext context) {
           return MyTextDialog(
+            //notifier: listenable,
             title: title,
             prefKey: prefKey,
             defaultText: defaultText,

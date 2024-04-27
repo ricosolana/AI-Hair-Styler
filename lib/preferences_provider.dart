@@ -1,20 +1,16 @@
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PreferencesProvider with ChangeNotifier {
-  static late PreferencesProvider instance;
+late final Wrapreferences prefs;
 
-  final SharedPreferences _prefs;
+class Wrapreferences {
+  final SharedPreferences _sharedPrefs;
 
-  // TODO cache set() values in memory until disk persist
-  //  will help avoid disk write slows
-
-  PreferencesProvider({required SharedPreferences prefs}) : _prefs = prefs {
-    instance = this;
+  Wrapreferences({required SharedPreferences sharedPrefs}) : _sharedPrefs = sharedPrefs {
+    prefs = this;
   }
 
   T getOr<T>(String prefKey, T def) {
-    final Object? value = _prefs.get(prefKey);
+    final Object? value = _sharedPrefs.get(prefKey);
     if (value is T) {
       return value;
     }
@@ -24,18 +20,22 @@ class PreferencesProvider with ChangeNotifier {
 
   T? get<T>(String prefKey) {
     if (T == List<String>) {
-      return _prefs.getStringList(prefKey) as T?;
+      return _sharedPrefs.getStringList(prefKey) as T?;
     }
-    return _prefs.get(prefKey) as T?;
+    return _sharedPrefs.get(prefKey) as T?;
     //return pref.get(prefKey) as T ?? def;
   }
 
+  T ensure<T>(String prefKey) {
+    return get<T>(prefKey)!;
+  }
+
   T getOrCreate<T>(String prefKey, T def) {
-    final Object? value = _prefs.get(prefKey);
+    final Object? value = _sharedPrefs.get(prefKey);
     if (value is T) {
       return value;
     } else if (def is List<String> && value is List<Object?>) {
-      return _prefs.getStringList(prefKey) as T;
+      return _sharedPrefs.getStringList(prefKey) as T;
     }
     set(prefKey, def);
     return def;
@@ -45,19 +45,18 @@ class PreferencesProvider with ChangeNotifier {
   Future<bool> set<T>(String prefKey, T value) async {
     bool status;
     if (T == int) {
-      status = await _prefs.setInt(prefKey, value as int);
+      status = await _sharedPrefs.setInt(prefKey, value as int);
     } else if (T == double) {
-      status = await _prefs.setDouble(prefKey, value as double);
+      status = await _sharedPrefs.setDouble(prefKey, value as double);
     } else if (T == bool) {
-      status = await _prefs.setBool(prefKey, value as bool);
+      status = await _sharedPrefs.setBool(prefKey, value as bool);
     } else if (T == String) {
-      status = await _prefs.setString(prefKey, value as String);
+      status = await _sharedPrefs.setString(prefKey, value as String);
     } else if (T == List<String>) {
-      status = await _prefs.setStringList(prefKey, value as List<String>);
+      status = await _sharedPrefs.setStringList(prefKey, value as List<String>);
     } else {
       throw UnsupportedError('Unsupported type $T');
     }
-    notifyListeners();
     return status;
   }
 

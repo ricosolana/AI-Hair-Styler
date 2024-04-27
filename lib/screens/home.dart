@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:app_tutorial/app_tutorial.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -70,15 +71,12 @@ class _MyHomePageState extends State<MyHomePage> {
       //Provider.of<PreferencesProvider>(context, listen: false)
       //.createListOrAdd(recentsListPrefKey, [result.paths.first!]);
 
-      Provider.of<PreferencesProvider>(context, listen: false)
-          .createListOrAdd(recentsListPrefKey, [returnedImage.path]);
+      prefs.createListOrAdd(recentsListPrefKey, [returnedImage.path]);
     });
   }
 
   void _tryStartTutorial() {
-    if (!(Provider.of<PreferencesProvider>(context, listen: false)
-            .get<bool>(tutorialCompletedPrefKey) ??
-        false)) {
+    if (!prefs.get<bool>(tutorialCompletedPrefKey)!) {
       _startTutorial();
     }
   }
@@ -167,56 +165,51 @@ class _MyHomePageState extends State<MyHomePage> {
                 ), // Add padding to the bottom
                 child: Stack(
                   children: [
-                    Consumer<PreferencesProvider>(
-                      builder: (context, prefs, child) {
-                        // TODO this is BAD
-                        //  Use ListView.Builder to not render offscreen widgets
-                        return ListView(
-                          padding: const EdgeInsets.only(bottom: 150),
-                          children: prefs
-                              .getOrCreate(recentsListPrefKey, <String>[])
-                              .reversed
-                              .map((path) {
-                                return ListTile(
-                                  title: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Spacer(),
-                                      Expanded(
-                                        child: Center(
-                                          child: Image.file(
-                                            File(path),
-                                            width: 150,
-                                            cacheWidth: (150 * devicePixelRatio)
-                                                .round(),
-                                          ),
-                                        ),
+                    // TODO use Listview.builder(...)
+                    ListView(
+                      padding: const EdgeInsets.only(bottom: 150),
+                      children: prefs
+                          .get<List<String>>(recentsListPrefKey)!
+                          .reversed
+                          .map((path) {
+                            return ListTile(
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Spacer(),
+                                  Expanded(
+                                    child: Center(
+                                      child: Image.file(
+                                        File(path),
+                                        width: 150,
+                                        cacheWidth: (150 * devicePixelRatio)
+                                            .round(),
                                       ),
-                                      Expanded(
-                                        flex: 2,
-                                        child: Text(
-                                          path.length > 20
-                                              ? '...${path.substring(path.length - 20)}'
-                                              : path,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 22.0,
-                                          ),
-                                        ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      path.length > 20
+                                          ? '...${path.substring(path.length - 20)}'
+                                          : path,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 22.0,
                                       ),
-                                      const Spacer(),
-                                    ],
+                                    ),
                                   ),
-                                  onTap: () => navigateToEditor(
-                                    context,
-                                    imagePath: path,
-                                    quietSuccess: true,
-                                  ),
-                                );
-                              })
-                              .toList(),
-                        );
-                      },
+                                  const Spacer(),
+                                ],
+                              ),
+                              onTap: () => navigateToEditor(
+                                context,
+                                imagePath: path,
+                                quietSuccess: true,
+                              ),
+                            );
+                          })
+                          .toList(),
                     ),
                     Positioned(
                       top: 500,
@@ -300,8 +293,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 // MUST trigger the change post-clear
                 setState(() {
                   // not necessary here
-                  Provider.of<PreferencesProvider>(context, listen: false)
-                      .set(recentsListPrefKey, <String>[]);
+                  prefs.set(recentsListPrefKey, <String>[]);
                 });
               },
               shape: const CircleBorder(),
