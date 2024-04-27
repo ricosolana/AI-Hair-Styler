@@ -17,6 +17,7 @@ import 'package:senior_project_hair_ai/screens/tutorial.dart';
 import 'package:senior_project_hair_ai/screens/user_profile.dart';
 import 'package:senior_project_hair_ai/screens/work.dart';
 import 'package:senior_project_hair_ai/string_ext.dart';
+import 'package:senior_project_hair_ai/theme_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -100,6 +101,8 @@ Future<void> main() async {
 
 
   // init defaults here
+  // TODO default to system theme
+  //prefs.getOrCreate(oldDarkThemePrefKey, false);
   prefs.getOrCreate(tutorialCompletedPrefKey, false);
   prefs.getOrCreate(apiHostPrefKey, 'http://10.0.2.2/');
   prefs.getOrCreate(apiCachedTemplateListPrefKey, <String>[]);
@@ -139,7 +142,14 @@ Future<void> main() async {
 
 
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeNotifier()),
+      ], 
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -149,6 +159,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'B3S',
+      // Default app theme template
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
         useMaterial3: true,
@@ -157,9 +168,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
       ),
-      themeMode: prefs.getOr(darkThemePrefKey, false)
-          ? ThemeMode.dark
-          : ThemeMode.light, // use saved pref, not built-in
+      themeMode: Provider.of<ThemeNotifier>(context).theme,
       home: const MyHomePage(title: "B3S"),
     );
   }

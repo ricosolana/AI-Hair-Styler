@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/api_access.dart';
 import 'package:senior_project_hair_ai/listenable.dart';
@@ -10,6 +11,7 @@ import 'package:senior_project_hair_ai/notifications.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/settings_text_tile.dart';
+import 'package:senior_project_hair_ai/theme_notifier.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 // TODO properly implement
@@ -112,7 +114,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
                 description: const Text(
                   'Request that the API immediately completes a fake sample',
                 ),
-                leading: const Icon(Icons.dark_mode),
+                leading: Icon(MdiIcons.testTube),
                 initialValue: prefs.get(apiDemoPrefKey),
                 onToggle: (value) {
                   prefs.set(apiDemoPrefKey, value);
@@ -127,9 +129,10 @@ class _MySettingsPageState extends State<MySettingsPage> {
               SettingsTile.switchTile(
                 title: const Text('Use Dark Theme'),
                 leading: const Icon(Icons.dark_mode),
-                initialValue: prefs.get(darkThemePrefKey),
+                initialValue: prefs.get(themeModePrefKey) == 'dark', // TODO impl system
                 onToggle: (isDarkTheme) {
-                  prefs.set(darkThemePrefKey, isDarkTheme);
+                  Provider.of<ThemeNotifier>(context, listen: false).theme = isDarkTheme ? ThemeMode.dark : ThemeMode.light;
+                  //prefs.set(oldDarkThemePrefKey, isDarkTheme);
                   // TODO trigger top rebuild
                   //setState(() {});
                 },

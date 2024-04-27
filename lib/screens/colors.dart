@@ -1,4 +1,7 @@
-const String darkThemePrefKey = 'dark-theme';
+@Deprecated('Use themePrefKey instead')
+const oldDarkThemePrefKey = 'dark-theme';
+
+const themeModePrefKey = 'theme-mode';
 
 /*
 class MyColorsPage extends StatefulWidget {
