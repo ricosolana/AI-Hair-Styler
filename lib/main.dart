@@ -11,6 +11,7 @@ import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/tutorial.dart';
+import 'package:senior_project_hair_ai/screens/user_profile.dart';
 import 'package:senior_project_hair_ai/screens/work.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
@@ -67,6 +68,11 @@ Future<void> main() async {
   prefs.getOrCreate(apiDemoPrefKey, false);
   prefs.getOrCreate(apiCachedWorkIDListPrefKey, <String>[]);
 
+  // TODO set profile defaults?
+  prefs.getOrCreate(activeProfileUserIDPrefKey, 'crzi');
+  prefs.getOrCreate(jsonUserProfilesPrefKey, '{"crzi": "Rico"}');
+
+  UserManager.load();
 
 
   // TODO disable debug mode

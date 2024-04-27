@@ -1,12 +1,16 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:app_tutorial/app_tutorial.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/Navigation.dart';
+import 'package:senior_project_hair_ai/listenable.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/about.dart';
 import 'package:senior_project_hair_ai/screens/capture.dart';
@@ -14,7 +18,10 @@ import 'package:senior_project_hair_ai/screens/editor.dart';
 import 'package:senior_project_hair_ai/screens/help.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/tutorial.dart';
+import 'package:senior_project_hair_ai/screens/user_profile.dart';
 import 'package:senior_project_hair_ai/screens/work.dart';
+
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -47,6 +54,18 @@ class _MyHomePageState extends State<MyHomePage> {
   final settingsKey = GlobalKey();
 
   List<TutorialItem> tutorialItems = [];
+
+  late String activeUserDisplayName;
+
+  void _setCurrentProfile({String ?userID}) {
+    setState(() {
+      if (userID == null) {
+        activeUserDisplayName = UserManager.getUserDisplayName(prefs.ensure(activeProfileUserIDPrefKey))!;
+      } else {
+        activeUserDisplayName = UserManager.getUserDisplayName(userID)!;
+      }
+    });
+  }
 
   //@override
   //void initState() {
@@ -123,6 +142,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     initTutorialItems();
     _tryStartTutorial();
+
+    _setCurrentProfile();
   }
 
   @override
@@ -307,8 +328,147 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       drawer: Drawer(
-        child: Column(
+        child: ListView(
           children: <Widget>[
+            UserAccountsDrawerHeader(
+              accountName: Text(activeUserDisplayName),
+              accountEmail: null, //Text('john.doe@example.com'),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Text(
+                  //activeUserProfile.g, // 'JD',
+                  UserManager.getAbbreviation(activeUserDisplayName), /// 'test',
+                  style: TextStyle(fontSize: 40.0),
+                ),
+              ),
+              onDetailsPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    final lvUpdateNotifier = UpdateNotifier();
+                    return AlertDialog(
+                      title: const Text('Switch Profile'),
+                      content: SizedBox(
+                        height: 300.0,
+                        width: 300.0,
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: ListenableBuilder(
+                                listenable: lvUpdateNotifier, // actually do not destroy
+                                builder: (context, child) {
+                                  // will dynamically rebuild?
+                                  final entriesList = UserManager.users.entries.toList();
+                                  return ListView.builder( // TODO use .builder
+                                    itemCount: entriesList.length,
+                                    itemBuilder: (context, index) {
+                                      // todo build profiles here
+                                      // Row(children: <Widget>[Container()])
+                                      final enumUser = entriesList[index];
+                                      final enumUserDisplayName = enumUser
+                                          .value;
+                                      final enumUserID = enumUser.key;
+                                      return ListTile(
+                                        leading: CircleAvatar(
+                                          backgroundColor: Colors.white,
+                                          child: Text(
+                                            //activeUserProfile.g, // 'JD',
+                                            UserManager.getAbbreviation(
+                                                activeUserDisplayName),
+
+                                            /// 'test',
+                                            //style: TextStyle(fontSize: 40.0),
+                                          ),
+                                        ),
+                                        //leading: const CircleAvatar(), // const Icon(Icons.person),
+                                        title: Text(enumUserDisplayName),
+                                        // Display name
+                                        subtitle: Text(enumUserID),
+                                        // id
+                                        onTap: () {
+                                          // TODO switch to profile
+                                          Navigator.pop(context);
+                                          _setCurrentProfile(
+                                              userID: enumUserID);
+                                        },
+                                      );
+                                    },
+                                  );
+                                }
+                              ),
+                            ),
+                            // TODO bottom static add profile
+                            ListTile(
+                              leading: const Icon(Icons.person_add),
+                              title: const Text('Add Profile'),
+                              onTap: () {
+                                // Add a new profile
+                                // TODO create a new after prompting
+
+
+                                final _textController = TextEditingController();
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Enter Text'),
+                                      content: TextFormField(
+                                        controller: _textController,
+                                        decoration: InputDecoration(hintText: "Enter the display name"),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text('Cancel'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            // Do something with the text input
+                                            //print(_textController.text);
+                                            final baseUserID = _textController.text.toLowerCase().replaceAll(' ', '_');
+                                            late String uniqueUserID;
+                                            for (var i=0; i < 999999999999; i++) {
+                                              uniqueUserID = '$baseUserID$i'; // like crzi1
+                                              // Will try to create a user, loop until successful
+                                              if (UserManager.createUser(uniqueUserID, _textController.text)) {
+                                                break;
+                                              }
+                                            }
+
+                                            // immediately switch to the profile
+
+                                            //Fluttertoast.showToast(msg: 'Created')
+                                            Navigator.of(context).pop();
+
+                                            _setCurrentProfile(userID: uniqueUserID);
+                                            lvUpdateNotifier.update();
+                                          },
+                                          child: const Text('OK'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+
+
+
+
+                                //Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+
+
+
             const DrawerHeader(
               decoration: BoxDecoration(color: Colors.deepPurple),
               child: Text(
@@ -367,7 +527,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
             ),
-            const Spacer(), // filler
+            //const Spacer(), // filler
+            Row(children: <Widget>[Container()]), // TODO this adds empty middle-spacing
             const Divider(),
             ListTile(
               leading: const Icon(Icons.help),
