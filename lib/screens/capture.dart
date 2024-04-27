@@ -8,7 +8,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project_hair_ai/camera_provider.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
+import 'package:senior_project_hair_ai/screens/user_profile.dart';
 
+@Deprecated('Use UserProfile.recentItems json instead')
 const String recentsListPrefKey = 'recent-captures-list';
 
 class TakePictureScreen extends StatefulWidget {
@@ -185,7 +187,7 @@ class DisplayPictureScreen extends StatelessWidget {
             Navigator.of(context).popUntil((route) => route.isFirst);
 
             Fluttertoast.showToast(msg: 'Image saved as $path');
-            prefs.createListOrAdd(recentsListPrefKey, [path]);
+            UserProfile.getActiveUserProfile().recentItems.add(path);
           },
           shape: const CircleBorder(),
           child: const Icon(Icons.save_alt, size: 45.0),

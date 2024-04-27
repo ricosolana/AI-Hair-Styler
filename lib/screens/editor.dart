@@ -15,6 +15,7 @@ import 'package:senior_project_hair_ai/listenable.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/capture.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
+import 'package:senior_project_hair_ai/screens/user_profile.dart';
 import 'package:senior_project_hair_ai/screens/work.dart';
 
 Future<void> navigateToEditor(
@@ -95,10 +96,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
     setState(() {
       _currentImagePath = returnedImage.path;
-      //imageUploaded = File(returnedImage.path);
-      //Provider.of<RecentsProvider>(context, listen: false).addFile(returnedImage.path);
-      //Provider.of<PreferencesProvider>(context, listen: false).
-      prefs.createListOrAdd(recentsListPrefKey, <String>[returnedImage.path]);
+      UserProfile.getActiveUserProfile().recentItems.add(returnedImage.path);
     });
   }
 
@@ -468,10 +466,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
                   // submit to work queue
                   final workID = map['work-id'] as String;
 
-                  prefs.createListOrAdd(
-                    apiCachedWorkIDListPrefKey,
-                    [workID],
-                  );
+                  UserProfile.getActiveUserProfile().workItems.add(workID);
 
                   //String imageUrl = apiGeneratedUrl(host, imageName);
 

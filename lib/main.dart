@@ -7,6 +7,7 @@ import 'package:senior_project_hair_ai/api_access.dart';
 import 'package:senior_project_hair_ai/camera_provider.dart';
 import 'package:senior_project_hair_ai/notifications.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
+import 'package:senior_project_hair_ai/screens/capture.dart';
 import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
@@ -66,13 +67,16 @@ Future<void> main() async {
   prefs.getOrCreate(apiCachedTemplateListPrefKey, <String>[]);
   prefs.getOrCreate(apiTokenPrefKey, '');
   prefs.getOrCreate(apiDemoPrefKey, false);
-  prefs.getOrCreate(apiCachedWorkIDListPrefKey, <String>[]);
+
+  //prefs.getOrCreate(apiCachedWorkIDListPrefKey, <String>[]);
+
+  //final userProfileDefault = UserProfile(displayName: 'alice');
 
   // TODO set profile defaults?
-  prefs.getOrCreate(activeProfileUserIDPrefKey, 'crzi');
-  prefs.getOrCreate(jsonUserProfilesPrefKey, '{"crzi": "Rico"}');
+  //prefs.getOrCreate(activeProfileUserIDPrefKey, userProfileDefault.getUniqueUserID());
+  //prefs.getOrCreate(jsonUserProfilesPrefKey, '[${UserProfile.toJsonString(userProfileDefault)}]');
 
-  UserManager.load();
+  UserProfile.load();
 
 
   // TODO disable debug mode

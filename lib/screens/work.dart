@@ -15,6 +15,7 @@ import 'package:senior_project_hair_ai/api_access.dart';
 import 'package:senior_project_hair_ai/listenable.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
+import 'package:senior_project_hair_ai/screens/user_profile.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 enum WorkPopupItems {
@@ -24,6 +25,7 @@ enum WorkPopupItems {
   openUrl
 }
 
+@Deprecated('Use UserProfiles.workItems json instead')
 const String apiCachedWorkIDListPrefKey = 'api-cached-work-list';
 
 class MyQueuedWorkPage extends StatefulWidget {
@@ -39,8 +41,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
       end: Offset.zero
   );
 
-  late List<String> cachedWorkIDList;
-  late List<UpdateNotifier> workQueueIndexNotifiers;
+  late List<String> workItems;
+  late List<UpdateNotifier> workItemNotifiers;
 
   Stream<TaskProgress> fetchJobStatusPeriodically({
       required String workID,
@@ -80,7 +82,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
           final progress = TaskProgress.fromJson(json);
 
           if (progress.status == 'COMPLETE') {
-            workQueueIndexNotifiers[index].update();
+            workItemNotifiers[index].update();
           } else {
             controller.add(progress);
           }
@@ -107,8 +109,8 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
   void initState() {
     super.initState();
 
-    cachedWorkIDList = prefs.get<List<String>>(apiCachedWorkIDListPrefKey)!.reversed.toList();
-    workQueueIndexNotifiers = List.generate(cachedWorkIDList.length, (_) => UpdateNotifier());
+    workItems = UserProfile.getActiveUserProfile().workItems.reversed.toList();
+    workItemNotifiers = List.generate(workItems.length, (_) => UpdateNotifier());
   }
 
   @override
@@ -124,7 +126,7 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
         title: const Text("Work Queue"),
       ),
       body: Center(
-        child: cachedWorkIDList.isEmpty
+        child: workItems.isEmpty
             ? const Text('Hmm, no work.') :
         Column(
           children: [
@@ -143,9 +145,9 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                 child: AnimatedList(
                   key: _listKey,
                   physics: const AlwaysScrollableScrollPhysics(),
-                  initialItemCount: cachedWorkIDList.length,
+                  initialItemCount: workItems.length,
                   itemBuilder: (context, index, animation) {
-                    final workID = cachedWorkIDList[index];
+                    final workID = workItems[index];
                     return SlideTransition(
                       position: _tween.animate(animation),
                       child: Dismissible(
@@ -189,10 +191,10 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                                     setState(() {
                                       _tween.begin = Offset(direction == DismissDirection.startToEnd ? 1 : -1, 0);
 
-                                      cachedWorkIDList.insert(index, workID);
-                                      prefs.set(apiCachedWorkIDListPrefKey, cachedWorkIDList.reversed.toList());
+                                      workItems.insert(index, workID);
+                                      // TODO save immediately
+                                      UserProfile.getActiveUserProfile().workItems = workItems.reversed.toList();
                                       _listKey.currentState?.insertItem(index);
-                                      //cachedWorkIDList.insert(cachedWorkIDList.length - index, workID);
                                     });
                                   }
                                 ),
@@ -204,16 +206,15 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                         },
                         onDismissed: (_) {
                           setState(() {
-                            cachedWorkIDList.removeAt(index);
-                            //cachedWorkIDList.remove(workID);
-                            prefs.set(apiCachedWorkIDListPrefKey, cachedWorkIDList.reversed.toList());
+                            workItems.removeAt(index);
+                            UserProfile.getActiveUserProfile().workItems = workItems.reversed.toList();
                             _listKey.currentState?.removeItem(index, (context, animation) => Container());
                           });
                         },
                         child: SizeTransition(
                           sizeFactor: animation,
                           child: ListenableBuilder(
-                            listenable: workQueueIndexNotifiers[index],
+                            listenable: workItemNotifiers[index],
                             builder: (context, child) => ListTile(
                               title: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -438,8 +439,9 @@ class _MyQueuedWorkPageState extends State<MyQueuedWorkPage> {
                             ),
                             child: const Text('Clear all'),
                             onPressed: () {
-                              cachedWorkIDList.clear();
-                              prefs.set(apiCachedWorkIDListPrefKey, cachedWorkIDList);
+                              workItems.clear();
+                              //prefs.set(apiCachedWorkIDListPrefKey, workItems);
+                              UserProfile.getActiveUserProfile().workItems = workItems.toList();
                               setState(() {});
                               Navigator.of(context).pop();
                               Fluttertoast.showToast(msg: 'Cleared work queue');

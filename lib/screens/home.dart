@@ -55,15 +55,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<TutorialItem> tutorialItems = [];
 
-  late String activeUserDisplayName;
+  //late String activeUserDisplayName;
+
+  late UserProfile activeUserProfile; // UserProfile.getActiveUserProfile()
+
+  //final _recentItemsNotifier = UpdateNotifier();
 
   void _setCurrentProfile({String ?userID}) {
     setState(() {
-      if (userID == null) {
-        activeUserDisplayName = UserManager.getUserDisplayName(prefs.ensure(activeProfileUserIDPrefKey))!;
-      } else {
-        activeUserDisplayName = UserManager.getUserDisplayName(userID)!;
-      }
+      //activeUserDisplayName = (userID == null ? UserProfile.getActiveUserProfile() : UserProfile.users[userID]!)
+      //    .displayName;
+      activeUserProfile = userID == null ? UserProfile.getActiveUserProfile() : UserProfile.users[userID]!;
     });
   }
 
@@ -85,12 +87,8 @@ class _MyHomePageState extends State<MyHomePage> {
       return;
     }
 
-    //Provider.of<PreferencesProvider>(context).createListOrAdd(recentsListPrefKey, [returnedImage.path]);
     setState(() {
-      //Provider.of<PreferencesProvider>(context, listen: false)
-      //.createListOrAdd(recentsListPrefKey, [result.paths.first!]);
-
-      prefs.createListOrAdd(recentsListPrefKey, [returnedImage.path]);
+      UserProfile.getActiveUserProfile().recentItems.add(returnedImage.path);
     });
   }
 
@@ -189,8 +187,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     // TODO use Listview.builder(...)
                     ListView(
                       padding: const EdgeInsets.only(bottom: 150),
-                      children: prefs
-                          .get<List<String>>(recentsListPrefKey)!
+                      // TODO rebuild dynamic notifier
+                      children:
+                        //prefs.get<List<String>>(recentsListPrefKey)!
+                          activeUserProfile.recentItems
                           .reversed
                           .map((path) {
                             return ListTile(
@@ -309,12 +309,10 @@ class _MyHomePageState extends State<MyHomePage> {
               heroTag: 'home-clear-fab',
               key: editorFloatingKey,
               onPressed: () {
-                // TODO add a list clear to PreferencesProvider
-                //Provider.of<RecentsProvider>(context, listen: false).clearFiles();
-                // MUST trigger the change post-clear
                 setState(() {
-                  // not necessary here
-                  prefs.set(recentsListPrefKey, <String>[]);
+                  // TODO must save profiles after transactions
+                  // TODO add a list clear to PreferencesProvider
+                  activeUserProfile.recentItems.clear();
                 });
               },
               shape: const CircleBorder(),
@@ -331,13 +329,12 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ListView(
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: Text(activeUserDisplayName),
+              accountName: Text(activeUserProfile.displayName),
               accountEmail: null, //Text('john.doe@example.com'),
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.white,
                 child: Text(
-                  //activeUserProfile.g, // 'JD',
-                  UserManager.getAbbreviation(activeUserDisplayName), /// 'test',
+                  activeUserProfile.getAbbreviation(),
                   style: TextStyle(fontSize: 40.0),
                 ),
               ),
@@ -358,30 +355,25 @@ class _MyHomePageState extends State<MyHomePage> {
                                 listenable: lvUpdateNotifier, // actually do not destroy
                                 builder: (context, child) {
                                   // will dynamically rebuild?
-                                  final entriesList = UserManager.users.entries.toList();
+                                  final entriesList = UserProfile.users.entries.toList();
                                   return ListView.builder( // TODO use .builder
                                     itemCount: entriesList.length,
                                     itemBuilder: (context, index) {
                                       // todo build profiles here
                                       // Row(children: <Widget>[Container()])
-                                      final enumUser = entriesList[index];
-                                      final enumUserDisplayName = enumUser
-                                          .value;
-                                      final enumUserID = enumUser.key;
+                                      final enumEntry = entriesList[index];
+                                      final enumUserProfile = enumEntry.value;
+                                      final enumUserID = enumEntry.key;
                                       return ListTile(
                                         leading: CircleAvatar(
                                           backgroundColor: Colors.white,
                                           child: Text(
-                                            //activeUserProfile.g, // 'JD',
-                                            UserManager.getAbbreviation(
-                                                activeUserDisplayName),
-
-                                            /// 'test',
+                                            enumUserProfile.getAbbreviation()
                                             //style: TextStyle(fontSize: 40.0),
                                           ),
                                         ),
                                         //leading: const CircleAvatar(), // const Icon(Icons.person),
-                                        title: Text(enumUserDisplayName),
+                                        title: Text(enumUserProfile.displayName),
                                         // Display name
                                         subtitle: Text(enumUserID),
                                         // id
@@ -425,21 +417,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                         ),
                                         TextButton(
                                           onPressed: () {
-                                            // Do something with the text input
-                                            //print(_textController.text);
-                                            final baseUserID = _textController.text.toLowerCase().replaceAll(' ', '_');
-                                            late String uniqueUserID;
-                                            for (var i=0; i < 999999999999; i++) {
-                                              uniqueUserID = '$baseUserID$i'; // like crzi1
-                                              // Will try to create a user, loop until successful
-                                              if (UserManager.createUser(uniqueUserID, _textController.text)) {
-                                                break;
-                                              }
+                                            final uniqueUserID = UserProfile.getUniqueUserID(_textController.text);
+                                            if (!UserProfile.createUser(uniqueUserID, _textController.text)) {
+                                              Fluttertoast.showToast(msg: 'unexpected');
                                             }
-
-                                            // immediately switch to the profile
-
-                                            //Fluttertoast.showToast(msg: 'Created')
                                             Navigator.of(context).pop();
 
                                             _setCurrentProfile(userID: uniqueUserID);
