@@ -407,6 +407,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 title: Text(enumUserProfile.displayName),
                                                 // Display name
                                                 subtitle: Text(enumUserID),
+                                                //trailing: IconButton(
+                                                //  onPressed: () {
+                                                //    // TODO remove profile
+                                                //  },
+                                                //  icon: const Icon(Icons.clear),
+                                                //),
                                                 // id
                                                 onTap: () {
                                                   // TODO switch to profile
@@ -430,14 +436,29 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
                                       final textController = TextEditingController();
+                                      final formKey = GlobalKey<FormState>();
                                       showDialog(
                                         context: context,
                                         builder: (BuildContext context) {
                                           return AlertDialog(
-                                            title: const Text('Enter Text'),
-                                            content: TextFormField(
-                                              controller: textController,
-                                              decoration: InputDecoration(hintText: "Enter the display name"),
+                                            title: const Text('New profile'),
+                                            content: Form(
+                                              key: formKey,
+                                              child: TextFormField(
+                                                controller: textController,
+                                                validator: (str) {
+                                                  if ((str ?? '').trim().isEmpty) {
+                                                    return 'Must input a display name';
+                                                  }
+
+                                                  if (str!.length < 2) {
+                                                    return 'Name must be at least 2 characters in length';
+                                                  }
+
+                                                  return null;
+                                                },
+                                                decoration: const InputDecoration(hintText: "Enter the profile display name"),
+                                              ),
                                             ),
                                             actions: [
                                               TextButton(
@@ -448,6 +469,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                               ),
                                               TextButton(
                                                 onPressed: () {
+                                                  if (!formKey.currentState!.validate()) {
+                                                    return;
+                                                  }
+
                                                   final uniqueUserID = UserProfile.getUniqueUserID(textController.text);
                                                   if (!UserProfile.createUser(uniqueUserID, textController.text)) {
                                                     Fluttertoast.showToast(msg: 'unexpected');
@@ -463,7 +488,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           );
                                         },
                                       );
-                                      Navigator.pop(context);
+                                      //Navigator.pop(context);
                                     },
                                   ),
                                 ],
