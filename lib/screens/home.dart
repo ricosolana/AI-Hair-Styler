@@ -63,9 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _setCurrentProfile({String ?userID}) {
     setState(() {
-      //activeUserDisplayName = (userID == null ? UserProfile.getActiveUserProfile() : UserProfile.users[userID]!)
-      //    .displayName;
-      activeUserProfile = userID == null ? UserProfile.getActiveUserProfile() : UserProfile.users[userID]!;
+      activeUserProfile = UserProfile.activeUserProfile(userID: userID);
     });
   }
 
@@ -88,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     setState(() {
-      UserProfile.getActiveUserProfile().recentItems.add(returnedImage.path);
+      activeUserProfile.recentItems.add(returnedImage.path);
     });
   }
 

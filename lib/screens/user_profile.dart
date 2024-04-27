@@ -14,7 +14,7 @@ final _rngRandom = Random();
 int randomRange(int minInclusive, int maxExclusive) => minInclusive + _rngRandom.nextInt(maxExclusive - minInclusive);
 
 class UserProfile {
-  //String userID;
+  late String userID;
   String displayName;
   List<String> workItems;
   List<String> recentItems;
@@ -63,7 +63,7 @@ class UserProfile {
           prefs.ensure<String>(jsonUserProfilesPrefKey)) as Map<String,
           dynamic>;
       users = json.map((key, value) =>
-          MapEntry(key, UserProfile.fromJson(value as Map<String, dynamic>)));
+          MapEntry(key, UserProfile.fromJson(value as Map<String, dynamic>)..userID = key));
     } catch (e) {
       // error doesnt really matter, just catch json or missing pref error
 
@@ -104,9 +104,23 @@ class UserProfile {
     );
   }
 
-  static UserProfile getActiveUserProfile() {
-    return users[prefs.ensure(activeProfileUserIDPrefKey)]!;
+  // Get or set the user profile
+  static UserProfile activeUserProfile({String ?userID}) {
+    if (userID != null) {
+      prefs.set(activeProfileUserIDPrefKey, userID);
+    } else {
+      userID = prefs.ensure(activeProfileUserIDPrefKey);
+    }
+    return users[userID]!;
   }
+
+  //static UserProfile setActiveUserProfile(String userID) {
+  //  prefs.set(activeProfileUserIDPrefKey, userID);
+  //  return users[userID]!;
+  //}
+  //static UserProfile getActiveUserProfile() {
+  //  return users[prefs.ensure(activeProfileUserIDPrefKey)]!;
+  //}
 
   // returns whether successful (collision or not)
   static bool createUser(String userID, String displayName) {

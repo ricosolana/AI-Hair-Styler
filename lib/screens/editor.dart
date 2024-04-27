@@ -96,7 +96,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
 
     setState(() {
       _currentImagePath = returnedImage.path;
-      UserProfile.getActiveUserProfile().recentItems.add(returnedImage.path);
+      UserProfile.activeUserProfile().recentItems.add(returnedImage.path);
     });
   }
 
@@ -466,7 +466,7 @@ class _MyEditorPageState extends State<MyEditorPage> {
                   // submit to work queue
                   final workID = map['work-id'] as String;
 
-                  UserProfile.getActiveUserProfile().workItems.add(workID);
+                  UserProfile.activeUserProfile().workItems.add(workID);
 
                   //String imageUrl = apiGeneratedUrl(host, imageName);
 
