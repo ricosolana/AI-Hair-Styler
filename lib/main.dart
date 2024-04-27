@@ -1,25 +1,16 @@
-import 'dart:convert';
-import 'dart:developer';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:provider/provider.dart';
-import 'package:senior_project_hair_ai/api_access.dart';
 import 'package:senior_project_hair_ai/camera_provider.dart';
 import 'package:senior_project_hair_ai/notifications.dart';
 import 'package:senior_project_hair_ai/preferences_provider.dart';
-import 'package:senior_project_hair_ai/screens/capture.dart';
-import 'package:senior_project_hair_ai/screens/colors.dart';
 import 'package:senior_project_hair_ai/screens/home.dart';
 import 'package:senior_project_hair_ai/screens/settings.dart';
 import 'package:senior_project_hair_ai/screens/tutorial.dart';
 import 'package:senior_project_hair_ai/screens/user_profile.dart';
-import 'package:senior_project_hair_ai/screens/work.dart';
-import 'package:senior_project_hair_ai/string_ext.dart';
 import 'package:senior_project_hair_ai/theme_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:workmanager/workmanager.dart';
 
 
 /*
